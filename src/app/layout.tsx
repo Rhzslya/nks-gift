@@ -10,18 +10,18 @@ import AuthProviders from "@/components/ClientWrapper";
 export const metadata: Metadata = {
   title: {
     absolute: "",
-    default: "NSK Gift",
-    template: "NSK Gift | %s ",
+    default: "NKS Gift",
+    template: "NKS Gift | %s ",
   },
   icons: {
     icon: "/icon.png",
     shortcut: "/icon.png",
     apple: "/icon.png",
   },
-  description: "The Online Shop for NSK Gift",
+  description: "The Online Shop for NKS Gift",
   authors: [{ name: "Seira", url: process.env.DOMAIN }],
   openGraph: {
-    title: "NSK Gift",
+    title: "NKS Gift",
     type: "website",
   },
 };

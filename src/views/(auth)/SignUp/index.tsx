@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { validationRegister } from "@/utils/Validations";
-import Button from "@/components/Button";
+import SubmitButton from "@/components/Button/SubmitButton";
 import { registerSubmit } from "@/utils/HandleSubmit";
 import MessageFromAPI from "@/components/Form/MessageFromAPI";
 import LogoForm from "@/components/Form/Image";
@@ -124,7 +124,11 @@ const SignUpViews = () => {
             </div>
 
             <div className="mb-6">
-              <Button isLoading={isLoading} text="Sign Up" type="submit" />
+              <SubmitButton
+                isLoading={isLoading}
+                text="Sign Up"
+                type="submit"
+              />
             </div>
 
             <div className="mb-6">

@@ -17,7 +17,7 @@ const Button: React.FC<ButtonProps> = ({
       disabled={isLoading}
       type={type}
       onClick={handleClick}
-      className="w-full bg-sky-400 text-white px-2 py-[6px] text-sm rounded hover:bg-sky-300 duration-300"
+      className="w-full bg-sky-400 text-white px-2 py-[6px] text-[15px] rounded hover:bg-sky-300 duration-300 "
     >
       {isLoading ? "Loading..." : text}
     </button>
