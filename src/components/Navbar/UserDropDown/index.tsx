@@ -29,7 +29,7 @@ const UserDropDown: React.FC<UserDropDownProps> = ({
       >
         <div className="hover:bg-gray-200 p-1 rounded-full duration-150">
           <Image
-            src={user.profileImage || `/images/profile.png`}
+            src={user.profileImage || `/user-profile.png`}
             width={100}
             height={100}
             alt={user.username}
@@ -47,7 +47,7 @@ const UserDropDown: React.FC<UserDropDownProps> = ({
           <div className="border-b-[1px]">
             <div className="profile relative flex flex-col justify-center items-center gap-1 py-2 z-10">
               <Image
-                src={user.profileImage || `/images/profile.png`}
+                src={user.profileImage || `/user-profile.png`}
                 width={100}
                 height={100}
                 alt={user.username}

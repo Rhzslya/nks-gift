@@ -20,9 +20,10 @@ const NavLink: React.FC<NavLinkProps> = ({
           <Image
             src="/icon.png"
             alt="NKS Gift"
-            width={100}
-            height={100}
-            className="h-12 w-12 object-contain"
+            width={50}
+            height={0}
+            className="w-14 object-contain"
+            loading="lazy"
           />
         </Link>
       </div>
