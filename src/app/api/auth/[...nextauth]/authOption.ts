@@ -3,7 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import User from "@/models/userModels";
 import { connect } from "@/dbConfig/dbConfig";
 import GoogleProvider from "next-auth/providers/google";
-import { signIn } from "../sign-in/route";
+import { signIn } from "../../../../lib/services/sign-in/route";
 
 export const authOptions: NextAuthOptions = {
   session: {
