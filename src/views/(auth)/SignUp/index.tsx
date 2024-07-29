@@ -1,18 +1,17 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { validationRegister } from "@/utils/Validations";
 import SubmitButton from "@/components/Button/SubmitButton";
-import { registerSubmit } from "@/utils/HandleSubmit";
+import { handleSignUp } from "@/utils/HandleSubmit";
 import MessageFromAPI from "@/components/Form/MessageFromAPI";
 import LogoForm from "@/components/Form/Image";
 import LabelAndInput from "@/components/Form/Label";
 import FormLink from "@/components/Form/FormLink";
+import { handleChange } from "@/utils/handleChange";
 const SignUpViews = () => {
-  const router = useRouter();
+  const { push } = useRouter();
   const [user, setUser] = useState({
     email: "",
     password: "",
@@ -24,29 +23,17 @@ const SignUpViews = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    await registerSubmit({
+    await handleSignUp({
       user,
       setErrors,
       setIsLoading,
       setMessage,
       validation: validationRegister,
       e,
-      responseAPI: "/api/auth/signup",
+      responseAPI: "/api/auth/sign-up",
       method: "POST",
+      push,
     });
-  };
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setUser((prevUser) => ({
-      ...prevUser,
-      [name]: value,
-    }));
-
-    // Remove specific error message when user starts typing
-    setErrors((prevErrors) => ({
-      ...prevErrors,
-      [name]: "",
-    }));
   };
 
   // Delete Message
@@ -82,7 +69,7 @@ const SignUpViews = () => {
                 name="username"
                 text="username"
                 value={user.username}
-                handleChange={handleChange}
+                handleChange={(e) => handleChange({ e, setUser, setErrors })}
                 error={errors.username}
               />
             </div>
@@ -94,7 +81,7 @@ const SignUpViews = () => {
                 name="email"
                 text="email"
                 value={user.email}
-                handleChange={handleChange}
+                handleChange={(e) => handleChange({ e, setUser, setErrors })}
                 error={errors.email}
               />
             </div>
@@ -106,7 +93,7 @@ const SignUpViews = () => {
                 name="password"
                 text="password"
                 value={user.password}
-                handleChange={handleChange}
+                handleChange={(e) => handleChange({ e, setUser, setErrors })}
                 error={errors.password}
               />
             </div>
@@ -118,7 +105,7 @@ const SignUpViews = () => {
                 name="confirmpassword"
                 text="confirm password"
                 value={user.confirmpassword}
-                handleChange={handleChange}
+                handleChange={(e) => handleChange({ e, setUser, setErrors })}
                 error={errors.confirmpassword}
               />
             </div>
@@ -133,7 +120,7 @@ const SignUpViews = () => {
 
             <div className="mb-6">
               <FormLink
-                href="/login"
+                href="/sign-in"
                 text="Have an Account? Login"
                 textLink="Here"
               />

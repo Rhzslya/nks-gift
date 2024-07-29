@@ -1,6 +1,6 @@
 export const disableNavAndFooter = [
-  "/login",
-  "/register",
+  "/sign-in",
+  "/sign-up",
   "/verifyemail",
   "/update-email",
   "/checkemail",
