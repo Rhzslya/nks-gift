@@ -1,49 +1,51 @@
 import mongoose from "mongoose";
-// Error Pending Register in fetch/XHR >>> Delete Plugin
-const AutoIncrement = require("mongoose-sequence")(mongoose); // Hapus plugin ini sementara
+const AutoIncrement = require("mongoose-sequence")(mongoose);
 
-const userSchema = new mongoose.Schema({
-  googleId: {
-    type: String,
-    require: false,
+const userSchema = new mongoose.Schema(
+  {
+    googleId: {
+      type: String,
+      required: false,
+    },
+    profileImage: {
+      type: String,
+      required: false,
+    },
+    username: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: false,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    isAdmin: {
+      type: Boolean,
+      default: false,
+    },
+    type: {
+      type: [String],
+      default: [],
+      enum: ["credentials", "google", "facebook"],
+    },
+    forgotPasswordToken: String,
+    forgotPasswordTokenExpiry: Date,
+    verifyToken: String,
+    verifyTokenExpiry: Date,
   },
-  profileImage: {
-    type: String,
-    require: false,
-  },
-  username: {
-    type: String,
-    required: [true, "Please provide username"],
-  },
-  email: {
-    type: String,
-    required: [true, "Please provide email"],
-    unique: true,
-  },
-  password: {
-    type: String,
-    required: false,
-  },
-  isVerified: {
-    type: Boolean,
-    default: false,
-  },
-  isAdmin: {
-    type: Boolean,
-    default: false,
-  },
-  type: {
-    type: String,
-    require: false,
-  },
-  forgotPasswordToken: String,
-  forgotPasswordTokenExpiry: Date,
-  verifyToken: String,
-  verifyTokenExpiry: Date,
-});
+  { timestamps: true }
+);
 
-// Tambahkan plugin AutoIncrement ke skema jika versi mongoose-sequence terbaru mendukung
-userSchema.plugin(AutoIncrement, { inc_field: "id" });
+userSchema.plugin(AutoIncrement, { inc_field: "userId" });
 
 const User = mongoose.models.users || mongoose.model("users", userSchema);
 

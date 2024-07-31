@@ -6,24 +6,42 @@ import bcryptjs from "bcryptjs";
 connect();
 
 export async function POST(request: NextRequest) {
-  //Defines an Asyncronus Function
-
   try {
-    //Get Data User From Body
     const reqBody = await request.json();
     const { username, email, password } = reqBody;
 
-    // Check Email if Already in Database
+    // Check if email is already used by a Google user
+    const userGoogle = await User.findOne({
+      email,
+      googleId: { $exists: true },
+    });
+
+    if (userGoogle) {
+      // Update the user with new credentials
+      const salt = await bcryptjs.genSalt(10);
+      const hashedPassword = await bcryptjs.hash(password, salt);
+      userGoogle.username = username;
+      userGoogle.password = hashedPassword;
+      userGoogle.type.push("credentials");
+      await userGoogle.save();
+
+      return NextResponse.json({
+        message: "Account updated with new credentials",
+        success: true,
+        user: userGoogle,
+      });
+    }
+
+    // Check if email is already in the database
     const user = await User.findOne({ email });
 
-    // If User already in Database and User is Verified, return response 400
     if (user) {
       return NextResponse.json(
         { message: "Email already exists" },
         { status: 400 }
       );
     } else {
-      //hash password using bcryptjs.
+      // Hash password using bcryptjs
       const salt = await bcryptjs.genSalt(10);
       const hashedPassword = await bcryptjs.hash(password, salt);
 
@@ -31,9 +49,10 @@ export async function POST(request: NextRequest) {
         username,
         email,
         password: hashedPassword,
+        type: ["credentials"],
       });
 
-      // Saves the new user to the database.
+      // Save the new user to the database
       const savedUser = await newUser.save();
 
       return NextResponse.json({

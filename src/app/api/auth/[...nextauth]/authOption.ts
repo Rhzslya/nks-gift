@@ -4,6 +4,7 @@ import User from "@/models/userModels";
 import { connect } from "@/dbConfig/dbConfig";
 import GoogleProvider from "next-auth/providers/google";
 import { signIn } from "../../../../lib/services/sign-in/route";
+import { handleGoogleSignIn } from "@/lib/services/sign-in-google/route";
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -51,28 +52,13 @@ export const authOptions: NextAuthOptions = {
       console.log(account);
       console.log(profile);
 
-      if (account?.provider === "google") {
-        const existingUser = await User.findOne({ email: user.email });
-        if (existingUser) {
-          await existingUser.save();
-          user.id = existingUser._id.toString();
-          user.isAdmin = existingUser.isAdmin;
-        } else {
-          const newUser = new User({
-            email: user.email,
-            profileImage: profile.picture,
-            username: user.name,
-            googleId: user.id,
-            isAdmin: false,
-            isVerified: profile.email_verified,
-            type: "google",
-          });
-          await newUser.save();
-          user.id = newUser._id.toString();
-          user.isAdmin = newUser.isAdmin;
-
-          console.log(newUser);
+      try {
+        if (account?.provider === "google") {
+          return await handleGoogleSignIn(user, profile);
         }
+      } catch (error) {
+        console.error("Error in signIn callback:", error);
+        return false; // Return false to prevent sign-in on error
       }
       return true;
     },
@@ -85,18 +71,9 @@ export const authOptions: NextAuthOptions = {
         token.isVerified = user.isVerified;
 
         if (account?.provider === "google") {
-          token.email = user.email;
           token.type = "google";
           token.profileImage = profile.picture;
-          token.username = user.name;
-          token.id = user.id;
-          token.googleId = account.id;
-          token.isAdmin = user.isAdmin;
           token.isVerified = profile.email_verified;
-
-          console.log(token.profileImage);
-          console.log(token.id);
-          console.log(token.googleId);
         }
       }
 
@@ -106,6 +83,7 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
         token.isAdmin = existingUser.isAdmin;
+        token.username = existingUser.username;
       }
       console.log("Token after:", token);
       return token;
