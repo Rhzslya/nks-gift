@@ -8,10 +8,8 @@ export async function signIn(email: string, password: string) {
     throw new Error("Email or password is incorrect. Please try again.");
   }
 
-  if (user.type?.google && !user.password) {
-    throw new Error(
-      "This account is linked with Google. Please log in using Google."
-    );
+  if (!user.password) {
+    throw new Error("Email or password is incorrect. Please try again.");
   }
 
   if (!user.isVerified) {
