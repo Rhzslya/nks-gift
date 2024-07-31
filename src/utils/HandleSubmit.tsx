@@ -14,9 +14,9 @@ export const handleSignUp = async ({
   user: {
     email: string;
     password: string;
-    confirmpassword?: string;
     username?: string;
   };
+
   setErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setMessage: React.Dispatch<React.SetStateAction<string>>;
@@ -55,11 +55,8 @@ export const handleSignUp = async ({
     }
   } catch (error) {
     if (error instanceof Error) {
-      if (error.message === "Email Already Exist") {
-        setErrors((prevErrors: any) => ({
-          ...prevErrors,
-          email: error.message,
-        }));
+      if (error instanceof Error) {
+        console.log(error);
       }
     } else {
       setMessage("Signup failed");

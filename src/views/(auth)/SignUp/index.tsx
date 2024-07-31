@@ -9,18 +9,35 @@ import MessageFromAPI from "@/components/Form/MessageFromAPI";
 import LogoForm from "@/components/Form/Image";
 import LabelAndInput from "@/components/Form/Label";
 import FormLink from "@/components/Form/FormLink";
-import { handleChange } from "@/utils/handleChange";
+import { handleChange, handlePasswordChange } from "@/utils/handleChange";
 const SignUpViews = () => {
   const { push } = useRouter();
   const [user, setUser] = useState({
     email: "",
     password: "",
-    confirmpassword: "",
     username: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [passwordCriteria, setPasswordCriteria] = useState({
+    length: false,
+    combination: false,
+    specialChar: false,
+  });
+
+  console.log(passwordCriteria);
+
+  const handlePasswordChangeWrapper = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    handlePasswordChange({
+      e,
+      setPasswordCriteria,
+      setUser,
+      setErrors,
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     await handleSignUp({
@@ -42,7 +59,6 @@ const SignUpViews = () => {
       const timer = setTimeout(() => {
         setMessage("");
       }, 3000);
-
       return () => clearTimeout(timer);
     }
   }, [message]);
@@ -62,7 +78,7 @@ const SignUpViews = () => {
               <LogoForm src="/icon.png" alt="NKS Gift" />
             </div>
 
-            <div className="flex flex-col text-md mb-6">
+            <div className="flex flex-col text-md mb-4">
               <LabelAndInput
                 id="username"
                 type="text"
@@ -74,7 +90,7 @@ const SignUpViews = () => {
               />
             </div>
 
-            <div className="flex flex-col text-md mb-6">
+            <div className="flex flex-col text-md mb-4">
               <LabelAndInput
                 id="email"
                 type="email"
@@ -86,31 +102,20 @@ const SignUpViews = () => {
               />
             </div>
 
-            <div className="flex flex-col text-md mb-6">
+            <div className="flex flex-col text-md mb-4">
               <LabelAndInput
                 id="password"
                 type="password"
                 name="password"
                 text="password"
                 value={user.password}
-                handleChange={(e) => handleChange({ e, setUser, setErrors })}
-                error={errors.password}
+                handlePasswordChange={handlePasswordChangeWrapper}
+                isPasswordSignUp
+                passwordCriteria={passwordCriteria}
               />
             </div>
 
-            <div className="flex flex-col text-md mb-6">
-              <LabelAndInput
-                id="confirmpassword"
-                type="password"
-                name="confirmpassword"
-                text="confirm password"
-                value={user.confirmpassword}
-                handleChange={(e) => handleChange({ e, setUser, setErrors })}
-                error={errors.confirmpassword}
-              />
-            </div>
-
-            <div className="mb-6">
+            <div className="mb-4">
               <SubmitButton
                 isLoading={isLoading}
                 text="Sign Up"

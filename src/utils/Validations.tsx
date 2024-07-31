@@ -2,7 +2,6 @@ type User = {
   username: string;
   email: string;
   password: string;
-  confirmpassword: string;
 };
 
 type UserLogin = {
@@ -24,39 +23,21 @@ export const validationRegister = (user: User) => {
 
   const email_pattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,6}$/;
 
-  if (!user.username) {
-    errors.username = "Username is required";
-  }
-
   if (!user.email) {
     errors.email = "Email is required";
   } else if (!email_pattern.test(user.email)) {
     errors.email = "Email is Invalid";
   }
 
-  // Password validation
-  if (!user.password) {
-    errors.password = "Password is required";
-  } else if (user.password.length < 8) {
-    errors.password = "Password must be at least 8 characters long";
-  } else if (!/[A-Z]/.test(user.password)) {
-    errors.password = "Password must contain at least one uppercase letter";
-  } else if (!/[a-z]/.test(user.password)) {
-    errors.password = "Password must contain at least one lowercase letter";
-  } else if (!/[0-9]/.test(user.password)) {
-    errors.password = "Password must contain at least one number";
-  } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(user.password)) {
-    errors.password = "Password must contain at least one special character";
+  // Password Validation
+  if (user.password.length < 8) {
+    errors.password = "Minimum of 8 characters";
   }
-
-  if (!user.confirmpassword) {
-    errors.confirmpassword = "Confirm password is required";
-  } else if (
-    user.password &&
-    user.confirmpassword &&
-    user.password !== user.confirmpassword
-  ) {
-    errors.confirmpassword = "Passwords do not match";
+  if (!/(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])/.test(user.password)) {
+    errors.password = "Uppercase, lowercase, and one number";
+  }
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(user.password)) {
+    errors.password = "One special character";
   }
 
   return errors;
