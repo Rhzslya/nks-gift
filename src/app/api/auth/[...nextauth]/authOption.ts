@@ -71,14 +71,14 @@ export const authOptions: NextAuthOptions = {
         };
       }
 
-      if (token.id) {
-        const existingUser = await User.findById(token.id);
-        if (!existingUser) {
-          return null;
-        }
-        token.isAdmin = existingUser.isAdmin;
-        token.username = existingUser.username;
-      }
+      // if (token.id) {
+      //   const existingUser = await User.findById(token.id);
+      //   if (!existingUser) {
+      //     return null;
+      //   }
+      //   token.isAdmin = existingUser.isAdmin;
+      //   token.username = existingUser.username;
+      // }
 
       console.log("Token after:", token);
       return token;
