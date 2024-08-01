@@ -15,7 +15,7 @@ export async function middleware(req: NextRequest, res: NextResponse) {
     path === "/reset-password" ||
     path === "/forgot-password";
 
-  const onlyAdmin = path === "/dashboard";
+  const onlyAdmin = path.split("/")[1] === "admin";
 
   // Get the token from the request
   const token = await getToken({
@@ -31,12 +31,12 @@ export async function middleware(req: NextRequest, res: NextResponse) {
     return NextResponse.redirect(new URL("/", req.nextUrl));
   }
 
-  // If trying to access a protected path without a token, redirect to the login page
+  // If trying to access a protected path without a token, redirect to the sign-in page
   if (!isPublicPath && !token) {
     console.log(
-      "Redirecting to the login page because the path is protected and no token was found"
+      "Redirecting to the sign-in page because the path is protected and no token was found"
     );
-    const url = new URL("/login", req.url);
+    const url = new URL("/sign-in", req.url);
     url.searchParams.set("callbackUrl", encodeURI(req.url));
     return NextResponse.redirect(url, { status: 303 });
   }
@@ -61,5 +61,6 @@ export const config = {
     "/404",
     "/not-found",
     "/settings/:path*",
+    "/admin/:path*",
   ],
 };
