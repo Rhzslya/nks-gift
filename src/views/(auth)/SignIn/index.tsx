@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { signIn, useSession, getSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { validationLogin } from "@/utils/Validations";
 import MessageFromAPI from "@/components/Form/MessageFromAPI";
 import LogoForm from "@/components/Form/Image";
@@ -13,18 +13,18 @@ import SubmitButton from "@/components/Button/SubmitButton";
 import FormLink from "@/components/Form/FormLink";
 import { handleSignIn } from "@/utils/HandleSubmit";
 import { handleChange } from "@/utils/handleChange";
-const SignInViews = ({ searchParams }: any) => {
+const SignInViews = () => {
   const { push, refresh } = useRouter();
   const [user, setUser] = useState({
     email: "",
     password: "",
   });
+  const searchParams = useSearchParams();
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const callbackUrl = searchParams?.callbackUrl || "/";
-
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
   const handleSubmit = async (e: any) => {
     await handleSignIn({
       user,

@@ -2,7 +2,7 @@
 import { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/fragements/Navbar";
 import { disableNavAndFooter } from "@/utils/Hide";
 // import Footer from "@/components/Footer/Footer";
 // import HashModal from "@/components/Modal/HashModal";

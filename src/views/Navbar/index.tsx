@@ -6,8 +6,8 @@ import { sectionsNav } from "@/utils/Sections";
 import { isActiveLink } from "@/utils/ActiveLink";
 import { signOut, signIn, useSession } from "next-auth/react";
 import AuthButton from "@/components/Button/AuthButton";
-import NavLink from "../../components/Navbar/NavLink";
-import UserDropDown from "@/components/Navbar/UserDropDown";
+import NavLink from "@/components/NavLink";
+import UserDropDown from "@/components/UserDropDown";
 import { disableNavAndFooter } from "@/utils/Hide";
 
 const NavbarViews = ({ serverSession }: { serverSession: any }) => {
@@ -29,7 +29,7 @@ const NavbarViews = ({ serverSession }: { serverSession: any }) => {
 
   return (
     <>
-      {!disableNavAndFooter.includes(path) && (
+      {!disableNavAndFooter.includes(path.split("/")[1]) && (
         <header className="flex justify-center border-b-[1px] border-gray-300 px-6 bg-white">
           <nav className="w-[1400px] flex items-center justify-between text-base text-neutral-700 font-semi-bold h-14">
             <NavLink
