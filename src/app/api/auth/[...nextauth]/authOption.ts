@@ -1,8 +1,8 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 import User from "@/models/userModels";
 import { connect } from "@/dbConfig/dbConfig";
-import GoogleProvider from "next-auth/providers/google";
 import { signIn } from "../../../../lib/services/sign-in/route";
 import { handleGoogleSignIn } from "@/lib/services/sign-in-google/route";
 
@@ -29,9 +29,8 @@ export const authOptions: NextAuthOptions = {
           email: string;
           password: string;
         };
-
         await connect();
-        return await signIn(email, password);
+        return signIn(email, password);
       },
     }),
     GoogleProvider({
@@ -41,40 +40,35 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async redirect({ url, baseUrl }) {
-      if (url.startsWith(baseUrl)) {
-        return url;
-      }
-      return baseUrl;
+      return url.startsWith(baseUrl) ? url : baseUrl;
     },
     async signIn({ user, account, profile }: any) {
       await connect();
-      console.log(user);
-      console.log(account);
-      console.log(profile);
-
-      try {
-        if (account?.provider === "google") {
+      if (account?.provider === "google") {
+        try {
           return await handleGoogleSignIn(user, profile);
+        } catch (error) {
+          console.error("Error in signIn callback:", error);
+          return false;
         }
-      } catch (error) {
-        console.error("Error in signIn callback:", error);
-        return false; // Return false to prevent sign-in on error
       }
       return true;
     },
     async jwt({ token, user, account, profile }: any) {
       if (user) {
-        token.email = user.email;
-        token.username = user.username;
-        token.id = user.id;
-        token.isAdmin = user.isAdmin;
-        token.isVerified = user.isVerified;
-
-        if (account?.provider === "google") {
-          token.type = "google";
-          token.profileImage = profile.picture;
-          token.isVerified = profile.email_verified;
-        }
+        token = {
+          ...token,
+          email: user.email,
+          username: user.username,
+          id: user.id,
+          isAdmin: user.isAdmin,
+          isVerified: user.isVerified,
+          type: account?.provider === "google" ? "google" : token.type,
+          profileImage:
+            account?.provider === "google"
+              ? profile.picture
+              : token.profileImage,
+        };
       }
 
       if (token.id) {
@@ -85,6 +79,7 @@ export const authOptions: NextAuthOptions = {
         token.isAdmin = existingUser.isAdmin;
         token.username = existingUser.username;
       }
+
       console.log("Token after:", token);
       return token;
     },
@@ -98,7 +93,6 @@ export const authOptions: NextAuthOptions = {
         isVerified: token.isVerified,
         type: token.type,
       };
-
       return session;
     },
   },

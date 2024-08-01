@@ -4,6 +4,8 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/fragements/Navbar";
 import { disableNavAndFooter } from "@/utils/Hide";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+
 // import Footer from "@/components/Footer/Footer";
 // import HashModal from "@/components/Modal/HashModal";
 import AuthProviders from "@/components/ClientWrapper";
@@ -51,6 +53,7 @@ export default function RootLayout({
           {children}
           {/* {<HashModal />} */}
           {/* <Footer /> */}
+          <SpeedInsights />
         </AuthProviders>
       </body>
     </html>

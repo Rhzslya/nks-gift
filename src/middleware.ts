@@ -1,27 +1,25 @@
 import { NextResponse, NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-export async function middleware(req: NextRequest, res: NextResponse) {
+export async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
 
   // Define paths that are considered public (accessible without a token)
+  const isPublicPath = [
+    "/",
+    "/sign-in",
+    "/sign-up",
+    "/verifyemail",
+    "/checkemail",
+    "/reset-password",
+    "/forgot-password",
+  ].includes(path);
 
-  const isPublicPath =
-    path === "/" ||
-    path === "/sign-in" ||
-    path === "/sign-up" ||
-    path === "/verifyemail" ||
-    path === "/checkemail" ||
-    path === "/reset-password" ||
-    path === "/forgot-password";
-
-  const onlyAdmin = path.split("/")[1] === "admin";
+  // Define paths that are restricted to admin users
+  const onlyAdmin = path.startsWith("/admin");
 
   // Get the token from the request
-  const token = await getToken({
-    req,
-    secret: process.env.TOKEN_SECRET,
-  });
+  const token = await getToken({ req, secret: process.env.TOKEN_SECRET });
 
   if (isPublicPath && token) {
     // If trying to access a public path with a token, redirect to the home page
@@ -41,9 +39,15 @@ export async function middleware(req: NextRequest, res: NextResponse) {
     return NextResponse.redirect(url, { status: 303 });
   }
 
+  // If trying to access an admin path without admin privileges, redirect to the home page
   if (onlyAdmin && token?.isAdmin !== true) {
+    console.log(
+      "Redirecting to the home page because the path is admin and the user is not an admin"
+    );
     return NextResponse.redirect(new URL("/", req.nextUrl));
   }
+
+  return NextResponse.next();
 }
 
 // It specifies the paths for which this middleware should be executed.
@@ -57,7 +61,7 @@ export const config = {
     "/checkemail",
     "/reset-password",
     "/forgot-password",
-    "/dashboard/:path",
+    "/dashboard/:path*",
     "/404",
     "/not-found",
     "/settings/:path*",
