@@ -1,5 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
+import User from "@/models/userModels";
+import { connect } from "@/dbConfig/dbConfig";
 
 export async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;

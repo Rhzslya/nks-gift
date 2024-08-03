@@ -17,9 +17,7 @@ export async function signIn(email: string, password: string) {
   }
 
   const validPassword = await bcryptjs.compare(password, user.password);
-  console.log(email);
-  console.log(password);
-  console.log(user.type);
+
   if (!validPassword) {
     throw new Error("Email or password is incorrect. Please try again.");
   }

@@ -6,26 +6,23 @@ export async function handleGoogleSignIn(user: any, profile: any) {
   if (existingUser) {
     // Update existing user
     if (!existingUser.type?.includes("google")) {
-      existingUser.type.push("google"); // Update type to include Google
+      existingUser.type.push("google");
       existingUser.googleId = user.id;
       existingUser.profileImage = profile.picture;
       existingUser.isVerified = profile.email_verified;
-      existingUser.username = existingUser.username || user.username;
-
-      console.log(existingUser);
+      existingUser.username = existingUser.username || user.name;
     } else {
       // Set type to Google
       existingUser.googleId = user.id;
       existingUser.profileImage = profile.picture;
       existingUser.isVerified = profile.email_verified;
-      existingUser.username = existingUser.username || user.username;
-
-      console.log(existingUser);
+      existingUser.username = existingUser.username || user.name;
     }
     await existingUser.save();
     user.id = existingUser._id.toString();
     user.isAdmin = existingUser.isAdmin;
     user.type = existingUser.type;
+    user.username = existingUser.username;
   } else {
     // Create new user
     const newUser = new User({

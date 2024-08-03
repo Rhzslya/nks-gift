@@ -54,12 +54,12 @@ export const authOptions: NextAuthOptions = {
       }
       return true;
     },
-    async jwt({ token, user, account, profile }: any) {
+    async jwt({ token, user, account, profile, existingUser }: any) {
       if (user) {
         token = {
           ...token,
           email: user.email,
-          username: user.username,
+          username: user.username || user.name,
           id: user.id,
           isAdmin: user.isAdmin,
           isVerified: user.isVerified,
@@ -70,15 +70,6 @@ export const authOptions: NextAuthOptions = {
               : token.profileImage,
         };
       }
-
-      // if (token.id) {
-      //   const existingUser = await User.findById(token.id);
-      //   if (!existingUser) {
-      //     return null;
-      //   }
-      //   token.isAdmin = existingUser.isAdmin;
-      //   token.username = existingUser.username;
-      // }
 
       console.log("Token after:", token);
       return token;
@@ -99,4 +90,5 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: "/sign-in",
   },
+  debug: true,
 };
