@@ -9,8 +9,15 @@ const UserManagement = () => {
 
   useEffect(() => {
     const getAllUsers = async () => {
+      setLoading(true);
       try {
-        const response = await fetch("/api/users");
+        const response = await fetch("/api/users", {
+          headers: {
+            "Cache-Control": "no-cache",
+            "Content-Type": "application/json",
+          },
+          method: "GET",
+        });
         const data = await response.json();
         setUsers(data.data);
       } catch (error) {
