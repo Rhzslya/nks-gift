@@ -5,11 +5,18 @@ import User from "@/models/userModels";
 connect();
 export async function GET() {
   try {
-    // Ambil semua pengguna, kecualikan field password
+    // Fetch all users excluding certain fields
     const users = await User.find({}).select(
       "-_id -password -__v -googleId -updatedAt"
     );
-    return NextResponse.json({ status: true, statusCode: 200, data: users });
+
+    const response = NextResponse.json({
+      status: true,
+      statusCode: 200,
+      data: users,
+    });
+    response.headers.set("Cache-Control", "no-store");
+    return response;
   } catch (error) {
     console.error(error);
     return NextResponse.json(
