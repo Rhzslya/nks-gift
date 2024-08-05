@@ -2,9 +2,8 @@ import { NextResponse } from "next/server";
 import { connect } from "@/dbConfig/dbConfig";
 import User from "@/models/userModels";
 
+connect();
 export async function GET() {
-  await connect();
-
   try {
     // Ambil semua pengguna, kecualikan field password
     const users = await User.find({}).select(
