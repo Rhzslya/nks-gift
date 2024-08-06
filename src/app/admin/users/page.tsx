@@ -9,8 +9,8 @@ const UserManagement = () => {
 
   useEffect(() => {
     const getAllUsers = async () => {
-      setLoading(true);
       try {
+        setLoading(true);
         const response = await fetch(
           `/api/users?timestamp=${new Date().getTime()}`,
           {
@@ -32,9 +32,9 @@ const UserManagement = () => {
     };
 
     getAllUsers();
-  }, []);
+  }, [setLoading]);
 
-  return <UsersManagementViews users={users} />;
+  return <UsersManagementViews users={users} loading={loading} />;
 };
 
 export default UserManagement;

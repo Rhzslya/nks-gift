@@ -92,7 +92,7 @@ const Sidebar: React.FC<ListsTypes> = ({ lists }) => {
           type="button"
           handleClick={signOut}
           text="Logout"
-          variant="pink"
+          variant="skyBlue"
         />
       </div>
     </div>
