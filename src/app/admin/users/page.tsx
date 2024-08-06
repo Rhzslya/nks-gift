@@ -1,7 +1,7 @@
 "use client";
 
-import UsersManagementViews from "@/views/Admin/Users";
 import React, { useState, useEffect } from "react";
+import UsersManagementViews from "@/views/Admin/Users";
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -14,6 +14,7 @@ const UserManagement = () => {
         const response = await fetch(
           `/api/users?timestamp=${new Date().getTime()}`,
           {
+            next: { revalidate: 1 },
             headers: {
               "Cache-Control": "no-cache",
               "Content-Type": "application/json",
@@ -33,7 +34,7 @@ const UserManagement = () => {
     getAllUsers();
   }, []);
 
-  return <UsersManagementViews users={users} loading={loading} />;
+  return <UsersManagementViews users={users} />;
 };
 
 export default UserManagement;

@@ -15,12 +15,10 @@ interface Users {
 
 interface UsersManagementViewsProps {
   users: Users[];
-  loading: boolean;
 }
 
 const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   users,
-  loading,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,14 +76,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
               </tr>
             </thead>
             <tbody className="bg-white">
-              {loading ? (
-                <tr>
-                  <td colSpan={tableHeaders.length} className="text-center p-4">
-                    Loading...
-                  </td>
-                </tr>
-              ) : (
-                filteredUsers.length > 0 &&
+              {filteredUsers.length > 0 &&
                 filteredUsers.map((user) => (
                   <tr key={user.userId}>
                     <td className="px-4 py-2 text-left text-xs font-medium text-gray-500 tracking-wider border-r-8 border-gray-100">
@@ -110,8 +101,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
                       {new Date(user.createdAt).toLocaleDateString()}
                     </td>
                   </tr>
-                ))
-              )}
+                ))}
             </tbody>
           </table>
         </div>
