@@ -23,6 +23,10 @@ body {
   box-shadow: 4px 0 6px rgba(0, 0, 0, 0.1); /* Atur ukuran dan warna shadow sesuai kebutuhan */
 }
 
+.shadow {
+  box-shadow: 2px 2px 7px 1px rgba(0, 0, 0, 0.2);
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

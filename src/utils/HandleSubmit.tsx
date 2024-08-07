@@ -1,3 +1,4 @@
+import { authServices } from "@/lib/services/auth";
 import { signIn } from "next-auth/react";
 
 export const handleSignUp = async ({
@@ -32,21 +33,14 @@ export const handleSignUp = async ({
 
   try {
     if (Object.keys(validationErrors).length === 0) {
-      const response = await fetch(responseAPI, {
-        method: method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(user),
-      });
-
+      const response = await authServices.signUpAccount(user);
       if (response.status === 200) {
         e.target.reset();
         setIsLoading(false);
         push("/sign-in");
       }
 
-      const data = await response.json();
+      const data = await response.data;
 
       if (response.status === 400) {
         setIsLoading(false);

@@ -7,7 +7,7 @@ export const GET = async (request: NextRequest, response: NextResponse) => {
     connect();
     // Fetch all users excluding certain fields
     const users = await User.find({}).select(
-      "-_id -password -__v -googleId -updatedAt"
+      "-userId -password -__v -googleId -updatedAt"
     );
 
     const path = request.nextUrl.searchParams.get("path") || "/";

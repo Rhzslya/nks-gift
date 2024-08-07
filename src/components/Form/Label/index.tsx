@@ -18,6 +18,8 @@ interface LabelAndInputProps {
     combination: boolean;
     specialChar: boolean;
   };
+  disabled?: boolean;
+  textStyle?: string;
 }
 
 const LabelAndInput: React.FC<LabelAndInputProps> = ({
@@ -31,6 +33,8 @@ const LabelAndInput: React.FC<LabelAndInputProps> = ({
   error,
   isPasswordSignUp,
   passwordCriteria,
+  disabled,
+  textStyle = "text-sm text-black",
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [hasBeenTouched, setHasBeenTouched] = useState(false);
@@ -64,11 +68,15 @@ const LabelAndInput: React.FC<LabelAndInputProps> = ({
         ? "border-red-500"
         : "border-gray-400"
       : "border-gray-400"
-  } text-sm w-full`;
+  } text-sm w-full ${
+    disabled ? "opacity-70 cursor-not-allowed" : ""
+  } ${textStyle}`;
 
   return (
     <div className="">
-      <label htmlFor={id}>{capitalizeFirst(text)}</label>
+      <label htmlFor={id} className={textStyle}>
+        {capitalizeFirst(text)}
+      </label>
       <div className="relative mt-2">
         <input
           type={isPasswordVisible && type === "password" ? "text" : type}
@@ -78,6 +86,7 @@ const LabelAndInput: React.FC<LabelAndInputProps> = ({
           onChange={handleInputChange}
           onFocus={() => setHasBeenTouched(true)}
           className={inputClassName}
+          disabled={disabled}
         />
         {type === "password" && (
           <span

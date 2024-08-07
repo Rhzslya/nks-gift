@@ -12,7 +12,7 @@ const UserManagement = () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `/api/users?timestamp=${new Date().getTime()}`,
+          `/api/users/get-users?timestamp=${new Date().getTime()}`,
           {
             next: { revalidate: 1 },
             headers: {
@@ -34,6 +34,7 @@ const UserManagement = () => {
     getAllUsers();
   }, [setLoading]);
 
+  console.log(users);
   return <UsersManagementViews users={users} loading={loading} />;
 };
 
