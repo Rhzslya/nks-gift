@@ -20,7 +20,7 @@ export async function handleGoogleSignIn(user: any, profile: any) {
     }
     await existingUser.save();
     user.id = existingUser._id.toString();
-    user.isAdmin = existingUser.isAdmin;
+    user.role = existingUser.role;
     user.type = existingUser.type;
     user.username = existingUser.username;
   } else {
@@ -30,14 +30,14 @@ export async function handleGoogleSignIn(user: any, profile: any) {
       username: user.name,
       googleId: user.id,
       profileImage: profile.picture,
-      isAdmin: false,
+      role: "user",
       isVerified: profile.email_verified,
       type: ["google"], // Set type to Google
     });
 
     await newUser.save();
     user.id = newUser._id.toString();
-    user.isAdmin = newUser.isAdmin;
+    user.role = newUser.role;
     user.type = newUser.type;
   }
 

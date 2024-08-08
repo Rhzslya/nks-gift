@@ -61,7 +61,7 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           username: user.username || user.name,
           id: user.id,
-          isAdmin: user.isAdmin,
+          role: user.role,
           isVerified: user.isVerified,
           type: account?.provider === "google" ? "google" : token.type,
           profileImage:
@@ -71,6 +71,7 @@ export const authOptions: NextAuthOptions = {
         };
       }
 
+      console.log(token.role);
       console.log("Token after:", token);
       return token;
     },
@@ -80,7 +81,7 @@ export const authOptions: NextAuthOptions = {
         profileImage: token.profileImage,
         email: token.email,
         username: token.username,
-        isAdmin: token.isAdmin,
+        role: token.role,
         isVerified: token.isVerified,
         type: token.type,
       };

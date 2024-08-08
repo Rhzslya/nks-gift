@@ -26,7 +26,7 @@ export async function signIn(email: string, password: string) {
     id: user._id.toString(),
     username: user.username,
     email: user.email,
-    isAdmin: user.isAdmin,
+    role: user.role,
     isVerified: user.isVerified,
     type: user.type,
   };

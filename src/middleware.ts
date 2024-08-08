@@ -42,7 +42,11 @@ export async function middleware(req: NextRequest) {
   }
 
   // If trying to access an admin path without admin privileges, redirect to the home page
-  if (onlyAdmin && token?.isAdmin !== true) {
+  if (
+    onlyAdmin &&
+    (typeof token?.role !== "string" ||
+      !["admin", "super_admin", "manager"].includes(token.role))
+  ) {
     console.log(
       "Redirecting to the home page because the path is admin and the user is not an admin"
     );

@@ -5,12 +5,13 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import MyPagination from "@/utils/Pagination";
 import Modal from "@/components/fragements/Modal";
+import { useSession } from "next-auth/react";
 import ModalUpdatedUser from "@/components/ModalUpdatedUser";
 interface Users {
   username: string;
   email: string;
   type: any;
-  isAdmin: boolean;
+  role: string;
   isVerified: boolean;
   createdAt: string;
   _id: string;
@@ -21,6 +22,11 @@ interface UsersManagementViewsProps {
   users: Users[];
   loading: boolean;
 }
+
+type Role = "user" | "manager" | "admin" | "super_admin";
+type RoleOrder = {
+  [key in Role]: number;
+};
 
 const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   users,
@@ -38,7 +44,10 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   const editedUser = users.find((user) => user._id === modalEditUser);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [activeUserId, setActiveUserId] = useState<string | null>(null);
-
+  const { data: session } = useSession();
+  const userInSession = session?.user;
+  const currentUserRole = userInSession?.role;
+  console.log(currentUserRole);
   // Open User Settings
   const handleSettingOpen = (_id: string) => {
     setActiveUserId(activeUserId === _id ? null : _id);
@@ -79,6 +88,13 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   };
 
   console.log(editedUser);
+  const roleOrder: RoleOrder = {
+    user: 3,
+    manager: 2,
+    admin: 1,
+    super_admin: 0,
+  };
+
   const sortedUsers = [...users].sort((a, b) => {
     if (sortBy === "username") {
       if (sortOrder === "asc") {
@@ -98,9 +114,9 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
       }
     } else if (sortBy === "accessLevel") {
       if (sortOrder === "asc") {
-        return a.isAdmin === b.isAdmin ? 0 : a.isAdmin ? -1 : 1;
+        return roleOrder[a.role as Role] - roleOrder[b.role as Role];
       } else if (sortOrder === "desc") {
-        return a.isAdmin === b.isAdmin ? 0 : a.isAdmin ? 1 : -1;
+        return roleOrder[b.role as Role] - roleOrder[a.role as Role];
       }
     }
     return 0;
@@ -200,7 +216,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
                     }`}
                     onClick={() => handleSortChange("asc", "accessLevel")}
                   >
-                    Sort by Access Level (Admin First)
+                    Sort by Access Level (Higher First)
                   </button>
                   <button
                     className={`block px-4 py-2 text-xs text-gray-500 hover:bg-gray-100 w-full text-left ${
@@ -209,7 +225,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
                     }`}
                     onClick={() => handleSortChange("desc", "accessLevel")}
                   >
-                    Sort by Access Level (User First)
+                    Sort by Access Level (Lower First)
                   </button>
                 </div>
               )}
@@ -260,7 +276,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
                         {user._id.slice(0, 8)}
                       </td>
                       <td className="px-4 py-3 text-left text-xs font-medium text-gray-500 tracking-wider ">
-                        {user.isAdmin ? "Admin" : "User"}
+                        {capitalizeFirst(user.role)}
                       </td>
                       <td
                         className={`px-4 py-3 text-left text-xs font-medium tracking-wider ${
@@ -340,8 +356,10 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
       </div>
       {modalEditUser !== null && editedUser ? (
         <ModalUpdatedUser
+          roleOrder={roleOrder}
           editedUser={editedUser}
           handleCloseModal={handleCloseModal}
+          currentUserRole={currentUserRole} // Pass current user role here
         />
       ) : null}
     </div>

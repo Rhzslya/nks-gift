@@ -1,3 +1,4 @@
+import { capitalizeFirst } from "@/utils/Capitalize";
 import React from "react";
 
 interface SelectProps {
@@ -7,6 +8,7 @@ interface SelectProps {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   textStyle?: string;
+  disabled?: boolean;
 }
 
 const Select: React.FC<SelectProps> = ({
@@ -16,18 +18,20 @@ const Select: React.FC<SelectProps> = ({
   value,
   onChange,
   textStyle,
+  disabled,
 }) => {
   return (
     <div className="flex flex-col mb-4">
       <label htmlFor={id} className={textStyle}>
-        {name}
+        {capitalizeFirst(name)}
       </label>
       <select
         id={id}
         name={name}
         value={value}
         onChange={onChange}
-        className="px-2 py-2 rounded bg-transparent border-[1px] border-gray-400 text-sm w-full"
+        className="px-2 py-[5px] rounded bg-transparent border-[1px] border-gray-400 text-sm w-full"
+        disabled={disabled}
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>

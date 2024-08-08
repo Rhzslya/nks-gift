@@ -4,22 +4,27 @@ import LabelAndInput from "../Form/Label";
 import Select from "../Select";
 import SubmitButton from "../Button/SubmitButton";
 import { authServices } from "@/lib/services/auth";
+import { capitalizeFirst } from "@/utils/Capitalize";
 interface User {
   username: string;
   email: string;
   isVerified: boolean;
-  isAdmin: boolean;
+  role: string;
   _id: string; // Ubah dari number ke string
 }
 
 interface ModalUpdatedUserProps {
   editedUser: User;
   handleCloseModal: () => void;
+  currentUserRole: any;
+  roleOrder: any;
 }
 
 const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
   editedUser,
   handleCloseModal,
+  currentUserRole,
+  roleOrder,
 }) => {
   const [updatedUser, setUpdatedUser] = useState<User>(editedUser);
   const [isLoading, setIsLoading] = useState(false);
@@ -29,10 +34,11 @@ const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
     const { name, value } = e.target;
     setUpdatedUser((prevUser) => ({
       ...prevUser,
-      isAdmin: value === "Admin",
+      role: value,
     }));
   };
 
+  console.log(roleOrder);
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -49,7 +55,7 @@ const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
             username: updatedUser.username,
             email: updatedUser.email,
             isVerified: updatedUser.isVerified,
-            isAdmin: updatedUser.isAdmin,
+            role: updatedUser.role,
           },
         }),
       });
@@ -76,7 +82,25 @@ const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
     }
   };
 
-  console.log(updatedUser);
+  // Determine allowed roles based on current user's role
+  const allowedRoles = Object.keys(roleOrder).filter(
+    (role) => roleOrder[role] >= roleOrder[currentUserRole]
+  );
+
+  console.log(allowedRoles);
+
+  const filteredOptions = [
+    { value: "user", label: "User" },
+    { value: "manager", label: "Manager" },
+    { value: "admin", label: "Admin" },
+    { value: "super_admin", label: "Super Admin" },
+  ].filter((option) => allowedRoles.includes(option.value));
+
+  const canEditRole = roleOrder[editedUser.role] >= roleOrder[currentUserRole];
+  console.log(roleOrder[editedUser.role]);
+  console.log(editedUser);
+  console.log(filteredOptions);
+  console.log(updatedUser.role);
   return (
     <Modal onClose={handleCloseModal}>
       <div className="w-[300px]">
@@ -118,18 +142,28 @@ const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
             />
           </div>
           <div className="flex flex-col text-md mb-4">
-            <Select
-              id="accessLevel"
-              name="accessLevel"
-              options={[
-                { value: "Admin", label: "Admin" },
-                { value: "User", label: "User" },
-              ]}
-              value={updatedUser.isAdmin ? "Admin" : "User"}
-              onChange={handleChange}
-              textStyle="text-xs font-medium"
-            />
+            {canEditRole ? (
+              <Select
+                id="role"
+                name="role"
+                options={filteredOptions}
+                value={updatedUser.role}
+                onChange={handleChange}
+                textStyle="text-xs font-medium"
+              />
+            ) : (
+              <LabelAndInput
+                id="role"
+                type="text"
+                name="role"
+                text="Role"
+                value={capitalizeFirst(updatedUser.role)}
+                disabled
+                textStyle="text-xs font-medium"
+              />
+            )}
           </div>
+
           <div className="mb-4">
             <SubmitButton type="submit" isLoading={isLoading} text="Save" />
           </div>
