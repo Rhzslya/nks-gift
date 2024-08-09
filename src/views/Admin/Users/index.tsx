@@ -1,4 +1,11 @@
-import React, { useState, useMemo, ReactEventHandler } from "react";
+import React, {
+  useState,
+  useMemo,
+  ReactEventHandler,
+  useRef,
+  useEffect,
+  MouseEventHandler,
+} from "react";
 import { tableHeaders } from "@/utils/TableHeaders";
 import { capitalizeFirst } from "@/utils/Capitalize";
 import Skeleton from "react-loading-skeleton";
@@ -47,10 +54,21 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   const { data: session } = useSession();
   const userInSession = session?.user;
   const currentUserRole = userInSession?.role;
-  console.log(currentUserRole);
-  // Open User Settings
-  const handleSettingOpen = (_id: string) => {
-    setActiveUserId(activeUserId === _id ? null : _id);
+
+  const buttonDotRef = useRef();
+  const menuSettingRef = useRef<HTMLDivElement | null>(null);
+  // Open or close User Settings based on click
+  const handleSettingToggle = (_id: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    setActiveUserId((prev) => (prev === _id ? null : _id));
+  };
+
+  const handleGlobalClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    const isMenuClick = menuSettingRef.current?.contains(event.target as Node);
+
+    if (!isMenuClick && activeUserId !== null) {
+      setActiveUserId(null);
+    }
   };
 
   // open Filter
@@ -60,6 +78,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
 
   // open Modal Edit User
   const handleModalEditUser = (_id: string) => {
+    setActiveUserId(null);
     setModalEditUser(modalEditUser === _id ? null : _id);
   };
 
@@ -87,7 +106,6 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
     setCurrentPage(1);
   };
 
-  console.log(editedUser);
   const roleOrder: RoleOrder = {
     user: 3,
     manager: 2,
@@ -137,10 +155,9 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   ) => sortBy === field && sortOrder === order;
 
   const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
-  console.log(editedUser);
 
   return (
-    <div className="w-full">
+    <div onClick={(e) => handleGlobalClick(e)} className="w-full">
       <header className="border-b-[1px] border-gray-300 px-6 bg-white -z-10">
         <nav className="flex items-center justify-between text-base text-gray-500 font-semi-bold h-28">
           <div className="flex">
@@ -289,37 +306,34 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
                         {new Date(user.createdAt).toLocaleDateString()}
                       </td>
                       <td className="text-left text-[20px] font-medium text-gray-500 tracking-wider ">
-                        <div className="relative">
+                        <div className="relative z-50 " ref={menuSettingRef}>
                           <button
-                            className=""
-                            onClick={() => handleSettingOpen(user._id)}
+                            onClick={(e) => {
+                              handleSettingToggle(user._id, e);
+                            }}
                           >
-                            <i className="bx bx-dots-vertical-rounded"></i>
+                            <i className="relative bx bx-dots-vertical-rounded "></i>
                           </button>
                           {activeUserId === user._id && (
-                            <div className="absolute z-50 right-full top-0">
-                              <div className="bg-white rounded-md shadow flex flex-col">
-                                <button
-                                  className="px-1 hover:bg-gray-100 duration-300"
-                                  onClick={() => handleModalEditUser(user._id)}
-                                >
-                                  <div className="flex gap-x-2 w-[120px] py-2">
-                                    <i className="bx bxs-pencil text-[16px]"></i>
-                                    <p className="text-xs">Edit</p>
-                                  </div>
-                                </button>
-                                <button
-                                  className="px-1 hover:bg-gray-100 duration-300"
-                                  onClick={() => alert("Delete User")}
-                                >
-                                  <div className="flex gap-x-2 w-[120px] py-2 ">
-                                    <i className="bx bxs-trash text-[16px]"></i>
-                                    <p className="text-xs text-red-500">
-                                      Delete
-                                    </p>
-                                  </div>
-                                </button>
-                              </div>
+                            <div className="absolute right-full top-0 bg-white rounded-md shadow flex flex-col">
+                              <button
+                                className="px-1 hover:bg-gray-100 duration-300"
+                                onClick={() => handleModalEditUser(user._id)}
+                              >
+                                <div className="flex gap-x-2 w-[120px] py-2">
+                                  <i className="bx bxs-pencil text-[16px]"></i>
+                                  <p className="text-xs">Edit</p>
+                                </div>
+                              </button>
+                              <button
+                                className="px-1 hover:bg-gray-100 duration-300"
+                                onClick={() => alert("Delete User")}
+                              >
+                                <div className="flex gap-x-2 w-[120px] py-2">
+                                  <i className="bx bxs-trash text-[16px]"></i>
+                                  <p className="text-xs text-red-500">Delete</p>
+                                </div>
+                              </button>
                             </div>
                           )}
                         </div>
