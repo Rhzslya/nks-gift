@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Modal from "../fragements/Modal";
 import LabelAndInput from "../Form/Label";
 import Select from "../Select";
 import SubmitButton from "../Button/SubmitButton";
 import { authServices } from "@/lib/services/auth";
 import { capitalizeFirst } from "@/utils/Capitalize";
+import MessageFromAPI from "../Form/MessageFromAPI";
 interface User {
   username: string;
   email: string;
@@ -18,6 +19,7 @@ interface ModalUpdatedUserProps {
   handleCloseModal: () => void;
   currentUserRole: any;
   roleOrder: any;
+  setUsersData: any;
 }
 
 const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
@@ -25,10 +27,15 @@ const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
   handleCloseModal,
   currentUserRole,
   roleOrder,
+  setUsersData,
 }) => {
   const [updatedUser, setUpdatedUser] = useState<User>(editedUser);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [isModified, setIsModified] = useState(false);
+
+  // Fetch Data Again When a user data is edited
+
   // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -36,7 +43,12 @@ const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
       ...prevUser,
       role: value,
     }));
+
+    setIsModified(value !== editedUser.role);
   };
+
+  console.log(isModified);
+  console.log(editedUser);
 
   console.log(roleOrder);
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -62,8 +74,16 @@ const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
-        setMessage("User updated successfully");
+        setMessage(data.message);
+        setTimeout(() => {
+          handleCloseModal();
+        }, 3000);
+        // Memperbarui daftar pengguna
+        setUsersData((prevUsers: User[]) =>
+          prevUsers.map((user) =>
+            user._id === updatedUser._id ? updatedUser : user
+          )
+        );
       } else {
         const errorData = await response.json();
         setMessage(
@@ -87,8 +107,6 @@ const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
     (role) => roleOrder[role] >= roleOrder[currentUserRole]
   );
 
-  console.log(allowedRoles);
-
   const filteredOptions = [
     { value: "user", label: "User" },
     { value: "manager", label: "Manager" },
@@ -97,10 +115,17 @@ const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
   ].filter((option) => allowedRoles.includes(option.value));
 
   const canEditRole = roleOrder[editedUser.role] >= roleOrder[currentUserRole];
-  console.log(roleOrder[editedUser.role]);
-  console.log(editedUser);
-  console.log(filteredOptions);
-  console.log(updatedUser.role);
+
+  // Delete Message
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => {
+        setMessage("");
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
   return (
     <Modal onClose={handleCloseModal}>
       <div className="w-[300px]">
@@ -108,6 +133,8 @@ const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
           <h3>Edit User</h3>
         </div>
         <form onSubmit={(e) => handleSubmit(e)}>
+          <MessageFromAPI message={message} />
+
           <div className="flex flex-col mb-4">
             <LabelAndInput
               id="username"
@@ -165,7 +192,12 @@ const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
           </div>
 
           <div className="mb-4">
-            <SubmitButton type="submit" isLoading={isLoading} text="Save" />
+            <SubmitButton
+              disabled={!isModified || isLoading}
+              type="submit"
+              isLoading={isLoading}
+              text="Save"
+            />
           </div>
         </form>
       </div>

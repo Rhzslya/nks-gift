@@ -1,7 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { connect } from "@/dbConfig/dbConfig";
 import User from "@/models/userModels";
-
 export const PUT = async (request: NextRequest) => {
   try {
     await connect();
@@ -26,6 +25,7 @@ export const PUT = async (request: NextRequest) => {
     return NextResponse.json({
       status: true,
       statusCode: 200,
+      message: "User Update Succesfully",
       data: user, // Kembalikan data user yang telah diperbarui
     });
   } catch (error) {

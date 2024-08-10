@@ -54,7 +54,7 @@ export const authOptions: NextAuthOptions = {
       }
       return true;
     },
-    async jwt({ token, user, account, profile, existingUser }: any) {
+    async jwt({ token, user, account, profile, trigger, session }: any) {
       if (user) {
         token = {
           ...token,
@@ -71,8 +71,6 @@ export const authOptions: NextAuthOptions = {
         };
       }
 
-      console.log(token.role);
-      console.log("Token after:", token);
       return token;
     },
     async session({ session, token }: any) {

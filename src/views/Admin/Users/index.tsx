@@ -23,6 +23,7 @@ interface Users {
   createdAt: string;
   _id: string;
   profileImage?: string;
+  userId?: number;
 }
 
 interface UsersManagementViewsProps {
@@ -54,8 +55,14 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   const { data: session } = useSession();
   const userInSession = session?.user;
   const currentUserRole = userInSession?.role;
+  const [usersData, setUsersData] = useState<Users[]>([]);
 
-  const buttonDotRef = useRef();
+  useEffect(() => {
+    setUsersData(users);
+  }, [users]);
+
+  console.log(usersData);
+  console.log(userInSession?.id);
   const menuSettingRef = useRef<HTMLDivElement | null>(null);
   // Open or close User Settings based on click
   const handleSettingToggle = (_id: string, event: React.MouseEvent) => {
@@ -113,7 +120,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
     super_admin: 0,
   };
 
-  const sortedUsers = [...users].sort((a, b) => {
+  const sortedUsers = [...usersData].sort((a, b) => {
     if (sortBy === "username") {
       if (sortOrder === "asc") {
         return a.username.localeCompare(b.username);
@@ -267,7 +274,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
               </tr>
             </thead>
 
-            <tbody className="bg-white">
+            <tbody className={`bg-white`}>
               {loading
                 ? Array(15)
                     .fill(null)
@@ -282,17 +289,24 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
                     ))
                 : paginatedUsers.length > 0 &&
                   paginatedUsers.map((user) => (
-                    <tr key={user._id}>
-                      <td className="px-4 py-3 text-left text-xs font-medium text-gray-500 tracking-wider border-r-8 border-gray-100">
+                    <tr
+                      key={user._id}
+                      className={`text-gray-500 ${
+                        user._id === userInSession?.id ? "bg-green-200" : ""
+                      }`}
+                    >
+                      <td
+                        className={`px-4 py-3 text-left text-xs font-medium  tracking-wider border-r-8 border-gray-100 `}
+                      >
                         {capitalizeFirst(user.username)}
                       </td>
-                      <td className="px-4 py-3 text-left text-xs font-medium text-gray-500 tracking-wider ">
+                      <td className="px-4 py-3 text-left text-xs font-medium  tracking-wider ">
                         {user.email}
                       </td>
-                      <td className="px-4 py-3 text-left text-xs font-medium text-gray-500 tracking-wider ">
+                      <td className="px-4 py-3 text-left text-xs font-medium  tracking-wider ">
                         {user._id.slice(0, 8)}
                       </td>
-                      <td className="px-4 py-3 text-left text-xs font-medium text-gray-500 tracking-wider ">
+                      <td className="px-4 py-3 text-left text-xs font-medium  tracking-wider ">
                         {capitalizeFirst(user.role)}
                       </td>
                       <td
@@ -302,10 +316,10 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
                       >
                         {user.isVerified ? "Verified" : "Not Verified"}
                       </td>
-                      <td className="px-4 py-3 text-left text-xs font-medium text-gray-500 tracking-wider ">
+                      <td className="px-4 py-3 text-left text-xs font-medium  tracking-wider ">
                         {new Date(user.createdAt).toLocaleDateString()}
                       </td>
-                      <td className="text-left text-[20px] font-medium text-gray-500 tracking-wider ">
+                      <td className="text-left text-[20px] font-medium  tracking-wider ">
                         <div className="relative z-50 " ref={menuSettingRef}>
                           <button
                             onClick={(e) => {
@@ -370,6 +384,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
       </div>
       {modalEditUser !== null && editedUser ? (
         <ModalUpdatedUser
+          setUsersData={setUsersData}
           roleOrder={roleOrder}
           editedUser={editedUser}
           handleCloseModal={handleCloseModal}
