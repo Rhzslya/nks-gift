@@ -55,6 +55,10 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
     async jwt({ token, user, account, profile, trigger, session }: any) {
+      if (trigger === "update" && session?.role) {
+        token.role = session.role;
+      }
+
       if (user) {
         token = {
           ...token,

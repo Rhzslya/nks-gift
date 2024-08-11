@@ -49,39 +49,93 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   >("");
   const [modalEditUser, setModalEditUser] = useState<string | null>(null);
   // Find the user by _id
-  const editedUser = users.find((user) => user._id === modalEditUser);
+
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [activeUserId, setActiveUserId] = useState<string | null>(null);
-  const { data: session } = useSession();
+  const { data: session, update } = useSession();
   const userInSession = session?.user;
   const currentUserRole = userInSession?.role;
   const [usersData, setUsersData] = useState<Users[]>([]);
+  const editedUser = usersData.find((user) => user._id === modalEditUser);
 
   useEffect(() => {
     setUsersData(users);
   }, [users]);
 
-  console.log(usersData);
-  console.log(userInSession?.id);
-  const menuSettingRef = useRef<HTMLDivElement | null>(null);
+  const menuSettingRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+  const settingButtonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>(
+    {}
+  );
+
+  const filterRef = useRef<HTMLDivElement | null>(null);
+  const filterButtonRef = useRef<HTMLButtonElement | null>(null);
   // Open or close User Settings based on click
+
+  // const handleGlobalClick = (event: React.MouseEvent<HTMLDivElement>) => {
+  //   const isMenuClick = menuSettingRefs.current?.contains(event.target as Node);
+
+  //   if (!isMenuClick && activeUserId !== null) {
+  //     setActiveUserId(null);
+  //   }
+  // };
+
+  // Open & Close Menu Setting Start
+  useEffect(() => {
+    const handleCloseSettingOutside = (e: MouseEvent) => {
+      if (activeUserId) {
+        const menuSettingRef = menuSettingRefs.current[activeUserId];
+        const settingButtonRef = settingButtonRefs.current[activeUserId];
+
+        if (
+          menuSettingRef &&
+          !menuSettingRef.contains(e.target as Node) &&
+          settingButtonRef &&
+          !settingButtonRef.contains(e.target as Node)
+        ) {
+          setActiveUserId(null);
+        }
+      }
+    };
+
+    document.addEventListener("mousedown", handleCloseSettingOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleCloseSettingOutside);
+    };
+  }, [activeUserId]);
+
   const handleSettingToggle = (_id: string, event: React.MouseEvent) => {
     event.stopPropagation();
     setActiveUserId((prev) => (prev === _id ? null : _id));
   };
 
-  const handleGlobalClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    const isMenuClick = menuSettingRef.current?.contains(event.target as Node);
+  // Open & Close Menu Setting End
 
-    if (!isMenuClick && activeUserId !== null) {
-      setActiveUserId(null);
-    }
-  };
+  // Open & Close Filter Start
+  useEffect(() => {
+    const handleCloseFilterOutside = (e: MouseEvent) => {
+      if (
+        filterRef.current &&
+        !filterRef.current.contains(e.target as Node) &&
+        !filterButtonRef.current?.contains(e.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
 
-  // open Filter
+    document.addEventListener("mousedown", handleCloseFilterOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleCloseFilterOutside);
+    };
+  }, [filterRef, isDropdownOpen]);
+
+  // Toggle Dropdown
   const handleToggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
+    setIsDropdownOpen((prev) => !prev);
   };
+
+  // Open & Close Filter End
 
   // open Modal Edit User
   const handleModalEditUser = (_id: string) => {
@@ -164,7 +218,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
 
   return (
-    <div onClick={(e) => handleGlobalClick(e)} className="w-full">
+    <div className="w-full">
       <header className="border-b-[1px] border-gray-300 px-6 bg-white -z-10">
         <nav className="flex items-center justify-between text-base text-gray-500 font-semi-bold h-28">
           <div className="flex">
@@ -189,15 +243,19 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
               />
             </div>
             <div className="relative pl-10">
-              <button onClick={handleToggleDropdown}>
+              <button onClick={handleToggleDropdown} ref={filterButtonRef}>
                 <i
                   className={`bx bx-filter text-[28px] text-gray-600 cursor-pointer rounded-md hover:bg-gray-300 duration-300 ${
                     isDropdownOpen && "bg-gray-300"
                   }`}
                 ></i>
               </button>
+
               {isDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg z-50">
+                <div
+                  ref={filterRef}
+                  className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg z-50"
+                >
                   <button
                     className={`block px-4 py-2 text-xs text-gray-500 hover:bg-gray-100 w-full text-left ${
                       isActive("asc", "username") && "bg-gray-300 text-gray-700"
@@ -320,8 +378,11 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
                         {new Date(user.createdAt).toLocaleDateString()}
                       </td>
                       <td className="text-left text-[20px] font-medium  tracking-wider ">
-                        <div className="relative z-50 " ref={menuSettingRef}>
+                        <div className="relative z-50 ">
                           <button
+                            ref={(el) => {
+                              settingButtonRefs.current[user._id] = el;
+                            }}
                             onClick={(e) => {
                               handleSettingToggle(user._id, e);
                             }}
@@ -329,7 +390,12 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
                             <i className="relative bx bx-dots-vertical-rounded "></i>
                           </button>
                           {activeUserId === user._id && (
-                            <div className="absolute right-full top-0 bg-white rounded-md shadow flex flex-col">
+                            <div
+                              ref={(el) => {
+                                menuSettingRefs.current[user._id] = el;
+                              }}
+                              className="absolute right-full top-0 bg-white rounded-md shadow flex flex-col"
+                            >
                               <button
                                 className="px-1 hover:bg-gray-100 duration-300"
                                 onClick={() => handleModalEditUser(user._id)}
@@ -388,7 +454,9 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
           roleOrder={roleOrder}
           editedUser={editedUser}
           handleCloseModal={handleCloseModal}
-          currentUserRole={currentUserRole} // Pass current user role here
+          currentUserRole={currentUserRole}
+          update={update}
+          userInSession={userInSession} // Pass current user role here
         />
       ) : null}
     </div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { SetStateAction, useEffect, useState } from "react";
 import Modal from "../fragements/Modal";
 import LabelAndInput from "../Form/Label";
 import Select from "../Select";
@@ -6,6 +6,7 @@ import SubmitButton from "../Button/SubmitButton";
 import { authServices } from "@/lib/services/auth";
 import { capitalizeFirst } from "@/utils/Capitalize";
 import MessageFromAPI from "../Form/MessageFromAPI";
+import { useRouter } from "next/navigation";
 interface User {
   username: string;
   email: string;
@@ -20,6 +21,8 @@ interface ModalUpdatedUserProps {
   currentUserRole: any;
   roleOrder: any;
   setUsersData: any;
+  update: any;
+  userInSession: any;
 }
 
 const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
@@ -28,35 +31,37 @@ const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
   currentUserRole,
   roleOrder,
   setUsersData,
+  update,
+  userInSession,
 }) => {
   const [updatedUser, setUpdatedUser] = useState<User>(editedUser);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [isModified, setIsModified] = useState(false);
-
-  // Fetch Data Again When a user data is edited
+  const { push } = useRouter();
 
   // Handle input changes
+  console.log(userInSession);
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
     setUpdatedUser((prevUser) => ({
       ...prevUser,
       role: value,
+      [name]: value,
     }));
 
     setIsModified(value !== editedUser.role);
   };
 
-  console.log(isModified);
-  console.log(editedUser);
-
-  console.log(roleOrder);
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
       const response = await fetch("/api/users/update-users", {
+        next: {
+          revalidate: 1,
+        },
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -75,15 +80,25 @@ const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
       if (response.ok) {
         const data = await response.json();
         setMessage(data.message);
-        setTimeout(() => {
-          handleCloseModal();
-        }, 3000);
+
         // Memperbarui daftar pengguna
         setUsersData((prevUsers: User[]) =>
           prevUsers.map((user) =>
             user._id === updatedUser._id ? updatedUser : user
           )
         );
+
+        if (userInSession.id === updatedUser._id) {
+          await update({ role: updatedUser.role });
+
+          if (updatedUser.role === "user") {
+            push("/");
+          }
+        }
+
+        setTimeout(() => {
+          handleCloseModal();
+        }, 1000);
       } else {
         const errorData = await response.json();
         setMessage(
@@ -114,7 +129,7 @@ const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
     { value: "super_admin", label: "Super Admin" },
   ].filter((option) => allowedRoles.includes(option.value));
 
-  const canEditRole = roleOrder[editedUser.role] >= roleOrder[currentUserRole];
+  const canEditRole = roleOrder[updatedUser.role] >= roleOrder[currentUserRole];
 
   // Delete Message
   useEffect(() => {
@@ -126,6 +141,19 @@ const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
     }
   }, [message]);
 
+  useEffect(() => {
+    if (userInSession?.role === "user") {
+      push("/");
+    }
+  }, [userInSession, push]);
+
+  console.log(userInSession);
+  console.log(editedUser.role);
+
+  setTimeout(() => {
+    console.log(editedUser.role);
+  }, 5000);
+  console.log(updatedUser.role);
   return (
     <Modal onClose={handleCloseModal}>
       <div className="w-[300px]">

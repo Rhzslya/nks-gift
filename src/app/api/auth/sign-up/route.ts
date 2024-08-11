@@ -14,6 +14,7 @@ export async function POST(request: NextRequest) {
     const userGoogle = await User.findOne({
       email,
       googleId: { $exists: true },
+      type: ["google"],
     });
 
     if (userGoogle) {
@@ -33,8 +34,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if email is already in the database
-    const user = await User.findOne({ email });
-
+    const user = await User.findOne({
+      email: { $regex: new RegExp(`^${email}$`, "i") },
+    });
+    console.log(user);
     if (user) {
       return NextResponse.json(
         { message: "Email already exists" },

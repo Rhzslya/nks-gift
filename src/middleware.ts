@@ -72,5 +72,6 @@ export const config = {
     "/not-found",
     "/settings/:path*",
     "/admin/:path*",
+    "/admin/users",
   ],
 };

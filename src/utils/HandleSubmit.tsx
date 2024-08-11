@@ -33,15 +33,20 @@ export const handleSignUp = async ({
 
   try {
     if (Object.keys(validationErrors).length === 0) {
-      const response = await authServices.signUpAccount(user);
+      const response = await fetch("api/auth/sign-up", {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify(user),
+      });
       if (response.status === 200) {
         e.target.reset();
         setIsLoading(false);
         push("/sign-in");
       }
 
-      const data = await response.data;
-
+      const data = await response.json();
       if (response.status === 400) {
         setIsLoading(false);
         setMessage(data.message);
