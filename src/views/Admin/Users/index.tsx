@@ -1,19 +1,14 @@
-import React, {
-  useState,
-  useMemo,
-  ReactEventHandler,
-  useRef,
-  useEffect,
-  MouseEventHandler,
-} from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { tableHeaders } from "@/utils/TableHeaders";
 import { capitalizeFirst } from "@/utils/Capitalize";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import MyPagination from "@/utils/Pagination";
-import Modal from "@/components/fragements/Modal";
-import { useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import ModalUpdatedUser from "@/components/ModalUpdatedUser";
+import Image from "next/image";
+import UserDropDown from "@/components/UserDropDown";
+import AuthButton from "@/components/Button/AuthButton";
 interface Users {
   username: string;
   email: string;
@@ -51,13 +46,15 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   // Find the user by _id
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+
   const [activeUserId, setActiveUserId] = useState<string | null>(null);
   const { data: session, update } = useSession();
   const userInSession = session?.user;
   const currentUserRole = userInSession?.role;
   const [usersData, setUsersData] = useState<Users[]>([]);
   const editedUser = usersData.find((user) => user._id === modalEditUser);
-
+  const [clickedButtonId, setClickedButtonId] = useState<string | null>(null);
   useEffect(() => {
     setUsersData(users);
   }, [users]);
@@ -66,19 +63,12 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   const settingButtonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>(
     {}
   );
+  const [isLoading, setIsLoading] = useState(false);
 
   const filterRef = useRef<HTMLDivElement | null>(null);
   const filterButtonRef = useRef<HTMLButtonElement | null>(null);
-  // Open or close User Settings based on click
-
-  // const handleGlobalClick = (event: React.MouseEvent<HTMLDivElement>) => {
-  //   const isMenuClick = menuSettingRefs.current?.contains(event.target as Node);
-
-  //   if (!isMenuClick && activeUserId !== null) {
-  //     setActiveUserId(null);
-  //   }
-  // };
-
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const dropdownButtonRef = useRef<HTMLDivElement | null>(null);
   // Open & Close Menu Setting Start
   useEffect(() => {
     const handleCloseSettingOutside = (e: MouseEvent) => {
@@ -106,7 +96,12 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
 
   const handleSettingToggle = (_id: string, event: React.MouseEvent) => {
     event.stopPropagation();
+    setClickedButtonId(_id);
     setActiveUserId((prev) => (prev === _id ? null : _id));
+
+    setTimeout(() => {
+      setClickedButtonId(null);
+    }, 200);
   };
 
   // Open & Close Menu Setting End
@@ -119,7 +114,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
         !filterRef.current.contains(e.target as Node) &&
         !filterButtonRef.current?.contains(e.target as Node)
       ) {
-        setIsDropdownOpen(false);
+        setIsFilterOpen(false);
       }
     };
 
@@ -128,14 +123,37 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
     return () => {
       document.removeEventListener("mousedown", handleCloseFilterOutside);
     };
-  }, [filterRef, isDropdownOpen]);
+  }, [filterRef, isFilterOpen]);
 
-  // Toggle Dropdown
-  const handleToggleDropdown = () => {
-    setIsDropdownOpen((prev) => !prev);
+  const handleToggleFilter = () => {
+    setIsFilterOpen((prev) => !prev);
   };
 
   // Open & Close Filter End
+
+  // Open & Close Dropdown Start
+  useEffect(() => {
+    const handleCloseDropdownOutside = (e: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node) &&
+        !dropdownButtonRef.current?.contains(e.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleCloseDropdownOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleCloseDropdownOutside);
+    };
+  }, [dropdownRef, isDropdownOpen]);
+
+  const handleToggleDropdown = () => {
+    setIsDropdownOpen((prev) => !prev);
+  };
+  // Open & Close Dropdown End
 
   // open Modal Edit User
   const handleModalEditUser = (_id: string) => {
@@ -223,7 +241,25 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
         <nav className="flex items-center justify-between text-base text-gray-500 font-semi-bold h-28">
           <div className="flex">
             <h1 className="font-semibold">User Management</h1>
-            <div className="flex gap-2 justify-center items-center"></div>
+          </div>
+          <div
+            ref={dropdownButtonRef}
+            className="flex pr-4 gap-2 justify-center items-center"
+          >
+            {userInSession && (
+              <UserDropDown
+                user={{
+                  username: userInSession.username!,
+                  email: userInSession.email!,
+                  profileImage: userInSession.profileImage!,
+                }}
+                handleToggleDropdown={handleToggleDropdown}
+                isDropdownOpen={isDropdownOpen}
+                isLoading={isLoading}
+                signOut={signOut}
+                ref={dropdownRef}
+              />
+            )}
           </div>
         </nav>
       </header>
@@ -243,15 +279,15 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
               />
             </div>
             <div className="relative pl-10">
-              <button onClick={handleToggleDropdown} ref={filterButtonRef}>
+              <button onClick={handleToggleFilter} ref={filterButtonRef}>
                 <i
-                  className={`bx bx-filter text-[28px] text-gray-600 cursor-pointer rounded-md hover:bg-gray-300 duration-300 ${
-                    isDropdownOpen && "bg-gray-300"
+                  className={`bx bx-filter text-[28px] text-gray-500 cursor-pointer rounded-md hover:bg-gray-200 duration-300 ${
+                    isFilterOpen && "bg-gray-200"
                   }`}
                 ></i>
               </button>
 
-              {isDropdownOpen && (
+              {isFilterOpen && (
                 <div
                   ref={filterRef}
                   className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg z-50"
@@ -362,7 +398,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
                         {user.email}
                       </td>
                       <td className="px-4 py-3 text-left text-xs font-medium  tracking-wider ">
-                        {user._id.slice(0, 8)}
+                        {user.userId}
                       </td>
                       <td className="px-4 py-3 text-left text-xs font-medium  tracking-wider ">
                         {capitalizeFirst(user.role)}
@@ -380,6 +416,11 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
                       <td className="text-left text-[20px] font-medium  tracking-wider ">
                         <div className="relative z-50 ">
                           <button
+                            className={`${
+                              clickedButtonId === user._id
+                                ? "bg-gray-200 border-gray-500 border-[1px] "
+                                : ""
+                            } w-[25px] h-[25px]  flex justify-center items-center rounded-full duration-300`}
                             ref={(el) => {
                               settingButtonRefs.current[user._id] = el;
                             }}
@@ -387,14 +428,14 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
                               handleSettingToggle(user._id, e);
                             }}
                           >
-                            <i className="relative bx bx-dots-vertical-rounded "></i>
+                            <i className="relative bx bx-dots-vertical-rounded  "></i>
                           </button>
                           {activeUserId === user._id && (
                             <div
                               ref={(el) => {
                                 menuSettingRefs.current[user._id] = el;
                               }}
-                              className="absolute right-full top-0 bg-white rounded-md shadow flex flex-col"
+                              className="absolute right-[110%] top-0 bg-white rounded-md shadow flex flex-col"
                             >
                               <button
                                 className="px-1 hover:bg-gray-100 duration-300"

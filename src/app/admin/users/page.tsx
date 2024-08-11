@@ -34,7 +34,6 @@ const UserManagement = () => {
     getAllUsers();
   }, [setLoading]);
 
-  console.log(users);
   return <UsersManagementViews users={users} loading={loading} />;
 };
 

@@ -3,7 +3,6 @@ import Modal from "../fragements/Modal";
 import LabelAndInput from "../Form/Label";
 import Select from "../Select";
 import SubmitButton from "../Button/SubmitButton";
-import { authServices } from "@/lib/services/auth";
 import { capitalizeFirst } from "@/utils/Capitalize";
 import MessageFromAPI from "../Form/MessageFromAPI";
 import { useRouter } from "next/navigation";
@@ -12,7 +11,7 @@ interface User {
   email: string;
   isVerified: boolean;
   role: string;
-  _id: string; // Ubah dari number ke string
+  _id: string;
 }
 
 interface ModalUpdatedUserProps {
@@ -41,7 +40,6 @@ const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
   const { push } = useRouter();
 
   // Handle input changes
-  console.log(userInSession);
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
     setUpdatedUser((prevUser) => ({

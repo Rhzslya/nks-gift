@@ -9,7 +9,6 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 // import Footer from "@/components/Footer/Footer";
 // import HashModal from "@/components/Modal/HashModal";
 import AuthProviders from "@/components/ClientWrapper";
-
 export const metadata: Metadata = {
   title: {
     absolute: "",
