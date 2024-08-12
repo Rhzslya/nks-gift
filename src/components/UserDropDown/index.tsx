@@ -23,7 +23,7 @@ type UserDropDownProps = {
 const UserDropDown = forwardRef<HTMLDivElement, UserDropDownProps>(
   ({ user, handleToggleDropdown, isDropdownOpen, isLoading, signOut }, ref) => {
     return (
-      <button className="relative">
+      <div className="relative">
         <div
           className="flex gap-1 justify-center items-center cursor-pointer"
           onClick={handleToggleDropdown}
@@ -77,7 +77,7 @@ const UserDropDown = forwardRef<HTMLDivElement, UserDropDownProps>(
             </div>
           </div>
         )}
-      </button>
+      </div>
     );
   }
 );

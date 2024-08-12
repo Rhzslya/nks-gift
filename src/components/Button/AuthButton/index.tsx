@@ -5,7 +5,7 @@ interface ButtonProps {
   text: string;
   type?: "button" | "submit" | "reset";
   handleClick?: () => void;
-  variant?: "skyBlue" | "pink" | "black";
+  variant?: "skyBlue" | "pink" | "black" | "red";
 }
 const AuthButton: React.FC<ButtonProps> = ({
   isLoading,
@@ -18,6 +18,7 @@ const AuthButton: React.FC<ButtonProps> = ({
     skyBlue: "bg-sky-400 hover:bg-sky-300",
     pink: "bg-pink-400 hover:bg-pink-300",
     black: "bg-black-400 hover:bg-black-300",
+    red: "bg-red-300 hover:bg-red-200",
   };
   return (
     <button

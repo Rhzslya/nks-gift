@@ -1,4 +1,4 @@
-import React, { SetStateAction, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Modal from "../fragements/Modal";
 import LabelAndInput from "../Form/Label";
 import Select from "../Select";
@@ -15,7 +15,7 @@ interface User {
 }
 
 interface ModalUpdatedUserProps {
-  editedUser: User;
+  isUpdatedUser: User;
   handleCloseModal: () => void;
   currentUserRole: any;
   roleOrder: any;
@@ -25,7 +25,7 @@ interface ModalUpdatedUserProps {
 }
 
 const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
-  editedUser,
+  isUpdatedUser,
   handleCloseModal,
   currentUserRole,
   roleOrder,
@@ -33,7 +33,7 @@ const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
   update,
   userInSession,
 }) => {
-  const [updatedUser, setUpdatedUser] = useState<User>(editedUser);
+  const [updatedUser, setUpdatedUser] = useState<User>(isUpdatedUser);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [isModified, setIsModified] = useState(false);
@@ -48,7 +48,7 @@ const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
       [name]: value,
     }));
 
-    setIsModified(value !== editedUser.role);
+    setIsModified(value !== isUpdatedUser.role);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -145,13 +145,6 @@ const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
     }
   }, [userInSession, push]);
 
-  console.log(userInSession);
-  console.log(editedUser.role);
-
-  setTimeout(() => {
-    console.log(editedUser.role);
-  }, 5000);
-  console.log(updatedUser.role);
   return (
     <Modal onClose={handleCloseModal}>
       <div className="w-[300px]">

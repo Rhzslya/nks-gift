@@ -9,6 +9,7 @@ import ModalUpdatedUser from "@/components/ModalUpdatedUser";
 import Image from "next/image";
 import UserDropDown from "@/components/UserDropDown";
 import AuthButton from "@/components/Button/AuthButton";
+import ModalDeleteUser from "@/components/ModalDeleteUser";
 interface Users {
   username: string;
   email: string;
@@ -43,6 +44,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
     "username" | "createdAt" | "accessLevel" | ""
   >("");
   const [modalEditUser, setModalEditUser] = useState<string | null>(null);
+  const [modalDeleteUser, setModalDeleteUser] = useState<string | null>(null);
   // Find the user by _id
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -53,7 +55,8 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   const userInSession = session?.user;
   const currentUserRole = userInSession?.role;
   const [usersData, setUsersData] = useState<Users[]>([]);
-  const editedUser = usersData.find((user) => user._id === modalEditUser);
+  const isUpdatedUser = usersData.find((user) => user._id === modalEditUser);
+  const isDeletedUser = usersData.find((user) => user._id === modalDeleteUser);
   const [clickedButtonId, setClickedButtonId] = useState<string | null>(null);
   useEffect(() => {
     setUsersData(users);
@@ -64,7 +67,6 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
     {}
   );
   const [isLoading, setIsLoading] = useState(false);
-
   const filterRef = useRef<HTMLDivElement | null>(null);
   const filterButtonRef = useRef<HTMLButtonElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -104,6 +106,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
     }, 200);
   };
 
+  console.log(usersData);
   // Open & Close Menu Setting End
 
   // Open & Close Filter Start
@@ -161,8 +164,17 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
     setModalEditUser(modalEditUser === _id ? null : _id);
   };
 
+  // open Modal Delete User
+  const handleModalDeleteUser = (_id: string) => {
+    setActiveUserId(null);
+    setModalDeleteUser(modalDeleteUser === _id ? null : _id);
+  };
+
+  console.log(modalDeleteUser);
+  console.log(isUpdatedUser);
   const handleCloseModal = () => {
     setModalEditUser(null);
+    setModalDeleteUser(null);
   };
 
   // Search Users
@@ -448,7 +460,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
                               </button>
                               <button
                                 className="px-1 hover:bg-gray-100 duration-300"
-                                onClick={() => alert("Delete User")}
+                                onClick={() => handleModalDeleteUser(user._id)}
                               >
                                 <div className="flex gap-x-2 w-[120px] py-2">
                                   <i className="bx bxs-trash text-[16px]"></i>
@@ -489,15 +501,24 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
           />
         </div>
       </div>
-      {modalEditUser !== null && editedUser ? (
+      {modalEditUser !== null && isUpdatedUser ? (
         <ModalUpdatedUser
           setUsersData={setUsersData}
           roleOrder={roleOrder}
-          editedUser={editedUser}
+          isUpdatedUser={isUpdatedUser}
           handleCloseModal={handleCloseModal}
           currentUserRole={currentUserRole}
           update={update}
           userInSession={userInSession} // Pass current user role here
+        />
+      ) : null}
+      {modalDeleteUser !== null && isDeletedUser ? (
+        <ModalDeleteUser
+          handleCloseModal={handleCloseModal}
+          isDeletedUser={isDeletedUser}
+          setUsersData={setUsersData}
+          userInSession={userInSession}
+          setModalDeleteUser={setModalDeleteUser}
         />
       ) : null}
     </div>
