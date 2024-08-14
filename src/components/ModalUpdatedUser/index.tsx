@@ -22,6 +22,7 @@ interface ModalUpdatedUserProps {
   setUsersData: any;
   update: any;
   userInSession: any;
+  accessToken: any;
 }
 
 const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
@@ -32,6 +33,7 @@ const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
   setUsersData,
   update,
   userInSession,
+  accessToken,
 }) => {
   const [updatedUser, setUpdatedUser] = useState<User>(isUpdatedUser);
   const [isLoading, setIsLoading] = useState(false);
@@ -63,6 +65,7 @@ const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
           _id: updatedUser._id,
@@ -75,8 +78,8 @@ const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
         }),
       });
 
+      const data = await response.json();
       if (response.ok) {
-        const data = await response.json();
         setMessage(data.message);
 
         // Memperbarui daftar pengguna
@@ -98,10 +101,7 @@ const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
           handleCloseModal();
         }, 1000);
       } else {
-        const errorData = await response.json();
-        setMessage(
-          `Update User Failed: ${errorData.message || response.statusText}`
-        );
+        setMessage(data.message);
       }
     } catch (error) {
       if (error instanceof Error) {

@@ -10,6 +10,9 @@ import Image from "next/image";
 import UserDropDown from "@/components/UserDropDown";
 import AuthButton from "@/components/Button/AuthButton";
 import ModalDeleteUser from "@/components/ModalDeleteUser";
+import { Bounce, toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 interface Users {
   username: string;
   email: string;
@@ -24,7 +27,11 @@ interface Users {
 
 interface UsersManagementViewsProps {
   users: Users[];
-  loading: boolean;
+  isLoading: boolean;
+  userInSession: any;
+  currentUserRole: any;
+  accessToken: any;
+  message: string;
 }
 
 type Role = "user" | "manager" | "admin" | "super_admin";
@@ -34,7 +41,11 @@ type RoleOrder = {
 
 const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   users,
-  loading,
+  isLoading,
+  userInSession,
+  currentUserRole,
+  accessToken,
+  message,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -52,12 +63,9 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
 
   const [activeUserId, setActiveUserId] = useState<string | null>(null);
   const { data: session, update } = useSession();
-  const userInSession = session?.user;
-  const currentUserRole = userInSession?.role;
-  const accessToken = session?.accessToken;
   const [usersData, setUsersData] = useState<Users[]>([]);
-  const isUpdatedUser = usersData.find((user) => user._id === modalEditUser);
-  const isDeletedUser = usersData.find((user) => user._id === modalDeleteUser);
+  const isUpdatedUser = usersData?.find((user) => user._id === modalEditUser);
+  const isDeletedUser = usersData?.find((user) => user._id === modalDeleteUser);
   const [clickedButtonId, setClickedButtonId] = useState<string | null>(null);
   useEffect(() => {
     setUsersData(users);
@@ -67,7 +75,6 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   const settingButtonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>(
     {}
   );
-  const [isLoading, setIsLoading] = useState(false);
   const filterRef = useRef<HTMLDivElement | null>(null);
   const filterButtonRef = useRef<HTMLButtonElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -202,32 +209,34 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
     super_admin: 0,
   };
 
-  const sortedUsers = [...usersData].sort((a, b) => {
-    if (sortBy === "username") {
-      if (sortOrder === "asc") {
-        return a.username.localeCompare(b.username);
-      } else if (sortOrder === "desc") {
-        return b.username.localeCompare(a.username);
-      }
-    } else if (sortBy === "createdAt") {
-      if (sortOrder === "asc") {
-        return (
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-        );
-      } else if (sortOrder === "desc") {
-        return (
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-      }
-    } else if (sortBy === "accessLevel") {
-      if (sortOrder === "asc") {
-        return roleOrder[a.role as Role] - roleOrder[b.role as Role];
-      } else if (sortOrder === "desc") {
-        return roleOrder[b.role as Role] - roleOrder[a.role as Role];
-      }
-    }
-    return 0;
-  });
+  const sortedUsers = Array.isArray(usersData)
+    ? [...usersData].sort((a, b) => {
+        if (sortBy === "username") {
+          if (sortOrder === "asc") {
+            return a.username.localeCompare(b.username);
+          } else if (sortOrder === "desc") {
+            return b.username.localeCompare(a.username);
+          }
+        } else if (sortBy === "createdAt") {
+          if (sortOrder === "asc") {
+            return (
+              new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+            );
+          } else if (sortOrder === "desc") {
+            return (
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+          }
+        } else if (sortBy === "accessLevel") {
+          if (sortOrder === "asc") {
+            return roleOrder[a.role as Role] - roleOrder[b.role as Role];
+          } else if (sortOrder === "desc") {
+            return roleOrder[b.role as Role] - roleOrder[a.role as Role];
+          }
+        }
+        return 0;
+      })
+    : [];
 
   const filteredUsers = sortedUsers.filter((user) =>
     user.username.toLowerCase().startsWith(searchTerm.toLowerCase())
@@ -245,8 +254,25 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
 
   const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
 
+  // Toast Notify
+  useEffect(() => {
+    if (message) {
+      toast.error(message, {
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+    }
+  }, [message]);
+
   return (
-    <div className="w-full">
+    <div className="w-full relative">
       <header className="border-b-[1px] border-gray-300 px-6 bg-white -z-10">
         <nav className="flex items-center justify-between text-base text-gray-500 font-semi-bold h-28">
           <div className="flex">
@@ -379,7 +405,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
             </thead>
 
             <tbody className={`bg-white`}>
-              {loading
+              {isLoading
                 ? Array(15)
                     .fill(null)
                     .map((_, index) => (
@@ -489,7 +515,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
                 <option value={10}>10</option>
                 <option value={15}>15</option>
               </select>{" "}
-              of {users.length} items
+              of {users?.length} items
             </p>
           </div>
           <MyPagination
@@ -507,7 +533,8 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
           handleCloseModal={handleCloseModal}
           currentUserRole={currentUserRole}
           update={update}
-          userInSession={userInSession} // Pass current user role here
+          userInSession={userInSession}
+          accessToken={accessToken}
         />
       ) : null}
       {modalDeleteUser !== null && isDeletedUser ? (
@@ -520,6 +547,20 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
           accessToken={accessToken}
         />
       ) : null}
+      <div className="absolute">
+        <ToastContainer
+          position="bottom-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
+      </div>
     </div>
   );
 };
