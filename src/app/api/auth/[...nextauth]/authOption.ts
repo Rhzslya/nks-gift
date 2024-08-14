@@ -5,7 +5,7 @@ import User from "@/models/userModels";
 import { connect } from "@/dbConfig/dbConfig";
 import { signIn } from "../../../../lib/services/sign-in/route";
 import { handleGoogleSignIn } from "@/lib/services/sign-in-google/route";
-
+import jwt from "jsonwebtoken";
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
@@ -87,11 +87,18 @@ export const authOptions: NextAuthOptions = {
         isVerified: token.isVerified,
         type: token.type,
       };
+
+      const accessToken = jwt.sign(token, process.env.TOKEN_SECRET || "", {
+        algorithm: "HS256",
+      });
+
+      session.accessToken = accessToken;
       return session;
     },
   },
   pages: {
     signIn: "/sign-in",
+    error: "/auth/error",
   },
   debug: true,
 };

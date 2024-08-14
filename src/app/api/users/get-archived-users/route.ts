@@ -1,12 +1,12 @@
 import { NextResponse, NextRequest } from "next/server";
 import { connect } from "@/dbConfig/dbConfig";
-import User from "@/models/userModels";
+import ArchivedUser from "@/models/archivedUser";
 import { revalidatePath } from "next/cache";
 export const GET = async (request: NextRequest, response: NextResponse) => {
   try {
     connect();
-    // Fetch all users excluding certain fields
-    const users = await User.find({ deletedAt: null }).select(
+    // Fetch all users
+    const users = await ArchivedUser.find({}).select(
       "-password -__v -googleId -updatedAt"
     );
 

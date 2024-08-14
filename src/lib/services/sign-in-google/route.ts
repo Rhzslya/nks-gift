@@ -4,6 +4,11 @@ export async function handleGoogleSignIn(user: any, profile: any) {
   const existingUser = await User.findOne({ email: user.email });
 
   if (existingUser) {
+    // Cek apakah pengguna telah dihapus
+    if (existingUser.deletedAt !== null) {
+      throw new Error("This account has been deleted.");
+    }
+
     // Update existing user
     if (!existingUser.type?.includes("google")) {
       existingUser.type.push("google");

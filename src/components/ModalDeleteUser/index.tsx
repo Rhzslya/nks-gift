@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from "react";
 import Modal from "../fragements/Modal";
-import LabelAndInput from "../Form/Label";
-import Select from "../Select";
-import SubmitButton from "../Button/SubmitButton";
 import { capitalizeFirst } from "@/utils/Capitalize";
-import MessageFromAPI from "../Form/MessageFromAPI";
-import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import ConfirmButton from "../Button/ConfirmButton";
+
 interface User {
   username: string;
   email: string;
@@ -19,12 +15,10 @@ interface User {
 interface ModalDeleteUserProps {
   isDeletedUser: User;
   handleCloseModal: () => void;
-  currentUserRole?: any;
-  roleOrder?: any;
   setUsersData: any;
-  update?: any;
-  userInSession: any;
-  setModalDeleteUser: any;
+  userInSession: any; // Menjadikan properti ini opsional
+  setModalDeleteUser: React.Dispatch<React.SetStateAction<string | null>>;
+  accessToken?: string;
 }
 
 const ModalDeleteUser: React.FC<ModalDeleteUserProps> = ({
@@ -33,34 +27,39 @@ const ModalDeleteUser: React.FC<ModalDeleteUserProps> = ({
   setUsersData,
   userInSession,
   setModalDeleteUser,
+  accessToken,
 }) => {
   const [deletedUser, setDeletedUser] = useState<User>(isDeletedUser);
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isError, setIsError] = useState(false);
-  console.log(isDeletedUser);
-  const handleDeleteUser = async (e: any) => {
+
+  const handleDeleteUser = async (e: React.MouseEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
+    if (!accessToken) {
+      setMessage("No access token provided.");
+      setIsError(true);
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const response = await fetch(
-        `/api/users/delete-users?id=${deletedUser._id}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ _id: isDeletedUser._id }),
-        }
-      );
+      const response = await fetch(`/api/users/delete-users`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ _id: isDeletedUser._id }),
+      });
 
       const data = await response.json();
       if (response.ok) {
         setMessage(data.message);
         setIsSuccess(true);
-        // Update state tanpa reload halaman
         setTimeout(() => {
           setUsersData((prevUsers: User[]) =>
             prevUsers.filter((user: User) => user._id !== isDeletedUser._id)
@@ -70,24 +69,17 @@ const ModalDeleteUser: React.FC<ModalDeleteUserProps> = ({
         if (userInSession.id === deletedUser._id) {
           await signOut();
         }
-      }
-
-      if (response.status === 400) {
-        setMessage(data.message);
-        setIsError(true);
-      }
-
-      if (response.status === 404) {
+      } else {
         setMessage(data.message);
         setIsError(true);
       }
     } catch (error) {
       if (error instanceof Error) {
-        console.log(error);
         setMessage("Update User Failed: " + error.message);
       } else {
         setMessage("Update User Failed");
       }
+      setIsError(true);
     } finally {
       setIsLoading(false);
     }
@@ -128,20 +120,16 @@ const ModalDeleteUser: React.FC<ModalDeleteUserProps> = ({
             </p>
           </div>
           <div className="flex mb-4 gap-2">
-            <div className="">
-              <ConfirmButton
-                text="Yes, Delete"
-                onClick={(e) => handleDeleteUser(e)}
-                variant="confirm"
-              />
-            </div>
-            <div className="">
-              <ConfirmButton
-                text="No, Cancel"
-                onClick={() => setModalDeleteUser(null)}
-                variant="cancel"
-              />
-            </div>
+            <ConfirmButton
+              text="Yes, Delete"
+              onClick={handleDeleteUser}
+              variant="confirm"
+            />
+            <ConfirmButton
+              text="No, Cancel"
+              onClick={() => setModalDeleteUser(null)}
+              variant="cancel"
+            />
           </div>
           {isSuccess && (
             <div className="flex items-center gap-2 text-green-500">

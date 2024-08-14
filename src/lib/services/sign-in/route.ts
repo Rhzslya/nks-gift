@@ -2,7 +2,10 @@ import User from "@/models/userModels";
 import bcryptjs from "bcryptjs";
 
 export async function signIn(email: string, password: string) {
-  const user = await User.findOne({ email });
+  // Pencarian case-insensitive dengan regex
+  const user = await User.findOne({
+    email: { $regex: new RegExp(`^${email}$`, "i") },
+  });
 
   if (!user) {
     throw new Error("Email or password is incorrect. Please try again.");
@@ -14,6 +17,12 @@ export async function signIn(email: string, password: string) {
 
   if (!user.isVerified) {
     throw new Error("Email is not verified.");
+  }
+
+  if (user.deletedAt !== null) {
+    throw new Error(
+      "Your account has been deactivated. Please contact support."
+    );
   }
 
   const validPassword = await bcryptjs.compare(password, user.password);

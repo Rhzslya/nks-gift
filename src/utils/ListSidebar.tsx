@@ -16,6 +16,17 @@ export const listSidebarItem = {
       title: "products",
       url: "/admin/products",
       icon: "bxs-box",
+      hasSubMenu: true,
+      subMenu: [
+        {
+          title: "flowers",
+          url: "/admin/products/flowers",
+        },
+        {
+          title: "bouquet",
+          url: "/admin/products/bouquet",
+        },
+      ],
     },
     {
       title: "categories",
@@ -36,8 +47,19 @@ export const listSidebarItem = {
   settings: [
     {
       title: "users",
-      url: "/admin/users",
+      url: ["/admin/users", "/admin/users/archived-users"],
       icon: "bxs-group",
+      hasSubMenu: true,
+      subMenu: [
+        {
+          title: "manage users",
+          url: "/admin/users",
+        },
+        {
+          title: "archived users",
+          url: "/admin/users/archived-users",
+        },
+      ],
     },
     {
       title: "customer support",

@@ -21,23 +21,31 @@ type UserResetPassword = {
 export const validationRegister = (user: User) => {
   const errors: Record<string, string> = {};
 
-  const email_pattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,6}$/;
+  const email_pattern = /^[^\s@][^\s@]+@[^\s@]+\.[^\s@]{2,6}$/;
+  const username_pattern = /^[A-Za-z]+$/; // Username hanya boleh mengandung huruf
 
+  // Validasi Email
   if (!user.email) {
     errors.email = "Email is required";
   } else if (!email_pattern.test(user.email)) {
     errors.email = "Email is Invalid";
   }
 
-  // Password Validation
-  if (user.password.length < 8) {
+  // Validasi Username
+  if (!user.username) {
+    errors.username = "Username is required";
+  } else if (!username_pattern.test(user.username)) {
+    errors.username = "Username cannot contain numbers";
+  }
+
+  // Validasi Password
+  if (!user.password || user.password.length < 8) {
     errors.password = "Minimum of 8 characters";
-  }
-  if (!/(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])/.test(user.password)) {
-    errors.password = "Uppercase, lowercase, and one number";
-  }
-  if (!/[!@#$%^&*(),.?":{}|<>]/.test(user.password)) {
-    errors.password = "One special character";
+  } else if (!/(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])/.test(user.password)) {
+    errors.password =
+      "Password must contain uppercase, lowercase, and one number";
+  } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(user.password)) {
+    errors.password = "Password must contain at least one special character";
   }
 
   return errors;

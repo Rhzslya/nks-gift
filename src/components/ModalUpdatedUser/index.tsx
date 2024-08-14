@@ -105,7 +105,6 @@ const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
       }
     } catch (error) {
       if (error instanceof Error) {
-        console.log(error);
         setMessage("Update User Failed: " + error.message);
       } else {
         setMessage("Update User Failed");

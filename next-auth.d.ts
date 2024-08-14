@@ -12,5 +12,6 @@ declare module "next-auth" {
       role?: string;
       profileImage?: string; // Tambahkan ini
     };
+    accessToken?: string;
   }
 }

@@ -30,6 +30,7 @@ export const handleSignUp = async ({
   e.preventDefault();
   const validationErrors = validation(user);
   setErrors(validationErrors);
+  setIsLoading(true);
 
   try {
     if (Object.keys(validationErrors).length === 0) {

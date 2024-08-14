@@ -8,7 +8,8 @@ connect();
 export async function POST(request: NextRequest) {
   try {
     const reqBody = await request.json();
-    const { username, email, password } = reqBody;
+    const { username, password } = reqBody;
+    const email = reqBody.email.toLowerCase();
 
     // Check if email is already used by a Google user
     const userGoogle = await User.findOne({
@@ -37,7 +38,7 @@ export async function POST(request: NextRequest) {
     const user = await User.findOne({
       email: { $regex: new RegExp(`^${email}$`, "i") },
     });
-    console.log(user);
+
     if (user) {
       return NextResponse.json(
         { message: "Email already exists" },

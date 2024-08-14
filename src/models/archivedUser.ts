@@ -1,15 +1,12 @@
 import mongoose from "mongoose";
-const AutoIncrement = require("mongoose-sequence")(mongoose);
 
-const userSchema = new mongoose.Schema(
+const archivedUserSchema = new mongoose.Schema(
   {
-    googleId: {
-      type: String,
-      required: false,
-    },
-    profileImage: {
-      type: String,
-      required: false,
+    googleId: String,
+    profileImage: String,
+    userId: {
+      type: Number,
+      required: true,
     },
     username: {
       type: String,
@@ -18,12 +15,8 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       required: true,
-      unique: true,
     },
-    password: {
-      type: String,
-      required: false,
-    },
+    password: String,
     isVerified: {
       type: Boolean,
       default: false,
@@ -39,8 +32,13 @@ const userSchema = new mongoose.Schema(
     },
     deletedAt: {
       type: Date,
-      default: null,
+      required: true,
     },
+    archivedAt: {
+      type: Date,
+      default: Date.now,
+    },
+
     forgotPasswordToken: String,
     forgotPasswordTokenExpiry: Date,
     verifyToken: String,
@@ -49,10 +47,8 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-userSchema.plugin(AutoIncrement, { inc_field: "userId", unique: true });
+const ArchivedUser =
+  mongoose.models.archived_users ||
+  mongoose.model("archived_users", archivedUserSchema);
 
-userSchema.index({ userId: 1 }, { unique: true });
-
-const User = mongoose.models.users || mongoose.model("users", userSchema);
-
-export default User;
+export default ArchivedUser;

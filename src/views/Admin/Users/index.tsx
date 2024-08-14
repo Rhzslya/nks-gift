@@ -54,6 +54,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   const { data: session, update } = useSession();
   const userInSession = session?.user;
   const currentUserRole = userInSession?.role;
+  const accessToken = session?.accessToken;
   const [usersData, setUsersData] = useState<Users[]>([]);
   const isUpdatedUser = usersData.find((user) => user._id === modalEditUser);
   const isDeletedUser = usersData.find((user) => user._id === modalDeleteUser);
@@ -106,7 +107,6 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
     }, 200);
   };
 
-  console.log(usersData);
   // Open & Close Menu Setting End
 
   // Open & Close Filter Start
@@ -170,8 +170,6 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
     setModalDeleteUser(modalDeleteUser === _id ? null : _id);
   };
 
-  console.log(modalDeleteUser);
-  console.log(isUpdatedUser);
   const handleCloseModal = () => {
     setModalEditUser(null);
     setModalDeleteUser(null);
@@ -519,6 +517,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
           setUsersData={setUsersData}
           userInSession={userInSession}
           setModalDeleteUser={setModalDeleteUser}
+          accessToken={accessToken}
         />
       ) : null}
     </div>
