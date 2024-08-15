@@ -1,6 +1,5 @@
 import { connect } from "@/dbConfig/dbConfig";
 import User from "@/models/userModels";
-import ArchivedUser from "@/models/archivedUser";
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
@@ -65,13 +64,6 @@ export const DELETE = async (request: NextRequest) => {
         { status: 404 }
       );
     }
-
-    // Set `deletedAt` ke waktu saat ini
-    user.deletedAt = new Date();
-
-    // Pindahkan data user ke koleksi ArchivedUser
-    const archivedUser = new ArchivedUser(user.toObject());
-    await archivedUser.save();
 
     // Hapus user dari koleksi User
     await User.findByIdAndDelete(_id);
