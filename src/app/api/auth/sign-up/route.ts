@@ -1,5 +1,6 @@
 import { connect } from "@/dbConfig/dbConfig";
 import User from "@/models/userModels";
+import ArchivedUser from "@/models/archivedUser";
 import { NextRequest, NextResponse } from "next/server";
 import bcryptjs from "bcryptjs";
 
@@ -38,6 +39,16 @@ export async function POST(request: NextRequest) {
     const user = await User.findOne({
       email: { $regex: new RegExp(`^${email}$`, "i") },
     });
+
+    if (user.deletedAt !== null) {
+      return NextResponse.json(
+        {
+          message:
+            "Email already exists but has been previously deleted. Please contact support for assistance.",
+        },
+        { status: 400 }
+      );
+    }
 
     if (user) {
       return NextResponse.json(
