@@ -1,17 +1,20 @@
-import { NextResponse, NextRequest } from "next/server";
 import { connect } from "@/dbConfig/dbConfig";
 import User from "@/models/userModels";
+import { NextRequest, NextResponse } from "next/server";
+import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 
 interface DecodedToken {
   role: string;
 }
 
-export const GET = async (request: NextRequest) => {
+export const PATCH = async (request: NextRequest) => {
   try {
     await connect();
 
+    // Daftar peran yang diizinkan
     const allowedRoles = ["manager", "admin", "super_admin"];
+    const { _id } = await request.json();
     const token = request.headers.get("authorization")?.split(" ")[1] || "";
 
     // Periksa token
@@ -45,22 +48,33 @@ export const GET = async (request: NextRequest) => {
       );
     }
 
-    // Ambil pengguna yang `deletedAt` tidak null
-    const users = await User.find({ deletedAt: { $ne: null } }).select(
-      "-password -__v -googleId"
-    );
+    // Validasi ID
+    if (typeof _id !== "string" || !mongoose.Types.ObjectId.isValid(_id)) {
+      return NextResponse.json(
+        { status: false, statusCode: 400, message: "Invalid ID format" },
+        { status: 400 }
+      );
+    }
 
-    // Revalidate the path to clear any potential cache
-    const path = request.nextUrl.searchParams.get("path") || "/";
-    const response = NextResponse.json({
+    // Temukan user berdasarkan ID
+    const user = await User.findById(_id);
+    if (!user) {
+      return NextResponse.json(
+        { status: false, statusCode: 404, message: "User Not Found" },
+        { status: 404 }
+      );
+    }
+
+    // Set `deletedAt` ke waktu saat ini
+    user.deletedAt = new Date();
+    await user.save();
+
+    return NextResponse.json({
       status: true,
       statusCode: 200,
-      data: users,
+      message: "User Archived Successfully",
+      data: { _id: user._id },
     });
-
-    response.headers.set("Cache-Control", "no-store, max-age=0");
-
-    return response;
   } catch (error) {
     console.error("Error:", error);
     // Mengembalikan respons berdasarkan jenis kesalahan
