@@ -22,8 +22,7 @@ export const validationRegister = (user: User) => {
   const errors: Record<string, string> = {};
 
   const email_pattern = /^[^\s@][^\s@]+@[^\s@]+\.[^\s@]{2,6}$/;
-  const username_pattern = /^[A-Za-z]+$/; // Username hanya boleh mengandung huruf
-
+  const username_pattern = /^[A-Za-z\s]+$/;
   // Validasi Email
   if (!user.email) {
     errors.email = "Email is required";

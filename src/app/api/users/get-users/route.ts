@@ -46,7 +46,7 @@ export const GET = async (request: NextRequest, response: NextResponse) => {
       );
     }
 
-    const users = await User.find({}).select(
+    const users = await User.find({ deletedAt: null }).select(
       "-password -__v -googleId -updatedAt"
     );
 

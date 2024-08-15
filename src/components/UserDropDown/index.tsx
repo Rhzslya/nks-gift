@@ -41,7 +41,9 @@ const UserDropDown = forwardRef<HTMLDivElement, UserDropDownProps>(
           <div className="hover:bg-gray-200 py-1 px-2 rounded-md duration-150 font-medium">
             <button>{user.username}</button>
           </div>
-          <i className="bx bx-chevron-down hover:bg-gray-200 rounded-md duration-150"></i>
+          <button className="hover:bg-gray-200 rounded-md duration-150">
+            <i className="bx bx-chevron-down"></i>
+          </button>
         </div>
         {isDropdownOpen && (
           <div

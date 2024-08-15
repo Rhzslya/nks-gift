@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import Modal from "../fragements/Modal";
-import LabelAndInput from "../Form/Label";
-import Select from "../Select";
-import SubmitButton from "../Button/SubmitButton";
+import Modal from "@/components/fragements/Modal";
+import LabelAndInput from "@/components/Form/Label";
+import Select from "@/components/Select";
+import SubmitButton from "@/components/Button/SubmitButton";
 import { capitalizeFirst } from "@/utils/Capitalize";
-import MessageFromAPI from "../Form/MessageFromAPI";
+import MessageFromAPI from "@/components/Form/MessageFromAPI";
 import { useRouter } from "next/navigation";
 interface User {
   username: string;

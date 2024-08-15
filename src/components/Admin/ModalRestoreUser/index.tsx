@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import Modal from "../fragements/Modal";
+import Modal from "@/components/fragements/Modal";
 import { capitalizeFirst } from "@/utils/Capitalize";
 import { signOut } from "next-auth/react";
-import ConfirmButton from "../Button/ConfirmButton";
+import ConfirmButton from "@/components/Button/ConfirmButton";
 
 interface User {
   username: string;
@@ -12,30 +12,30 @@ interface User {
   _id: string;
 }
 
-interface ModalDeleteUserProps {
-  isDeletedUser: User;
+interface ModalRestoreUserProps {
+  isRestoredUser: User;
   handleCloseModal: () => void;
   setUsersData: any;
   userInSession: any; // Menjadikan properti ini opsional
-  setModalDeleteUser: React.Dispatch<React.SetStateAction<string | null>>;
+  setModalRestoreUser: React.Dispatch<React.SetStateAction<string | null>>;
   accessToken?: string;
 }
 
-const ModalDeleteUser: React.FC<ModalDeleteUserProps> = ({
+const ModalRestoreUser: React.FC<ModalRestoreUserProps> = ({
   handleCloseModal,
-  isDeletedUser,
+  isRestoredUser,
   setUsersData,
   userInSession,
-  setModalDeleteUser,
+  setModalRestoreUser,
   accessToken,
 }) => {
-  const [deletedUser, setDeletedUser] = useState<User>(isDeletedUser);
+  const [restoredUser, setRestoredUser] = useState<User>(isRestoredUser);
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isError, setIsError] = useState(false);
 
-  const handleDeleteUser = async (e: React.MouseEvent) => {
+  const handleRestoreUser = async (e: React.MouseEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
@@ -47,13 +47,13 @@ const ModalDeleteUser: React.FC<ModalDeleteUserProps> = ({
     }
 
     try {
-      const response = await fetch(`/api/users/delete-users`, {
-        method: "DELETE",
+      const response = await fetch(`/api/users/restore-users`, {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({ _id: isDeletedUser._id }),
+        body: JSON.stringify({ _id: isRestoredUser._id }),
       });
 
       const data = await response.json();
@@ -62,11 +62,11 @@ const ModalDeleteUser: React.FC<ModalDeleteUserProps> = ({
         setIsSuccess(true);
         setTimeout(() => {
           setUsersData((prevUsers: User[]) =>
-            prevUsers.filter((user: User) => user._id !== isDeletedUser._id)
+            prevUsers.filter((user: User) => user._id !== isRestoredUser._id)
           );
         }, 1500);
 
-        if (userInSession.id === deletedUser._id) {
+        if (userInSession.id === restoredUser._id) {
           await signOut();
         }
       } else {
@@ -96,38 +96,36 @@ const ModalDeleteUser: React.FC<ModalDeleteUserProps> = ({
     }
   }, [isError, isSuccess]);
 
+  console.log(isRestoredUser);
   return (
     <Modal onClose={handleCloseModal}>
       <div className="w-[400px]">
-        <div className="text-xl text-center mb-4 flex justify-center items-center gap-2 text-red-500">
-          <i className="bx bx-error-circle text-[24px] text-red-500"></i>
-          <h4>User Deletion Confirmation</h4>
+        <div className="text-xl text-center mb-4 flex justify-center items-center gap-2 text-green-500">
+          <i className="bx bx-error-circle text-[24px] text-green-500"></i>
+          <h4>User Restore Confirmation</h4>
         </div>
 
         <div className="flex flex-col">
           <div className="text-sm mb-4 text-gray-600 border-b-[1px] border-gray-500 py-1">
             <p>
-              Are you sure you want to delete all{" "}
+              Are you sure you want to restore the user{" "}
               <span className="font-medium">
-                Records, History, and Orders Associated
+                {capitalizeFirst(restoredUser?.username)}
               </span>{" "}
-              with{" "}
-              <span className="font-medium">
-                {capitalizeFirst(deletedUser?.username)}
-              </span>{" "}
-              from the company’s system?{" "}
-              <span className="text-red-500">This action is irreversible.</span>
+              to the system? This action will reactivate the user&apos;s
+              account, and all previously deleted records will be restored.
             </p>
           </div>
+
           <div className="flex mb-4 gap-2">
             <ConfirmButton
-              text="Yes, Delete"
-              onClick={handleDeleteUser}
-              variant="confirm"
+              text="Yes, Restore"
+              onClick={handleRestoreUser}
+              variant="success"
             />
             <ConfirmButton
               text="No, Cancel"
-              onClick={() => setModalDeleteUser(null)}
+              onClick={() => setModalRestoreUser(null)}
               variant="cancel"
             />
           </div>
@@ -149,4 +147,4 @@ const ModalDeleteUser: React.FC<ModalDeleteUserProps> = ({
   );
 };
 
-export default ModalDeleteUser;
+export default ModalRestoreUser;
