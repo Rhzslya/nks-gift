@@ -119,8 +119,8 @@ const Table: React.FC<TableProps> = ({
                     )}
                     {header.key === "dateCreated" &&
                       new Date(user.createdAt).toLocaleDateString()}
-                    {header.key === "archivedAt" &&
-                      new Date(user.archivedAt).toLocaleDateString()}
+                    {header.key === "deletedAt" &&
+                      new Date(user.deletedAt).toLocaleDateString()}
                     {header.key === "action" && (
                       <div className="relative z-50">
                         <button

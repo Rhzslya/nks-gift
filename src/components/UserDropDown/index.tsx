@@ -7,6 +7,7 @@ import React, {
 import Image from "next/image";
 import AuthButton from "@/components/Button/AuthButton";
 import Link from "next/link";
+import AuthButtonAlt from "../Button/AuthButtonAlt";
 
 type UserDropDownProps = {
   user: {
@@ -38,17 +39,11 @@ const UserDropDown = forwardRef<HTMLDivElement, UserDropDownProps>(
               loading="lazy"
             />
           </div>
-          <div className="hover:bg-gray-200 py-1 px-2 rounded-md duration-150 font-medium">
-            <button>{user.username}</button>
-          </div>
-          <button className="hover:bg-gray-200 rounded-md duration-150">
-            <i className="bx bx-chevron-down"></i>
-          </button>
         </div>
         {isDropdownOpen && (
           <div
             ref={ref as React.RefObject<HTMLDivElement>}
-            className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-md z-10"
+            className="absolute right-0 top-[110%] mt-2 w-48 bg-white border rounded shadow-md z-10"
           >
             <div className="border-b-[1px]">
               <div className="profile relative flex flex-col justify-center items-center gap-1 py-2 z-10">
@@ -65,17 +60,13 @@ const UserDropDown = forwardRef<HTMLDivElement, UserDropDownProps>(
               </div>
             </div>
             <div className="border-b-[1px]">
-              <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                <Link href={"/settings"}>Settings</Link>
+              <button className="flex items-center gap-2 w-full text-left p-2 text-sm text-gray-700 hover:bg-gray-100">
+                <i className="bx bx-cog text-[18px]"></i>
+                <Link href={"/settings/profile"}>Settings</Link>
               </button>
             </div>
-            <div>
-              <AuthButton
-                isLoading={isLoading}
-                type="button"
-                handleClick={() => signOut()}
-                text="Logout"
-              />
+            <div className="border-b-[1px]">
+              <AuthButtonAlt text="sign out" variant="signOut" />
             </div>
           </div>
         )}

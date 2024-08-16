@@ -18,6 +18,7 @@ interface ArchivedUsers {
   role: string;
   isVerified: boolean;
   createdAt: string;
+  archivedAt: string;
   _id: string;
   profileImage?: string;
   userId?: number;
@@ -83,6 +84,7 @@ const ArchivedUsersViews: React.FC<ArchivedUsersViewsProps> = ({
     setUsersData(users);
   }, [users]);
 
+  console.log(usersData);
   // Open & Close Menu Setting Start
   useEffect(() => {
     const handleCloseSettingOutside = (e: MouseEvent) => {

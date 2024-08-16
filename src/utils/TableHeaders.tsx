@@ -14,6 +14,6 @@ export const tableArchivedUser = [
   { name: "user id", key: "userId" },
   { name: "access level", key: "accessLevel" },
   { name: "verified status", key: "verifiedStatus" },
-  { name: "date archived", key: "archivedAt" },
+  { name: "date archived", key: "deletedAt" },
   { name: "", key: "action" },
 ];

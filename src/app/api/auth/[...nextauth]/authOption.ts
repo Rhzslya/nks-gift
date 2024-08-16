@@ -52,6 +52,8 @@ export const authOptions: NextAuthOptions = {
           return false;
         }
       }
+
+      console.log(profile);
       return true;
     },
     async jwt({ token, user, account, profile, trigger, session }: any) {
@@ -66,7 +68,7 @@ export const authOptions: NextAuthOptions = {
           username: user.username || user.name,
           id: user.id,
           role: user.role,
-          isVerified: user.isVerified,
+          isVerified: user.isVerified || profile.email_verified,
           type: account?.provider === "google" ? "google" : token.type,
           profileImage:
             account?.provider === "google"
@@ -74,7 +76,6 @@ export const authOptions: NextAuthOptions = {
               : token.profileImage,
         };
       }
-
       return token;
     },
     async session({ session, token }: any) {

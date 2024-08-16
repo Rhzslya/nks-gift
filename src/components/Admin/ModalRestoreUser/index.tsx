@@ -96,7 +96,6 @@ const ModalRestoreUser: React.FC<ModalRestoreUserProps> = ({
     }
   }, [isError, isSuccess]);
 
-  console.log(isRestoredUser);
   return (
     <Modal onClose={handleCloseModal}>
       <div className="w-[400px]">

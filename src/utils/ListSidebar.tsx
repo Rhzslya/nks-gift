@@ -88,3 +88,28 @@ export const listSidebarItem = {
     },
   ],
 };
+
+export const listSidebarSettingsItem = {
+  general_settings: [
+    {
+      title: "profile",
+      url: ["/settings/profile", "/settings"],
+      icon: "bxs-user",
+    },
+    {
+      title: "Account",
+      url: "/settings/account",
+      icon: "bxs-user-detail",
+    },
+    {
+      title: "Appearance",
+      url: "/settings/appearance",
+      icon: "bxs-paint",
+    },
+    {
+      title: "Notifications",
+      url: "/settings/notifications",
+      icon: "bxs-bell",
+    },
+  ],
+};
