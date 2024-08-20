@@ -21,6 +21,8 @@ interface Users {
   _id: string;
   profileImage?: string;
   userId?: number;
+  numberPhone: string;
+  address: string;
 }
 
 interface UsersManagementViewsProps {
