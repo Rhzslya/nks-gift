@@ -48,6 +48,7 @@ export const handleSignUp = async ({
       }
 
       const data = await response.json();
+      console.log(data);
       if (response.status === 400) {
         setIsLoading(false);
         setMessage(data.message);

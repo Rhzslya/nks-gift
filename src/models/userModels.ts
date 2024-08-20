@@ -41,6 +41,14 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    numberPhone: {
+      type: String,
+      default: "",
+    },
+    address: {
+      type: String,
+      default: "",
+    },
     forgotPasswordToken: String,
     forgotPasswordTokenExpiry: Date,
     verifyToken: String,

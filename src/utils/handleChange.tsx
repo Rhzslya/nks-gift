@@ -4,9 +4,15 @@ interface HandleChangeParams {
   e: ChangeEvent<HTMLInputElement>;
   setUser: Dispatch<SetStateAction<any>>;
   setErrors: Dispatch<SetStateAction<Record<string, string>>>;
+  setIsModified?: Dispatch<SetStateAction<boolean>>;
 }
 
-export const handleChange = ({ e, setUser, setErrors }: HandleChangeParams) => {
+export const handleChange = ({
+  e,
+  setUser,
+  setErrors,
+  setIsModified,
+}: HandleChangeParams) => {
   const { name, value } = e.target;
   setUser((prevUser: any) => ({
     ...prevUser,

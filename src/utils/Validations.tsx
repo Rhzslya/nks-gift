@@ -18,6 +18,11 @@ type UserResetPassword = {
   confirmpassword: string;
 };
 
+type UserUpdatedProfile = {
+  username: string;
+  address: string;
+  numberPhone: string;
+};
 export const validationRegister = (user: User) => {
   const errors: Record<string, string> = {};
 
@@ -106,6 +111,49 @@ export const validationPassword = (user: UserResetPassword) => {
     user.newPassword !== user.confirmpassword
   ) {
     errors.confirmpassword = "Passwords do not match";
+  }
+
+  return errors;
+};
+
+export const validationUpdateProfile = (
+  user: UserUpdatedProfile,
+  initialNumberPhone: string
+) => {
+  const errors: Record<string, string> = {};
+  const username_pattern = /^[A-Za-z\s]+$/;
+  const numberPhone_pattern = /^[0-9+\s]+$/;
+
+  // Validasi Username
+  if (!user.username) {
+    errors.username = "Username is required";
+  } else if (!username_pattern.test(user.username)) {
+    errors.username = "Username cannot contain numbers";
+  }
+  // Validasi Number Phone
+
+  if (initialNumberPhone !== "") {
+    if (user.numberPhone === "") {
+      errors.numberPhone = "Number cannot be empty";
+    } else if (user.numberPhone.length < 9) {
+      errors.numberPhone = "Number too short";
+    } else if (!numberPhone_pattern.test(user.numberPhone)) {
+      errors.numberPhone = "Number contains invalid characters";
+    } else if (
+      !(user.numberPhone.startsWith("0") || user.numberPhone.startsWith("62"))
+    ) {
+      errors.numberPhone = "Number must start with 0 or 62";
+    }
+  } else if (initialNumberPhone === "" && user.numberPhone !== "") {
+    if (user.numberPhone.length < 9) {
+      errors.numberPhone = "Number too short";
+    } else if (!numberPhone_pattern.test(user.numberPhone)) {
+      errors.numberPhone = "Number contains invalid characters";
+    } else if (
+      !(user.numberPhone.startsWith("0") || user.numberPhone.startsWith("62"))
+    ) {
+      errors.numberPhone = "Number must start with 0 or 62";
+    }
   }
 
   return errors;

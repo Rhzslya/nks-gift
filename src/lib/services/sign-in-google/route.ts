@@ -22,12 +22,18 @@ export async function handleGoogleSignIn(user: any, profile: any) {
       existingUser.profileImage = profile.picture;
       existingUser.isVerified = profile.email_verified;
       existingUser.username = existingUser.username || user.name;
+      existingUser.address = existingUser.address;
+      existingUser.numberPhone = existingUser.numberPhone;
+      existingUser.role = existingUser.role;
     }
+
     await existingUser.save();
     user.id = existingUser._id.toString();
     user.role = existingUser.role;
     user.type = existingUser.type;
     user.username = existingUser.username;
+    user.address = existingUser.address;
+    user.numberPhone = existingUser.numberPhone;
   } else {
     // Create new user
     const newUser = new User({

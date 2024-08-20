@@ -38,5 +38,7 @@ export async function signIn(email: string, password: string) {
     role: user.role,
     isVerified: user.isVerified,
     type: user.type,
+    address: user.address,
+    numberPhone: user.numberPhone,
   };
 }

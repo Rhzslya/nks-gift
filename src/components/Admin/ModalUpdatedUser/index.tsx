@@ -12,6 +12,8 @@ interface User {
   isVerified: boolean;
   role: string;
   _id: string;
+  numberPhone: string;
+  address: string;
 }
 
 interface ModalUpdatedUserProps {
@@ -90,7 +92,12 @@ const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
         );
 
         if (userInSession.id === updatedUser._id) {
-          await update({ role: updatedUser.role });
+          await update({
+            username: updatedUser.username,
+            numberPhone: updatedUser.numberPhone,
+            address: updatedUser.address,
+            role: updatedUser.role,
+          });
 
           if (updatedUser.role === "user") {
             push("/");

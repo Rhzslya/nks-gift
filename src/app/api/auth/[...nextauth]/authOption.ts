@@ -53,12 +53,14 @@ export const authOptions: NextAuthOptions = {
         }
       }
 
-      console.log(profile);
       return true;
     },
     async jwt({ token, user, account, profile, trigger, session }: any) {
-      if (trigger === "update" && session?.role) {
+      if (trigger === "update" && session) {
         token.role = session.role;
+        token.username = session.username;
+        token.address = session.address;
+        token.numberPhone = session.numberPhone;
       }
 
       if (user) {
@@ -68,14 +70,17 @@ export const authOptions: NextAuthOptions = {
           username: user.username || user.name,
           id: user.id,
           role: user.role,
-          isVerified: user.isVerified || profile.email_verified,
-          type: account?.provider === "google" ? "google" : token.type,
-          profileImage:
+          isVerified: user.isVerified || profile?.email_verified,
+          type:
             account?.provider === "google"
-              ? profile.picture
-              : token.profileImage,
+              ? "google"
+              : token.type || "credentials",
+          profileImage: profile?.picture || token.profileImage,
+          numberPhone: user.numberPhone,
+          address: user.address,
         };
       }
+
       return token;
     },
     async session({ session, token }: any) {
@@ -87,6 +92,8 @@ export const authOptions: NextAuthOptions = {
         role: token.role,
         isVerified: token.isVerified,
         type: token.type,
+        numberPhone: token.numberPhone,
+        address: token.address,
       };
 
       const accessToken = jwt.sign(token, process.env.TOKEN_SECRET || "", {

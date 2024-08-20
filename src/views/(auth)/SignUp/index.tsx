@@ -26,8 +26,6 @@ const SignUpViews = () => {
     specialChar: false,
   });
 
-  console.log(passwordCriteria);
-
   const handlePasswordChangeWrapper = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {

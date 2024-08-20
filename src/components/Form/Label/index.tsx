@@ -70,7 +70,7 @@ const LabelAndInput: React.FC<LabelAndInputProps> = ({
       : "border-gray-400"
   } text-sm w-full ${
     disabled ? "opacity-70 cursor-not-allowed" : ""
-  } ${textStyle}`;
+  } ${textStyle} ${type === "number" ? "no-spinner" : ""}`;
 
   return (
     <div className="">
@@ -87,6 +87,7 @@ const LabelAndInput: React.FC<LabelAndInputProps> = ({
           onFocus={() => setHasBeenTouched(true)}
           className={inputClassName}
           disabled={disabled}
+          autoComplete="off"
         />
         {type === "password" && (
           <span
