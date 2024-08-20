@@ -27,7 +27,7 @@ const ProfileViews = ({ serverSession }: any) => {
   const [user, setUser] = useState<User>({
     username: userInSession.username,
     address: userInSession.address,
-    numberPhone: convertNumber(userInSession.numberPhone),
+    numberPhone: convertNumber(userInSession?.numberPhone),
     profileImage: userInSession.profileImage || "",
     _id: userInSession.id,
     role: userInSession.role,
@@ -43,7 +43,7 @@ const ProfileViews = ({ serverSession }: any) => {
     setUser({
       username: userInSession.username,
       address: userInSession.address,
-      numberPhone: convertNumber(userInSession.numberPhone),
+      numberPhone: convertNumber(userInSession?.numberPhone),
       profileImage: userInSession.profileImage || "",
       _id: userInSession.id,
       role: userInSession.role,
