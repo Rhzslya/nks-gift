@@ -20,7 +20,13 @@ type UserResetPassword = {
 
 type UserUpdatedProfile = {
   username: string;
-  address: string;
+  address: {
+    street: string;
+    state: string;
+    city: string;
+    country: string;
+    postalCode: string;
+  };
   numberPhone: string;
 };
 export const validationRegister = (user: User) => {

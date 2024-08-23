@@ -20,6 +20,7 @@ interface LabelAndInputProps {
   };
   disabled?: boolean;
   textStyle?: string;
+  padding?: string;
 }
 
 const LabelAndInput: React.FC<LabelAndInputProps> = ({
@@ -35,6 +36,7 @@ const LabelAndInput: React.FC<LabelAndInputProps> = ({
   passwordCriteria,
   disabled,
   textStyle = "text-sm text-black",
+  padding = "p-2",
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [hasBeenTouched, setHasBeenTouched] = useState(false);
@@ -54,7 +56,7 @@ const LabelAndInput: React.FC<LabelAndInputProps> = ({
   };
 
   // Determine if the input should have an error class
-  const inputClassName = `px-2 py-2 rounded bg-transparent focus:bg-transparent focus:border-pink-300 border-[1px] ${
+  const inputClassName = `${padding} rounded bg-transparent focus:bg-transparent focus:border-pink-300 border-[1px] ${
     isPasswordSignUp && passwordCriteria
       ? passwordCriteria.length &&
         passwordCriteria.combination &&

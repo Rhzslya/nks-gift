@@ -21,7 +21,6 @@ const Sidebar: React.FC<ListsTypes> = ({ lists }) => {
   const pathname = usePathname();
   const [isLoading, setIsLoading] = useState(false);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
-  console.log(lists);
 
   const handleClickHaveSubMenu = (title: string) => {
     setActiveMenu(activeMenu === title ? null : title);
@@ -47,23 +46,25 @@ const Sidebar: React.FC<ListsTypes> = ({ lists }) => {
   };
   return (
     <div className="w-[250px]  panel p-2 flex flex-col justify-between z-10">
-      <div className="list flex flex-col gap-[2px] flex-grow px-1 border-b-[1px] border-gray-200">
-        {lists.general_settings.map((list) => (
-          <div key={list.title}>
-            <Link
-              href={list.url as string}
-              onClick={handleClickNoSubMenu}
-              className={`item flex items-center gap-4 px-1 py-2 text-sm rounded-md duration-300 ${
-                isMenuActive(list)
-                  ? "text-gray-800 bg-gray-100"
-                  : "text-gray-600 hover:text-gray-800 hover:bg-gray-100"
-              }`}
-            >
-              <i className={`bx ${list.icon} text-[20px]`}></i>
-              <h3>{capitalizeFirst(list.title)}</h3>
-            </Link>
-          </div>
-        ))}
+      <div className="list gap-[2px] flex-grow px-1">
+        <div className="border-b-[1px] border-gray-200">
+          {lists.general_settings.map((list) => (
+            <div key={list.title}>
+              <Link
+                href={list.url as string}
+                onClick={handleClickNoSubMenu}
+                className={`item flex items-center gap-4 px-1 py-2 text-sm rounded-md duration-300 ${
+                  isMenuActive(list)
+                    ? "text-gray-800 bg-gray-100"
+                    : "text-gray-600 hover:text-gray-800 hover:bg-gray-100"
+                }`}
+              >
+                <i className={`bx ${list.icon} text-[20px]`}></i>
+                <h3>{capitalizeFirst(list.title)}</h3>
+              </Link>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

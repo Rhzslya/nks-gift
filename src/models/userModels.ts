@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema(
     profileImage: {
       type: String,
       required: false,
+      default: "",
     },
     username: {
       type: String,
@@ -46,8 +47,26 @@ const userSchema = new mongoose.Schema(
       default: "",
     },
     address: {
-      type: String,
-      default: "",
+      street: {
+        type: String,
+        default: "",
+      },
+      city: {
+        type: String,
+        default: "",
+      },
+      state: {
+        type: String,
+        default: "",
+      },
+      postalCode: {
+        type: String,
+        default: "",
+      },
+      country: {
+        type: String,
+        default: "",
+      },
     },
     forgotPasswordToken: String,
     forgotPasswordTokenExpiry: Date,

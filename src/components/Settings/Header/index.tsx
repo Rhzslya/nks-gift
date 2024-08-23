@@ -21,7 +21,7 @@ const Header = ({ serverSession }: { serverSession: any }) => {
               width={100}
               height={100}
               alt={userInSession?.username || ""}
-              className="h-12 w-12 object-contain rounded-full"
+              className="h-12 w-12 object-cover rounded-full"
             />
           </div>
           <div className="flex flex-col font-medium text-gray-600">

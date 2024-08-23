@@ -1,39 +1,59 @@
-import {} from "firebase/firestore";
-import app from ".";
 import {
+  deleteObject,
   getDownloadURL,
   getStorage,
+  listAll,
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
+import app from ".";
 
 const storage = getStorage(app);
 
-export async function uploadFile(userId: string, file: any) {
-  if (file) {
-    if (file.size < 1048576) {
-      const newName = "profile." + file.name.split(".")[1];
-      console.log(newName);
-      const storageRef = ref(storage, `images/users/${userId}/${newName}`);
-      const uploadTask = uploadBytesResumable(storageRef, file);
+export async function uploadFile(
+  userId: string,
+  file: File,
+  progressCallback: (progress: number) => void
+): Promise<string | false> {
+  if (!file) return false;
+
+  if (file.size >= 1048576) {
+    // File lebih dari 1MB
+    return false;
+  }
+
+  const newName = `profile.${file.name.split(".").pop()}`;
+  const userFolderRef = ref(storage, `images/users/${userId}/`);
+
+  // List all files in the user's folder and delete the old profile picture
+  const files = await listAll(userFolderRef);
+  for (const item of files.items) {
+    await deleteObject(item);
+  }
+
+  const storageRef = ref(storage, `images/users/${userId}/${newName}`);
+  try {
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    return await new Promise<string>((resolve, reject) => {
       uploadTask.on(
         "state_changed",
         (snapshot) => {
           const progress =
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          progressCallback(progress);
         },
-        () => {
-          console.log("error");
+        (error) => {
+          reject(`Upload failed: ${error.message}`);
         },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL: any) => {
-            console.log(downloadURL);
-          });
+        async () => {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          resolve(downloadURL);
         }
       );
-    } else {
-      return false;
-    }
+    });
+  } catch (error) {
+    console.error("Error uploading file", error);
+    return false;
   }
-  return true;
 }

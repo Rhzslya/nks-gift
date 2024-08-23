@@ -13,7 +13,14 @@ interface User {
   role: string;
   _id: string;
   numberPhone: string;
-  address: string;
+  address: {
+    street: string;
+    state: string;
+    city: string;
+    country: string;
+    postalCode: string;
+  };
+  profileImage: string;
 }
 
 interface ModalUpdatedUserProps {
@@ -96,8 +103,15 @@ const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
           await update({
             username: updatedUser.username,
             numberPhone: updatedUser.numberPhone,
-            address: updatedUser.address,
+            address: {
+              street: updatedUser.address.street,
+              state: updatedUser.address.state,
+              city: updatedUser.address.city,
+              country: updatedUser.address.country,
+              postalCode: updatedUser.address.postalCode,
+            },
             role: updatedUser.role,
+            profileImage: updatedUser.profileImage,
           });
 
           if (updatedUser.role === "user") {

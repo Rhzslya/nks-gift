@@ -12,7 +12,13 @@ import { uploadFile } from "@/lib/firebase/services";
 
 interface User {
   username: string;
-  address: string;
+  address: {
+    street: string;
+    state: string;
+    city: string;
+    country: string;
+    postalCode: string;
+  };
   numberPhone: string;
   profileImage?: string;
   _id: string;
@@ -27,7 +33,13 @@ const ProfileViews = ({ serverSession }: any) => {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [user, setUser] = useState<User>({
     username: userInSession.username,
-    address: userInSession.address,
+    address: {
+      street: userInSession.address.street,
+      state: userInSession.address.state,
+      city: userInSession.address.city,
+      country: userInSession.address.country,
+      postalCode: userInSession.address.postalCode,
+    },
     numberPhone: convertNumber(userInSession?.numberPhone || ""),
     profileImage: userInSession.profileImage || "",
     _id: userInSession.id,
@@ -37,14 +49,23 @@ const ProfileViews = ({ serverSession }: any) => {
   const [initialNumberPhone, setInitialNumberPhone] = useState(
     convertNumber(user.numberPhone)
   );
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [isModified, setIsModified] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null); // Tambah state untuk menyimpan file yang dipilih
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLLabelElement>(null);
+  const contentInputRef = useRef<HTMLDivElement>(null);
 
   // Update the user state whenever userInSession changes
   useEffect(() => {
     setUser({
       username: userInSession.username,
-      address: userInSession.address,
+      address: {
+        street: userInSession.address.street,
+        state: userInSession.address.state,
+        city: userInSession.address.city,
+        country: userInSession.address.country,
+        postalCode: userInSession.address.postalCode,
+      },
       numberPhone: convertNumber(userInSession?.numberPhone),
       profileImage: userInSession.profileImage || "",
       _id: userInSession.id,
@@ -52,31 +73,84 @@ const ProfileViews = ({ serverSession }: any) => {
     });
   }, [userInSession]);
 
-  const handleToggleEdit = () => {
-    setIsEditOpen(!isEditOpen);
-  };
+  console.log(userInSession);
+  console.log(user.address);
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setSelectedImage(file);
 
-  const handleUpload = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!selectedFile) return;
-
-    try {
-      setIsLoading(true);
-      // Upload image to Firebase or your backend
-      const uploadedImageUrl = await uploadFile(user._id, selectedFile);
-
-      // Update profile image
-    } catch (error) {
-      console.log("Error uploading image:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
     if (file) {
-      setSelectedFile(file); // Simpan file yang dipilih di state
+      const previewUrl = URL.createObjectURL(file);
+      setUser((prevUser: User) => ({
+        ...prevUser,
+        profileImage: previewUrl,
+      }));
     }
+  };
+
+  const handleSaveProfilePicture = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
+    e.preventDefault();
+    if (selectedImage && user) {
+      try {
+        const newImageUrl = await uploadFile(
+          user._id,
+          selectedImage,
+          setUploadProgress
+        );
+
+        // Periksa apakah upload berhasil
+        if (newImageUrl && typeof newImageUrl === "string") {
+          const response = await fetch(
+            "/api/users/update-profile/profile-image",
+            {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${accessToken}`,
+              },
+              body: JSON.stringify({ _id: user._id, newImageURL: newImageUrl }),
+            }
+          );
+
+          const data = await response.json();
+          if (response.ok) {
+            setUser((prevUser: User) => ({
+              ...prevUser,
+              profileImage: newImageUrl,
+            }));
+
+            await update({
+              username: user.username,
+              numberPhone: user.numberPhone,
+              address: {
+                street: user.address.street,
+                state: user.address.state,
+                city: user.address.city,
+                country: user.address.country,
+                postalCode: user.address.postalCode,
+              },
+              role: user.role,
+              profileImage: newImageUrl,
+            });
+            setUploadProgress(null);
+            setSelectedImage(null);
+          } else {
+            console.error("Failed to update profile");
+          }
+        } else {
+          console.error("Upload failed or invalid URL");
+        }
+      } catch (error) {
+        console.error("Error updating profile", error);
+      }
+    }
+  };
+
+  const handleClickLabel = (e: any) => {
+    e.preventDefault();
+    fileInputRef.current?.click();
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -108,8 +182,15 @@ const ProfileViews = ({ serverSession }: any) => {
           await update({
             username: user.username,
             numberPhone: user.numberPhone,
-            address: user.address,
+            address: {
+              street: user.address.street,
+              state: user.address.state,
+              city: user.address.city,
+              country: user.address.country,
+              postalCode: user.address.postalCode,
+            },
             role: user.role,
+            profileImage: user.profileImage,
           });
         } else {
           console.error("Error updating profile:", data.message);
@@ -130,58 +211,134 @@ const ProfileViews = ({ serverSession }: any) => {
 
       <div className="mt-4 flex gap-4">
         <div className="w-full border-[1px] border-gray-200 p-4 rounded-md">
-          <form method="PATCH" onSubmit={handleSubmit} noValidate>
-            <div className="flex flex-col text-sm mb-4">
-              <LabelAndInput
-                id="username"
-                type="text"
-                name="username"
-                text="username"
-                value={user.username}
-                handleChange={(e) => handleChange({ e, setUser, setErrors })}
-                error={errors.username}
-                textStyle="text-sm font-bold text-gray-600"
-              />
+          <form
+            method="PATCH"
+            onSubmit={handleSubmit}
+            noValidate
+            className="flex flex-col h-full"
+          >
+            <div className="flex-grow">
+              <div className="flex flex-col text-sm mb-4">
+                <LabelAndInput
+                  id="username"
+                  type="text"
+                  name="username"
+                  text="Username"
+                  value={user.username}
+                  handleChange={(e) => handleChange({ e, setUser, setErrors })}
+                  error={errors.username}
+                  textStyle="text-sm font-medium text-gray-600"
+                />
+              </div>
+              <div className="flex flex-col text-sm mb-4">
+                <LabelAndInput
+                  id="numberPhone"
+                  type="number"
+                  name="numberPhone"
+                  text="Phone Number"
+                  value={user.numberPhone}
+                  handleChange={(e) => handleChange({ e, setUser, setErrors })}
+                  error={errors.numberPhone}
+                  textStyle="text-sm font-medium text-gray-600"
+                />
+              </div>
+              <div className="grid grid-cols-2 grid-rows-3 gap-2">
+                <div className="flex flex-col text-sm mb-4 col-span-2">
+                  <LabelAndInput
+                    id="street"
+                    type="text"
+                    name="address.street"
+                    text="Street"
+                    value={user.address.street}
+                    handleChange={(e) =>
+                      handleChange({ e, setUser, setErrors })
+                    }
+                    error={errors.address}
+                    textStyle="text-sm font-medium text-gray-600"
+                    padding="px-2 py-1"
+                  />
+                </div>
+                <div className="flex flex-col text-sm mb-4">
+                  <LabelAndInput
+                    id="city"
+                    type="text"
+                    name="address.city"
+                    text="City"
+                    value={user.address.city}
+                    handleChange={(e) =>
+                      handleChange({ e, setUser, setErrors })
+                    }
+                    error={errors.address}
+                    textStyle="text-sm font-medium text-gray-600"
+                    padding="px-2 py-1"
+                  />
+                </div>
+                <div className="flex flex-col text-sm mb-4">
+                  <LabelAndInput
+                    id="state"
+                    type="text"
+                    name="address.state"
+                    text="State"
+                    value={user.address.state}
+                    handleChange={(e) =>
+                      handleChange({ e, setUser, setErrors })
+                    }
+                    error={errors.address}
+                    textStyle="text-sm font-medium text-gray-600"
+                    padding="px-2 py-1"
+                  />
+                </div>
+                <div className="flex flex-col text-sm mb-4">
+                  <LabelAndInput
+                    id="postalCode"
+                    type="text"
+                    name="address.postalCode"
+                    text="Postal Code"
+                    value={user.address.postalCode}
+                    handleChange={(e) =>
+                      handleChange({ e, setUser, setErrors })
+                    }
+                    error={errors.address}
+                    textStyle="text-sm font-medium text-gray-600"
+                    padding="px-2 py-1"
+                  />
+                </div>
+                <div className="flex flex-col text-sm mb-4">
+                  <LabelAndInput
+                    id="country"
+                    type="text"
+                    name="address.country"
+                    text="Country"
+                    value={user.address.country}
+                    handleChange={(e) =>
+                      handleChange({ e, setUser, setErrors })
+                    }
+                    error={errors.address}
+                    textStyle="text-sm font-medium text-gray-600"
+                    padding="px-2 py-1"
+                  />
+                </div>
+              </div>
             </div>
-            <div className="flex flex-col text-sm mb-4">
-              <LabelAndInput
-                id="numberPhone"
-                type="number"
-                name="numberPhone"
-                text="number phone"
-                value={user.numberPhone}
-                handleChange={(e) => handleChange({ e, setUser, setErrors })}
-                error={errors.numberPhone}
-                textStyle="text-sm font-bold text-gray-600"
-              />
-            </div>
-            <div className="flex flex-col text-sm mb-4">
-              <LabelAndInput
-                id="address"
-                type="text"
-                name="address"
-                text="address"
-                value={user.address}
-                handleChange={(e) => handleChange({ e, setUser, setErrors })}
-                error={errors.address}
-                textStyle="text-sm font-bold text-gray-600"
-              />
-            </div>
-
-            <div className="flex flex-col text-sm mb-4 w-[180px]">
-              <SubmitButton
-                isLoading={isLoading}
-                text="Update Profile"
-                type="submit"
-              />
+            <div className="mt-auto">
+              <div className="flex flex-col text-sm w-[180px]">
+                <SubmitButton
+                  isLoading={isLoading}
+                  text="Update Profile"
+                  type="submit"
+                />
+              </div>
             </div>
           </form>
         </div>
         <div className="w-full border-[1px] border-gray-200 p-4 rounded-md">
-          <form onSubmit={handleUpload}>
-            <div className="flex flex-col justify-center items-center gap-2">
-              <div className="">
-                <h3 className="text-sm font-bold text-gray-600">
+          <form
+            onSubmit={handleSaveProfilePicture}
+            className="flex flex-col h-full"
+          >
+            <div className="flex flex-col justify-center items-center gap-2 flex-grow mb-4">
+              <div>
+                <h3 className="text-sm font-medium text-gray-600">
                   Profile Picture
                 </h3>
               </div>
@@ -195,22 +352,75 @@ const ProfileViews = ({ serverSession }: any) => {
                   className="h-24 w-24 object-cover rounded-full"
                 />
               </div>
-              <label htmlFor="profile_image">
-                <p>Phpyp</p>
+              <label
+                ref={fileInputRef}
+                title="Click to Upload Your Profile Picture"
+                htmlFor="profile_image"
+                className="w-full"
+              >
+                <button
+                  type="button"
+                  onClick={handleClickLabel}
+                  className="relative border-dashed border-[2px] border-gray-200 p-6 rounded-md text-gray-600 w-full"
+                >
+                  {selectedImage ? (
+                    <div className="relative z-10 flex flex-col justify-center items-center text-gray-600 min-h-[76.75px]">
+                      <small>
+                        <strong>{selectedImage.name}</strong>
+                      </small>
+                      <small>
+                        Click Save and Upload to save and upload your new
+                        Profile Picture.
+                      </small>
+                      <small>
+                        If you wish to change the image, please select a
+                        different file.
+                      </small>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="absolute inset-0 flex justify-center items-center z-0">
+                        <i className="bx bx-upload text-[80px] text-gray-300"></i>
+                      </div>
+
+                      <div className="relative z-10 flex flex-col justify-center items-center text-gray-600 min-h-[76.75px]">
+                        <small className="">
+                          Click here to upload a profile picture.
+                        </small>
+                        <small className="">
+                          Accepted formats: JPG, PNG (Max size: 1MB).
+                        </small>
+                        <small className="">
+                          For best results, use a clear image with a minimum
+                          resolution of 300x300 pixels.
+                        </small>
+                      </div>
+                    </>
+                  )}
+                </button>
               </label>
+
               <div className="opacity-0 -z-10 hidden">
                 <input
                   type="file"
                   accept="image"
                   id="profile_image"
-                  onChange={handleFileChange}
+                  onChange={handleInputChange}
                 />
               </div>
-              <div className="flex flex-col text-sm mb-4 w-[180px]">
+            </div>
+
+            <div className="mt-auto ml-auto">
+              <div className="flex flex-col text-sm w-[180px]">
                 <SubmitButton
                   isLoading={isLoading}
-                  text="Upload Photo"
+                  text={
+                    uploadProgress !== null
+                      ? `${uploadProgress}%`
+                      : "Save and Upload"
+                  }
                   type="submit"
+                  disabled={!selectedImage}
                 />
               </div>
             </div>

@@ -59,8 +59,15 @@ export const authOptions: NextAuthOptions = {
       if (trigger === "update" && session) {
         token.role = session.role;
         token.username = session.username;
-        token.address = session.address;
+        token.address = {
+          street: session.address.street,
+          state: session.address.state,
+          city: session.address.city,
+          country: session.address.country,
+          postalCode: session.address.postalCode,
+        };
         token.numberPhone = session.numberPhone;
+        token.profileImage = session.profileImage;
       }
 
       if (user) {
@@ -75,9 +82,15 @@ export const authOptions: NextAuthOptions = {
             account?.provider === "google"
               ? "google"
               : token.type || "credentials",
-          profileImage: profile?.picture || token.profileImage,
+          profileImage: user.profileImage,
           numberPhone: user.numberPhone,
-          address: user.address,
+          address: {
+            street: user.address.street,
+            state: user.address.state,
+            city: user.address.city,
+            country: user.address.country,
+            postalCode: user.address.postalCode,
+          },
         };
       }
 
@@ -93,7 +106,13 @@ export const authOptions: NextAuthOptions = {
         isVerified: token.isVerified,
         type: token.type,
         numberPhone: token.numberPhone,
-        address: token.address,
+        address: {
+          street: token.address.street,
+          state: token.address.state,
+          city: token.address.city,
+          country: token.address.country,
+          postalCode: token.address.postalCode,
+        },
       };
 
       const accessToken = jwt.sign(token, process.env.TOKEN_SECRET || "", {

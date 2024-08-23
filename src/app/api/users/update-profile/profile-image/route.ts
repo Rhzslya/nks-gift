@@ -13,13 +13,13 @@ export const PATCH = async (request: NextRequest) => {
     await connect();
 
     const reqBody = await request.json();
-    const { username, address, numberPhone, _id } = reqBody;
+    const { newImageURL, _id } = reqBody;
     const token = request.headers.get("authorization")?.split(" ")[1] || "";
 
     // Periksa token
     if (!token) {
       return NextResponse.json(
-        { status: false, statusCode: 401, message: "No Token Provided" },
+        { status: false, message: "No Token Provided" },
         { status: 401 }
       );
     }
@@ -33,12 +33,17 @@ export const PATCH = async (request: NextRequest) => {
           resolve(decoded as DecodedToken);
         }
       });
+    }).catch((error) => {
+      return NextResponse.json(
+        { status: false, message: "Invalid or Expired Token" },
+        { status: 401 }
+      );
     });
 
     // Validasi ID
-    if (typeof _id !== "string" || !mongoose.Types.ObjectId.isValid(_id)) {
+    if (!mongoose.Types.ObjectId.isValid(_id)) {
       return NextResponse.json(
-        { status: false, statusCode: 400, message: "Invalid ID format" },
+        { status: false, message: "Invalid ID format" },
         { status: 400 }
       );
     }
@@ -46,27 +51,31 @@ export const PATCH = async (request: NextRequest) => {
     // Update user di database
     const updatedUser = await User.findByIdAndUpdate(
       _id,
-      {
-        username,
-        "address.street": address.street,
-        "address.state": address.state,
-        "address.country": address.country,
-        "address.postalCode": address.postalCode,
-        "address.city": address.city,
-        numberPhone,
-      },
-      { new: true }
+      { profileImage: newImageURL },
+      { new: true, select: "username profileImage" } // Hanya memilih field yang diperlukan
     );
 
     if (!updatedUser) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
+      return NextResponse.json(
+        { status: false, message: "User not found" },
+        { status: 404 }
+      );
     }
 
+    // Mengembalikan hanya field yang diperlukan
     return NextResponse.json(
-      { message: "Profile updated successfully", user: updatedUser },
+      {
+        status: true,
+        message: "Profile updated successfully",
+        user: {
+          username: updatedUser.username,
+          profileImage: updatedUser.profileImage,
+        },
+      },
       { status: 200 }
     );
   } catch (error) {
+    console.error("Error updating profile:", error);
     return NextResponse.json(
       { message: "Error updating profile", error },
       { status: 500 }

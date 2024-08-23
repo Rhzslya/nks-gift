@@ -12,28 +12,31 @@ export async function handleGoogleSignIn(user: any, profile: any) {
     // Update existing user
     if (!existingUser.type?.includes("google")) {
       existingUser.type.push("google");
-      existingUser.googleId = user.id;
+    }
+    existingUser.googleId = user.id;
+    existingUser.isVerified = profile.email_verified;
+    existingUser.username = existingUser.username || user.name;
+
+    // Update profileImage only if it's currently empty
+    if (!existingUser.profileImage) {
       existingUser.profileImage = profile.picture;
-      existingUser.isVerified = profile.email_verified;
-      existingUser.username = existingUser.username || user.name;
-    } else {
-      // Set type to Google
-      existingUser.googleId = user.id;
-      existingUser.profileImage = profile.picture;
-      existingUser.isVerified = profile.email_verified;
-      existingUser.username = existingUser.username || user.name;
-      existingUser.address = existingUser.address;
-      existingUser.numberPhone = existingUser.numberPhone;
-      existingUser.role = existingUser.role;
     }
 
     await existingUser.save();
+
     user.id = existingUser._id.toString();
     user.role = existingUser.role;
     user.type = existingUser.type;
     user.username = existingUser.username;
-    user.address = existingUser.address;
+    user.address = {
+      street: existingUser.address?.street,
+      state: existingUser.address?.state,
+      country: existingUser.address?.country,
+      postalCode: existingUser.address?.postalCode,
+      city: existingUser.address?.city,
+    };
     user.numberPhone = existingUser.numberPhone;
+    user.profileImage = existingUser.profileImage;
   } else {
     // Create new user
     const newUser = new User({
@@ -43,13 +46,17 @@ export async function handleGoogleSignIn(user: any, profile: any) {
       profileImage: profile.picture,
       role: "user",
       isVerified: profile.email_verified,
-      type: ["google"], // Set type to Google
+      type: ["google"],
     });
 
     await newUser.save();
+
     user.id = newUser._id.toString();
     user.role = newUser.role;
     user.type = newUser.type;
+    user.profileImage = newUser.profileImage;
+    user.address = newUser.address;
+    user.numberPhone = newUser.numberPhone;
   }
 
   return user;

@@ -14,10 +14,24 @@ export const handleChange = ({
   setIsModified,
 }: HandleChangeParams) => {
   const { name, value } = e.target;
-  setUser((prevUser: any) => ({
-    ...prevUser,
-    [name]: value,
-  }));
+  setUser((prevUser: any) => {
+    // Check if the field is part of the address object
+    if (name.startsWith("address.")) {
+      const addressField = name.split(".")[1];
+      return {
+        ...prevUser,
+        address: {
+          ...prevUser.address,
+          [addressField]: value,
+        },
+      };
+    }
+
+    return {
+      ...prevUser,
+      [name]: value,
+    };
+  });
 
   // Remove specific error message when user starts typing
   setErrors((prevErrors: any) => ({

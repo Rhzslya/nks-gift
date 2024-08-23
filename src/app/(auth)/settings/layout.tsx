@@ -9,8 +9,8 @@ const SettingsLayout = async ({ children }: { children: React.ReactNode }) => {
   const serverSession = await getServerSession(authOptions);
 
   return (
-    <section className="px-3">
-      <div className="max-w-[1200px] mx-auto flex flex-col">
+    <section className="px-3 bg-gray-100">
+      <div className="max-w-[1200px] mx-auto flex flex-col shadow-md h-screen bg-white">
         <Header serverSession={serverSession} />
         <div className="flex">
           <Sidebar lists={listSidebarSettingsItem} />

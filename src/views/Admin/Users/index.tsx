@@ -19,7 +19,7 @@ interface Users {
   isVerified: boolean;
   createdAt: string;
   _id: string;
-  profileImage?: string;
+  profileImage: string;
   userId?: number;
   numberPhone: string;
   address: string;
