@@ -22,7 +22,13 @@ interface Users {
   profileImage: string;
   userId?: number;
   numberPhone: string;
-  address: string;
+  address: {
+    street: string;
+    state: string;
+    city: string;
+    country: string;
+    postalCode: string;
+  };
 }
 
 interface UsersManagementViewsProps {
