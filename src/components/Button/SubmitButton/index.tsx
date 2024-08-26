@@ -1,10 +1,11 @@
+import { Spinner } from "@/utils/Loading";
 import React from "react";
 
 interface ButtonProps {
-  isLoading: boolean;
+  isLoading?: boolean;
   text: string;
   type?: "button" | "submit" | "reset";
-  handleClick?: () => void;
+  handleClick?: (e: React.FormEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
 }
 const SubmitButton: React.FC<ButtonProps> = ({
@@ -25,7 +26,18 @@ const SubmitButton: React.FC<ButtonProps> = ({
       onClick={handleClick}
       className={`w-full bg-sky-400 text-white px-2 py-[6px] text-[15px] rounded duration-300 ${inputClassName}`}
     >
-      {isLoading ? "Loading..." : text}
+      {isLoading ? (
+        <div className="flex justify-center items-center">
+          <Spinner
+            type="spinningBubbles"
+            color="white"
+            width="20px"
+            height="20px"
+          />
+        </div>
+      ) : (
+        text
+      )}{" "}
     </button>
   );
 };

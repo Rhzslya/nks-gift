@@ -9,6 +9,8 @@ import SubmitButton from "@/components/Button/SubmitButton";
 import { validationUpdateProfile } from "@/utils/Validations";
 import { convertNumber } from "@/utils/ConvertNumber";
 import { uploadFile } from "@/lib/firebase/services";
+import ModalRemoveProfilePicture from "@/components/Settings/ModalRemoveProfilePicture";
+import { Spinner } from "@/utils/Loading";
 
 interface User {
   username: string;
@@ -54,6 +56,9 @@ const ProfileViews = ({ serverSession }: any) => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLLabelElement>(null);
   const contentInputRef = useRef<HTMLDivElement>(null);
+  const [modalRemoveProfilePicture, setModalRemoveProfilePicture] = useState<
+    string | null
+  >(null);
 
   // Update the user state whenever userInSession changes
   useEffect(() => {
@@ -73,8 +78,6 @@ const ProfileViews = ({ serverSession }: any) => {
     });
   }, [userInSession]);
 
-  console.log(userInSession);
-  console.log(user.address);
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     setSelectedImage(file);
@@ -88,6 +91,7 @@ const ProfileViews = ({ serverSession }: any) => {
     }
   };
 
+  // Change Profile Picture
   const handleSaveProfilePicture = async (
     e: React.FormEvent<HTMLFormElement>
   ) => {
@@ -103,7 +107,7 @@ const ProfileViews = ({ serverSession }: any) => {
         // Periksa apakah upload berhasil
         if (newImageUrl && typeof newImageUrl === "string") {
           const response = await fetch(
-            "/api/users/update-profile/profile-image",
+            "/api/users/update-profile/change-profile-image",
             {
               method: "PATCH",
               headers: {
@@ -155,10 +159,12 @@ const ProfileViews = ({ serverSession }: any) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsLoading(true);
+
+    if (isLoading) return;
+
     const validationErrors = validationUpdateProfile(user, initialNumberPhone);
     setErrors(validationErrors);
-
+    setIsLoading(true);
     try {
       if (Object.keys(validationErrors).length === 0) {
         const response = await fetch("/api/users/update-profile", {
@@ -192,6 +198,7 @@ const ProfileViews = ({ serverSession }: any) => {
             role: user.role,
             profileImage: user.profileImage,
           });
+          setIsLoading(false);
         } else {
           console.error("Error updating profile:", data.message);
         }
@@ -203,14 +210,22 @@ const ProfileViews = ({ serverSession }: any) => {
     }
   };
 
+  // handleCloseModal
+  const handleClickButtonRemove = () => {
+    setModalRemoveProfilePicture(user._id);
+  };
+
+  const handleCloseModal = () => {
+    setModalRemoveProfilePicture(null);
+  };
   return (
     <div className="p-2 w-full relative">
       <h1 className="font-semibold text-2xl text-gray-600 border-b-[1px] border-gray-200">
         Public Profile
       </h1>
 
-      <div className="mt-4 flex gap-4">
-        <div className="w-full border-[1px] border-gray-200 p-4 rounded-md">
+      <div className="mt-4 flex gap-4 px-6">
+        <div className="w-full ">
           <form
             method="PATCH"
             onSubmit={handleSubmit}
@@ -218,7 +233,10 @@ const ProfileViews = ({ serverSession }: any) => {
             className="flex flex-col h-full"
           >
             <div className="flex-grow">
-              <div className="flex flex-col text-sm mb-4">
+              <h2 className="font-semibold text-lg text-gray-600">
+                General Profile
+              </h2>
+              <div className="flex flex-col text-sm mb-4 mt-2">
                 <LabelAndInput
                   id="username"
                   type="text"
@@ -229,6 +247,11 @@ const ProfileViews = ({ serverSession }: any) => {
                   error={errors.username}
                   textStyle="text-sm font-medium text-gray-600"
                 />
+                <span className="text-gray-500 text-xs mt-1">
+                  Your Username is your display name within the system. It does
+                  not need to be unique, so feel free to use a name that suits
+                  you.
+                </span>
               </div>
               <div className="flex flex-col text-sm mb-4">
                 <LabelAndInput
@@ -241,83 +264,97 @@ const ProfileViews = ({ serverSession }: any) => {
                   error={errors.numberPhone}
                   textStyle="text-sm font-medium text-gray-600"
                 />
+                <span className="text-gray-500 text-xs mt-1">
+                  Your Phone Number will be used for account verification and
+                  communication purposes. Please ensure it is correct and
+                  up-to-date.
+                </span>
               </div>
-              <div className="grid grid-cols-2 grid-rows-3 gap-2">
-                <div className="flex flex-col text-sm mb-4 col-span-2">
-                  <LabelAndInput
-                    id="street"
-                    type="text"
-                    name="address.street"
-                    text="Street"
-                    value={user.address.street}
-                    handleChange={(e) =>
-                      handleChange({ e, setUser, setErrors })
-                    }
-                    error={errors.address}
-                    textStyle="text-sm font-medium text-gray-600"
-                    padding="px-2 py-1"
-                  />
+              <div className="flex flex-col mb-4">
+                <h2 className="font-semibold text-lg text-gray-600">Adress</h2>
+                <div className="grid grid-cols-2 grid-rows-3 gap-2 mt-2">
+                  <div className="flex flex-col text-sm mb-4 col-span-2">
+                    <LabelAndInput
+                      id="street"
+                      type="text"
+                      name="address.street"
+                      text="Street"
+                      value={user.address.street}
+                      handleChange={(e) =>
+                        handleChange({ e, setUser, setErrors })
+                      }
+                      error={errors.address}
+                      textStyle="text-sm font-medium text-gray-600"
+                      padding="px-2 py-1"
+                    />
+                  </div>
+
+                  <div className="flex flex-col text-sm mb-4">
+                    <LabelAndInput
+                      id="city"
+                      type="text"
+                      name="address.city"
+                      text="City"
+                      value={user.address.city}
+                      handleChange={(e) =>
+                        handleChange({ e, setUser, setErrors })
+                      }
+                      error={errors.address}
+                      textStyle="text-sm font-medium text-gray-600"
+                      padding="px-2 py-1"
+                    />
+                  </div>
+                  <div className="flex flex-col text-sm">
+                    <LabelAndInput
+                      id="state"
+                      type="text"
+                      name="address.state"
+                      text="State"
+                      value={user.address.state}
+                      handleChange={(e) =>
+                        handleChange({ e, setUser, setErrors })
+                      }
+                      error={errors.address}
+                      textStyle="text-sm font-medium text-gray-600"
+                      padding="px-2 py-1"
+                    />
+                  </div>
+                  <div className="flex flex-col text-sm">
+                    <LabelAndInput
+                      id="postalCode"
+                      type="text"
+                      name="address.postalCode"
+                      text="Postal Code"
+                      value={user.address.postalCode}
+                      handleChange={(e) =>
+                        handleChange({ e, setUser, setErrors })
+                      }
+                      error={errors.address}
+                      textStyle="text-sm font-medium text-gray-600"
+                      padding="px-2 py-1"
+                    />
+                  </div>
+                  <div className="flex flex-col text-sm">
+                    <LabelAndInput
+                      id="country"
+                      type="text"
+                      name="address.country"
+                      text="Country"
+                      value={user.address.country}
+                      handleChange={(e) =>
+                        handleChange({ e, setUser, setErrors })
+                      }
+                      error={errors.address}
+                      textStyle="text-sm font-medium text-gray-600"
+                      padding="px-2 py-1"
+                    />
+                  </div>
                 </div>
-                <div className="flex flex-col text-sm mb-4">
-                  <LabelAndInput
-                    id="city"
-                    type="text"
-                    name="address.city"
-                    text="City"
-                    value={user.address.city}
-                    handleChange={(e) =>
-                      handleChange({ e, setUser, setErrors })
-                    }
-                    error={errors.address}
-                    textStyle="text-sm font-medium text-gray-600"
-                    padding="px-2 py-1"
-                  />
-                </div>
-                <div className="flex flex-col text-sm mb-4">
-                  <LabelAndInput
-                    id="state"
-                    type="text"
-                    name="address.state"
-                    text="State"
-                    value={user.address.state}
-                    handleChange={(e) =>
-                      handleChange({ e, setUser, setErrors })
-                    }
-                    error={errors.address}
-                    textStyle="text-sm font-medium text-gray-600"
-                    padding="px-2 py-1"
-                  />
-                </div>
-                <div className="flex flex-col text-sm mb-4">
-                  <LabelAndInput
-                    id="postalCode"
-                    type="text"
-                    name="address.postalCode"
-                    text="Postal Code"
-                    value={user.address.postalCode}
-                    handleChange={(e) =>
-                      handleChange({ e, setUser, setErrors })
-                    }
-                    error={errors.address}
-                    textStyle="text-sm font-medium text-gray-600"
-                    padding="px-2 py-1"
-                  />
-                </div>
-                <div className="flex flex-col text-sm mb-4">
-                  <LabelAndInput
-                    id="country"
-                    type="text"
-                    name="address.country"
-                    text="Country"
-                    value={user.address.country}
-                    handleChange={(e) =>
-                      handleChange({ e, setUser, setErrors })
-                    }
-                    error={errors.address}
-                    textStyle="text-sm font-medium text-gray-600"
-                    padding="px-2 py-1"
-                  />
-                </div>
+                <span className="text-gray-500 text-xs mt-1">
+                  Your address will be used for shipping purposes. Please ensure
+                  it is accurate so that any items you order can be delivered to
+                  this location.
+                </span>
               </div>
             </div>
             <div className="mt-auto">
@@ -331,11 +368,8 @@ const ProfileViews = ({ serverSession }: any) => {
             </div>
           </form>
         </div>
-        <div className="w-full border-[1px] border-gray-200 p-4 rounded-md">
-          <form
-            onSubmit={handleSaveProfilePicture}
-            className="flex flex-col h-full"
-          >
+        <div className="w-full h-min  p-4">
+          <form onSubmit={handleSaveProfilePicture} className=" h-full">
             <div className="flex flex-col justify-center items-center gap-2 flex-grow mb-4">
               <div>
                 <h3 className="text-sm font-medium text-gray-600">
@@ -356,7 +390,7 @@ const ProfileViews = ({ serverSession }: any) => {
                 ref={fileInputRef}
                 title="Click to Upload Your Profile Picture"
                 htmlFor="profile_image"
-                className="w-full"
+                className="relative w-full"
               >
                 <button
                   type="button"
@@ -398,27 +432,29 @@ const ProfileViews = ({ serverSession }: any) => {
                     </>
                   )}
                 </button>
+                <div className="absolute w-full h-full top-0 -z-10 opacity-0  flex justify-center items-center">
+                  <input
+                    type="file"
+                    accept="image"
+                    id="profile_image"
+                    onChange={handleInputChange}
+                  />
+                </div>
               </label>
-
-              <div className="opacity-0 -z-10 hidden">
-                <input
-                  type="file"
-                  accept="image"
-                  id="profile_image"
-                  onChange={handleInputChange}
-                />
-              </div>
             </div>
 
-            <div className="mt-auto ml-auto">
+            <div className="flex justify-between">
               <div className="flex flex-col text-sm w-[180px]">
                 <SubmitButton
-                  isLoading={isLoading}
-                  text={
-                    uploadProgress !== null
-                      ? `${uploadProgress}%`
-                      : "Save and Upload"
-                  }
+                  text="Remove Photo"
+                  type="button"
+                  handleClick={handleClickButtonRemove}
+                  disabled={!userInSession.profileImage}
+                />
+              </div>
+              <div className="flex flex-col text-sm w-[180px]">
+                <SubmitButton
+                  text="Save and Upload"
                   type="submit"
                   disabled={!selectedImage}
                 />
@@ -427,6 +463,16 @@ const ProfileViews = ({ serverSession }: any) => {
           </form>
         </div>
       </div>
+      {modalRemoveProfilePicture !== null && (
+        <ModalRemoveProfilePicture
+          handleCloseModal={handleCloseModal}
+          user={user}
+          setModalRemoveProfilePicture={setModalRemoveProfilePicture}
+          accessToken={accessToken}
+          setUser={setUser}
+          update={update}
+        />
+      )}
     </div>
   );
 };

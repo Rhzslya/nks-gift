@@ -45,7 +45,7 @@ const Sidebar: React.FC<ListsTypes> = ({ lists }) => {
     return pathname === list.url || isSubMenuActive(list.subMenu);
   };
   return (
-    <div className="w-[250px]  panel p-2 flex flex-col justify-between z-10">
+    <div className="min-w-[300px]  panel p-2 flex flex-col justify-between z-10">
       <div className="list gap-[2px] flex-grow px-1">
         <div className="border-b-[1px] border-gray-200">
           {lists.general_settings.map((list) => (
