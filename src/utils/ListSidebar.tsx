@@ -16,17 +16,6 @@ export const listSidebarItem = {
       title: "products",
       url: "/admin/products",
       icon: "bxs-box",
-      hasSubMenu: true,
-      subMenu: [
-        {
-          title: "flowers",
-          url: "/admin/products/flowers",
-        },
-        {
-          title: "bouquet",
-          url: "/admin/products/bouquet",
-        },
-      ],
     },
     {
       title: "categories",

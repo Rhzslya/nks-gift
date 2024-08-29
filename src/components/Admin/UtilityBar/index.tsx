@@ -1,4 +1,5 @@
 import React, { RefObject } from "react";
+import { SortOption } from "@/utils/SortOptions";
 
 interface UtilityBarProps {
   searchTerm: string;
@@ -7,14 +8,10 @@ interface UtilityBarProps {
   filterButtonRef: RefObject<HTMLButtonElement>;
   isFilterOpen: boolean;
   filterRef: RefObject<HTMLDivElement>;
-  isActive: (
-    order: "asc" | "desc",
-    field: "username" | "createdAt" | "accessLevel"
-  ) => boolean;
-  handleSortChange: (
-    order: "asc" | "desc",
-    field: "username" | "createdAt" | "accessLevel"
-  ) => void;
+  isActive: (order: "asc" | "desc", field: any) => boolean;
+  handleSortChange: (order: "asc" | "desc", field: any) => void;
+  placeholder: string;
+  sortOptions: SortOption[];
 }
 
 const UtilityBar: React.FC<UtilityBarProps> = ({
@@ -26,6 +23,8 @@ const UtilityBar: React.FC<UtilityBarProps> = ({
   filterRef,
   isActive,
   handleSortChange,
+  placeholder,
+  sortOptions,
 }) => {
   return (
     <div className="relative py-2 flex items-center">
@@ -35,7 +34,7 @@ const UtilityBar: React.FC<UtilityBarProps> = ({
         </span>
         <input
           type="text"
-          placeholder="Search Users"
+          placeholder={placeholder}
           className="px-2 py-1 border rounded text-sm pl-10 focus:border-sky-300 focus:outline-none"
           value={searchTerm}
           onChange={handleSearchChange}
@@ -55,54 +54,18 @@ const UtilityBar: React.FC<UtilityBarProps> = ({
             ref={filterRef}
             className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg z-50"
           >
-            <button
-              className={`block px-4 py-2 text-xs text-gray-500 hover:bg-gray-100 w-full text-left ${
-                isActive("asc", "username") && "bg-gray-300 text-gray-700"
-              }`}
-              onClick={() => handleSortChange("asc", "username")}
-            >
-              Sort by Username (A-Z)
-            </button>
-            <button
-              className={`block px-4 py-2 text-xs text-gray-500 hover:bg-gray-100 w-full text-left ${
-                isActive("desc", "username") && "bg-gray-300 text-gray-700"
-              }`}
-              onClick={() => handleSortChange("desc", "username")}
-            >
-              Sort by Username (Z-A)
-            </button>
-            <button
-              className={`block px-4 py-2 text-xs text-gray-500 hover:bg-gray-100 w-full text-left ${
-                isActive("asc", "createdAt") && "bg-gray-300 text-gray-700"
-              }`}
-              onClick={() => handleSortChange("asc", "createdAt")}
-            >
-              Sort by Created Date (Oldest First)
-            </button>
-            <button
-              className={`block px-4 py-2 text-xs text-gray-500 hover:bg-gray-100 w-full text-left ${
-                isActive("desc", "createdAt") && "bg-gray-300 text-gray-700"
-              }`}
-              onClick={() => handleSortChange("desc", "createdAt")}
-            >
-              Sort by Created Date (Newest First)
-            </button>
-            <button
-              className={`block px-4 py-2 text-xs text-gray-500 hover:bg-gray-100 w-full text-left ${
-                isActive("asc", "accessLevel") && "bg-gray-300 text-gray-700"
-              }`}
-              onClick={() => handleSortChange("asc", "accessLevel")}
-            >
-              Sort by Access Level (Higher First)
-            </button>
-            <button
-              className={`block px-4 py-2 text-xs text-gray-500 hover:bg-gray-100 w-full text-left ${
-                isActive("desc", "accessLevel") && "bg-gray-300 text-gray-700"
-              }`}
-              onClick={() => handleSortChange("desc", "accessLevel")}
-            >
-              Sort by Access Level (Lower First)
-            </button>
+            {sortOptions.map((option) => (
+              <button
+                key={`${option.field}-${option.order}`}
+                className={`block px-4 py-2 text-xs text-gray-500 hover:bg-gray-100 w-full text-left ${
+                  isActive(option.order, option.field) &&
+                  "bg-gray-300 text-gray-700"
+                }`}
+                onClick={() => handleSortChange(option.order, option.field)}
+              >
+                {option.label}
+              </button>
+            ))}
           </div>
         )}
       </div>

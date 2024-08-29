@@ -8,6 +8,7 @@ import Image from "next/image";
 import AuthButton from "@/components/Button/AuthButton";
 import Link from "next/link";
 import AuthButtonAlt from "../Button/AuthButtonAlt";
+import { getInitials } from "@/utils/Initials";
 
 type UserDropDownProps = {
   user: {
@@ -29,15 +30,23 @@ const UserDropDown = forwardRef<HTMLDivElement, UserDropDownProps>(
           className="flex gap-1 justify-center items-center cursor-pointer"
           onClick={handleToggleDropdown}
         >
-          <div className="hover:bg-gray-200 p-1 rounded-full duration-150">
-            <Image
-              src={user.profileImage || `/user-profile.png`}
-              width={100}
-              height={100}
-              alt={user.username}
-              className="h-7 w-7 object-contain rounded-full"
-              loading="lazy"
-            />
+          <div className="flex items-center bg-gray-100 p-1 rounded-full hover:bg-gray-200 duration-300">
+            {user.profileImage ? (
+              <Image
+                src={user.profileImage}
+                width={100}
+                height={100}
+                alt={user.username || ""}
+                quality={100}
+                className="h-7 w-7 object-cover rounded-full"
+              />
+            ) : (
+              <div className="relative inline-flex items-center justify-center w-7 h-7 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-400">
+                <span className="font-medium text-gray-600 dark:text-gray-300 text-xs">
+                  {getInitials(user.username)}
+                </span>
+              </div>
+            )}
           </div>
         </div>
         {isDropdownOpen && (
@@ -47,14 +56,24 @@ const UserDropDown = forwardRef<HTMLDivElement, UserDropDownProps>(
           >
             <div className="border-b-[1px]">
               <div className="profile relative flex flex-col justify-center items-center gap-1 py-2 z-10">
-                <Image
-                  src={user.profileImage || `/user-profile.png`}
-                  width={100}
-                  height={100}
-                  alt={user.username}
-                  className="h-10 w-10 object-contain rounded-full"
-                  loading="lazy"
-                />
+                <div className="flex items-center bg-gray-100 p-1 rounded-full">
+                  {user.profileImage ? (
+                    <Image
+                      src={user.profileImage}
+                      width={100}
+                      height={100}
+                      alt={user.username || ""}
+                      quality={100}
+                      className="h-10 w-10 object-cover rounded-full"
+                    />
+                  ) : (
+                    <div className="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-400">
+                      <span className="font-medium text-gray-600 dark:text-gray-300 text-sb">
+                        {getInitials(user.username)}
+                      </span>
+                    </div>
+                  )}
+                </div>
                 <p className="font-medium text-sm">{user.username}</p>
                 <p className="text-xs">{user.email}</p>
               </div>

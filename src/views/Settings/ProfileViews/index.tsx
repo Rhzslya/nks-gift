@@ -11,6 +11,7 @@ import { convertNumber } from "@/utils/ConvertNumber";
 import { uploadFile } from "@/lib/firebase/services";
 import ModalRemoveProfilePicture from "@/components/Settings/ModalRemoveProfilePicture";
 import { Spinner } from "@/utils/Loading";
+import { getInitials } from "@/utils/Initials";
 
 interface User {
   username: string;
@@ -31,7 +32,7 @@ const ProfileViews = ({ serverSession }: any) => {
   const { data: session, update } = useSession();
   const userInSession = session?.user || serverSession?.user;
   const accessToken = session?.accessToken || serverSession.accessToken;
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState("");
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [user, setUser] = useState<User>({
     username: userInSession.username,
@@ -54,7 +55,7 @@ const ProfileViews = ({ serverSession }: any) => {
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [isModified, setIsModified] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const fileInputRef = useRef<HTMLLabelElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const contentInputRef = useRef<HTMLDivElement>(null);
   const [modalRemoveProfilePicture, setModalRemoveProfilePicture] = useState<
     string | null
@@ -81,7 +82,8 @@ const ProfileViews = ({ serverSession }: any) => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     setSelectedImage(file);
-
+    console.log(file);
+    console.log(selectedImage);
     if (file) {
       const previewUrl = URL.createObjectURL(file);
       setUser((prevUser: User) => ({
@@ -96,6 +98,7 @@ const ProfileViews = ({ serverSession }: any) => {
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
+    setIsLoading("save-profile-image");
     if (selectedImage && user) {
       try {
         const newImageUrl = await uploadFile(
@@ -140,6 +143,12 @@ const ProfileViews = ({ serverSession }: any) => {
             });
             setUploadProgress(null);
             setSelectedImage(null);
+            setIsLoading("");
+
+            // Reset input file
+            if (fileInputRef.current) {
+              fileInputRef.current.value = "";
+            }
           } else {
             console.error("Failed to update profile");
           }
@@ -148,6 +157,8 @@ const ProfileViews = ({ serverSession }: any) => {
         }
       } catch (error) {
         console.error("Error updating profile", error);
+      } finally {
+        setIsLoading("");
       }
     }
   };
@@ -164,7 +175,7 @@ const ProfileViews = ({ serverSession }: any) => {
 
     const validationErrors = validationUpdateProfile(user, initialNumberPhone);
     setErrors(validationErrors);
-    setIsLoading(true);
+    setIsLoading("update-profile");
     try {
       if (Object.keys(validationErrors).length === 0) {
         const response = await fetch("/api/users/update-profile", {
@@ -198,7 +209,7 @@ const ProfileViews = ({ serverSession }: any) => {
             role: user.role,
             profileImage: user.profileImage,
           });
-          setIsLoading(false);
+          setIsLoading("");
         } else {
           console.error("Error updating profile:", data.message);
         }
@@ -206,7 +217,7 @@ const ProfileViews = ({ serverSession }: any) => {
     } catch (error) {
       console.error("Error submitting the form:", error);
     } finally {
-      setIsLoading(false);
+      setIsLoading("");
     }
   };
 
@@ -360,9 +371,10 @@ const ProfileViews = ({ serverSession }: any) => {
             <div className="mt-auto">
               <div className="flex flex-col text-sm w-[180px]">
                 <SubmitButton
-                  isLoading={isLoading}
+                  isLoading={isLoading === "update-profile" ? isLoading : ""}
                   text="Update Profile"
                   type="submit"
+                  variant="gray"
                 />
               </div>
             </div>
@@ -377,17 +389,25 @@ const ProfileViews = ({ serverSession }: any) => {
                 </h3>
               </div>
               <div className="flex items-center bg-gray-100 p-2 rounded-full">
-                <Image
-                  src={user.profileImage || "/user-profile.png"}
-                  width={100}
-                  height={100}
-                  alt={user.username || ""}
-                  quality={100}
-                  className="h-24 w-24 object-cover rounded-full"
-                />
+                {user.profileImage ? (
+                  <Image
+                    src={user.profileImage}
+                    width={100}
+                    height={100}
+                    alt={user.username || ""}
+                    quality={100}
+                    className="h-24 w-24 object-cover rounded-full"
+                  />
+                ) : (
+                  <div className="relative inline-flex items-center justify-center w-24 h-24 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-400">
+                    <span className="font-medium text-gray-600 dark:text-gray-300 text-3xl">
+                      {getInitials(userInSession.username)}
+                    </span>
+                  </div>
+                )}
               </div>
+
               <label
-                ref={fileInputRef}
                 title="Click to Upload Your Profile Picture"
                 htmlFor="profile_image"
                 className="relative w-full"
@@ -438,6 +458,7 @@ const ProfileViews = ({ serverSession }: any) => {
                     accept="image"
                     id="profile_image"
                     onChange={handleInputChange}
+                    ref={fileInputRef}
                   />
                 </div>
               </label>
@@ -450,6 +471,10 @@ const ProfileViews = ({ serverSession }: any) => {
                   type="button"
                   handleClick={handleClickButtonRemove}
                   disabled={!userInSession.profileImage}
+                  variant="gray"
+                  isLoading={
+                    isLoading === "remove-profile-image" ? isLoading : ""
+                  }
                 />
               </div>
               <div className="flex flex-col text-sm w-[180px]">
@@ -457,6 +482,10 @@ const ProfileViews = ({ serverSession }: any) => {
                   text="Save and Upload"
                   type="submit"
                   disabled={!selectedImage}
+                  variant="gray"
+                  isLoading={
+                    isLoading === "save-profile-image" ? isLoading : ""
+                  }
                 />
               </div>
             </div>
@@ -471,6 +500,7 @@ const ProfileViews = ({ serverSession }: any) => {
           accessToken={accessToken}
           setUser={setUser}
           update={update}
+          setIsLoading={setIsLoading}
         />
       )}
     </div>

@@ -1,37 +1,19 @@
-"use client";
-
-import React, { useEffect, useRef, useState } from "react";
-import UserDropDown from "@/components/UserDropDown";
-import { tableArchivedUser } from "@/utils/TableHeaders";
-import { signIn, signOut, useSession } from "next-auth/react";
+import React, { useState, useRef, useEffect } from "react";
+import { productsTableHeaders } from "@/utils/TableHeaders";
+import "react-loading-skeleton/dist/skeleton.css";
+import { useSession } from "next-auth/react";
+import { Bounce, toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Header from "@/components/Admin/Header";
-import UtilityBar from "@/components/Admin/UtilityBar";
 import Table from "@/components/Admin/Table";
+import UtilityBar from "@/components/Admin/UtilityBar";
 import PaginationToolbar from "@/components/Admin/PaginationToolbar";
-import ModalDeletePermanently from "@/components/Admin/ModalDeletePermanently";
-import ModalRestoreUser from "@/components/Admin/ModalRestoreUser";
-import { userSortOptions } from "@/utils/SortOptions";
+import { productSortOptions } from "@/utils/SortOptions";
 
-interface ArchivedUsers {
-  username: string;
-  email: string;
-  type: any;
-  role: string;
-  isVerified: boolean;
-  createdAt: string;
-  archivedAt: string;
-  _id: string;
-  profileImage?: string;
-  userId?: number;
-}
-
-interface ArchivedUsersViewsProps {
-  users: ArchivedUsers[];
+interface ProductsManagementViewsProps {
   isLoading: boolean;
   userInSession: any;
-  currentUserRole: any;
   accessToken: any;
-  message: string;
 }
 
 type Role = "user" | "manager" | "admin" | "super_admin";
@@ -39,13 +21,10 @@ type RoleOrder = {
   [key in Role]: number;
 };
 
-const ArchivedUsersViews: React.FC<ArchivedUsersViewsProps> = ({
-  users,
+const ProductsManagementViews: React.FC<ProductsManagementViewsProps> = ({
   isLoading,
   userInSession,
-  currentUserRole,
   accessToken,
-  message,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -54,22 +33,14 @@ const ArchivedUsersViews: React.FC<ArchivedUsersViewsProps> = ({
   const [sortBy, setSortBy] = useState<
     "username" | "createdAt" | "accessLevel" | ""
   >("");
-  const [modalRestoreUser, setModalRestoreUser] = useState<string | null>(null);
-  const [modalDeletePermanentlyUser, setModalDeletePermanentlyUser] = useState<
-    string | null
-  >(null);
+  const [modalEditUser, setModalEditUser] = useState<string | null>(null);
+  const [modalArchivedUser, setModalArchivedUser] = useState<string | null>(
+    null
+  );
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [activeUserId, setActiveUserId] = useState<string | null>(null);
   const { data: session, update } = useSession();
-  const [usersData, setUsersData] = useState<ArchivedUsers[]>([]);
-  const isDeletedPermanentlyUser = usersData?.find(
-    (user) => user._id === modalDeletePermanentlyUser
-  );
-  const isRestoredUser = usersData?.find(
-    (user) => user._id === modalRestoreUser
-  );
-
   const [clickedButtonId, setClickedButtonId] = useState<string | null>(null);
   const menuSettingRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const settingButtonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>(
@@ -79,11 +50,8 @@ const ArchivedUsersViews: React.FC<ArchivedUsersViewsProps> = ({
   const filterButtonRef = useRef<HTMLButtonElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const dropdownButtonRef = useRef<HTMLDivElement | null>(null);
-
+  const [message, setMessage] = useState("");
   // Always Update Data
-  useEffect(() => {
-    setUsersData(users);
-  }, [users]);
 
   // Open & Close Menu Setting Start
   useEffect(() => {
@@ -171,25 +139,21 @@ const ArchivedUsersViews: React.FC<ArchivedUsersViewsProps> = ({
   };
   // Open & Close Dropdown End
 
-  // open Modal Restore User
-
-  const handleModalRestoreUser = (_id: string) => {
+  // open Modal Edit User
+  const handleModalEditUser = (_id: string) => {
     setActiveUserId(null);
-    setModalRestoreUser(modalRestoreUser === _id ? null : _id);
+    setModalEditUser(modalEditUser === _id ? null : _id);
   };
 
-  // open Modal Delete Permanently User
-  const handleModalDeletePermanently = (_id: string) => {
+  // open Modal Delete User
+  const handleModalArchivedUser = (_id: string) => {
     setActiveUserId(null);
-    setModalDeletePermanentlyUser(
-      modalDeletePermanentlyUser === _id ? null : _id
-    );
+    setModalArchivedUser(modalArchivedUser === _id ? null : _id);
   };
 
-  // Close Modal
   const handleCloseModal = () => {
-    setModalRestoreUser(null);
-    setModalDeletePermanentlyUser(null);
+    setModalEditUser(null);
+    setModalArchivedUser(null);
   };
 
   // Search Users
@@ -219,50 +183,63 @@ const ArchivedUsersViews: React.FC<ArchivedUsersViewsProps> = ({
     super_admin: 0,
   };
 
-  const sortedUsers = Array.isArray(usersData)
-    ? [...usersData].sort((a, b) => {
-        if (sortBy === "username") {
-          if (sortOrder === "asc") {
-            return a.username.localeCompare(b.username);
-          } else if (sortOrder === "desc") {
-            return b.username.localeCompare(a.username);
-          }
-        } else if (sortBy === "createdAt") {
-          if (sortOrder === "asc") {
-            return (
-              new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-            );
-          } else if (sortOrder === "desc") {
-            return (
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-            );
-          }
-        } else if (sortBy === "accessLevel") {
-          if (sortOrder === "asc") {
-            return roleOrder[a.role as Role] - roleOrder[b.role as Role];
-          } else if (sortOrder === "desc") {
-            return roleOrder[b.role as Role] - roleOrder[a.role as Role];
-          }
-        }
-        return 0;
-      })
-    : [];
+  //   const sortedUsers = Array.isArray(usersData)
+  //     ? [...usersData].sort((a, b) => {
+  //         if (sortBy === "username") {
+  //           if (sortOrder === "asc") {
+  //             return a.username.localeCompare(b.username);
+  //           } else if (sortOrder === "desc") {
+  //             return b.username.localeCompare(a.username);
+  //           }
+  //         } else if (sortBy === "createdAt") {
+  //           if (sortOrder === "asc") {
+  //             return (
+  //               new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+  //             );
+  //           } else if (sortOrder === "desc") {
+  //             return (
+  //               new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  //             );
+  //           }
+  //         } else if (sortBy === "accessLevel") {
+  //           if (sortOrder === "asc") {
+  //             return roleOrder[a.role as Role] - roleOrder[b.role as Role];
+  //           } else if (sortOrder === "desc") {
+  //             return roleOrder[b.role as Role] - roleOrder[a.role as Role];
+  //           }
+  //         }
+  //         return 0;
+  //       })
+  //     : [];
 
-  const filteredUsers = sortedUsers.filter((user) =>
-    user.username.toLowerCase().startsWith(searchTerm.toLowerCase())
-  );
+  //   const filteredUsers = sortedUsers.filter((user) =>
+  //     user.username.toLowerCase().startsWith(searchTerm.toLowerCase())
+  //   );
 
-  const paginatedUsers = filteredUsers.slice(
-    (currentPage - 1) * usersPerPage,
-    currentPage * usersPerPage
-  );
-
+  const paginatedUsers = 10;
   const isActive = (
     order: "asc" | "desc",
     field: "username" | "createdAt" | "accessLevel"
   ) => sortBy === field && sortOrder === order;
 
-  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+  //   const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+
+  // Toast Notify
+  useEffect(() => {
+    if (message) {
+      toast.error(message, {
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+    }
+  }, [message]);
 
   return (
     <div className="w-full relative">
@@ -279,11 +256,11 @@ const ArchivedUsersViews: React.FC<ArchivedUsersViewsProps> = ({
         isDropdownOpen={isDropdownOpen}
         isLoading={isLoading}
         dropdownRef={dropdownRef}
-        title="Archived User"
+        title="Products Management"
       />
 
-      <div className="p-6">
-        <div className="bg-gray-100 p-2 rounded-md">
+      <div className="p-6 ">
+        <div className="bg-gray-100 p-2 rounded-md ">
           <UtilityBar
             searchTerm={searchTerm}
             handleSearchChange={handleSearchChange}
@@ -293,55 +270,34 @@ const ArchivedUsersViews: React.FC<ArchivedUsersViewsProps> = ({
             filterRef={filterRef}
             isActive={isActive}
             handleSortChange={handleSortChange}
-            placeholder="Archived User Search"
-            sortOptions={userSortOptions}
+            sortOptions={productSortOptions}
+            placeholder="Product Search"
           />
           <Table
-            tableHeaders={tableArchivedUser}
+            tableHeaders={productsTableHeaders}
             isLoading={isLoading}
-            paginatedUsers={paginatedUsers}
+            paginatedUsers={[]}
             userInSession={userInSession}
             clickedButtonId={clickedButtonId}
             settingButtonRefs={settingButtonRefs}
             handleSettingToggle={handleSettingToggle}
             activeUserId={activeUserId}
             menuSettingRefs={menuSettingRefs}
-            handleModalRestoreUser={handleModalRestoreUser}
-            handleModalDeletePermanently={handleModalDeletePermanently}
-            variant="orange"
+            handleModalEditUser={handleModalEditUser}
+            handleModalArchivedUser={handleModalArchivedUser}
           />
           <PaginationToolbar
             usersPerPage={usersPerPage}
             handleUsersPerPage={handleUsersPerPage}
-            users={users}
+            users={[]}
             currentPage={currentPage}
-            totalPages={totalPages}
+            totalPages={10}
             setCurrentPage={setCurrentPage}
           />
         </div>
       </div>
-      {modalDeletePermanentlyUser !== null && isDeletedPermanentlyUser ? (
-        <ModalDeletePermanently
-          handleCloseModal={handleCloseModal}
-          isDeletedPermanentlyUser={isDeletedPermanentlyUser}
-          setUsersData={setUsersData}
-          userInSession={userInSession}
-          setModalDeletePermanentlyUser={setModalDeletePermanentlyUser}
-          accessToken={accessToken}
-        />
-      ) : null}
-      {modalRestoreUser !== null && isRestoredUser ? (
-        <ModalRestoreUser
-          handleCloseModal={handleCloseModal}
-          isRestoredUser={isRestoredUser}
-          setUsersData={setUsersData}
-          userInSession={userInSession}
-          setModalRestoreUser={setModalRestoreUser}
-          accessToken={accessToken}
-        />
-      ) : null}
     </div>
   );
 };
 
-export default ArchivedUsersViews;
+export default ProductsManagementViews;

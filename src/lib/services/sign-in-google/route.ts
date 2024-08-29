@@ -18,9 +18,9 @@ export async function handleGoogleSignIn(user: any, profile: any) {
     existingUser.username = existingUser.username || user.name;
 
     // Update profileImage only if it's currently empty
-    if (!existingUser.profileImage) {
-      existingUser.profileImage = profile.picture;
-    }
+    // if (!existingUser.profileImage) {
+    //   existingUser.profileImage = profile.picture;
+    // }
 
     await existingUser.save();
 

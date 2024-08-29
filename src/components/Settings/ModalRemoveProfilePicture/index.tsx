@@ -1,7 +1,7 @@
 import ConfirmButton from "@/components/Button/ConfirmButton";
 import Modal from "@/components/fragements/Modal";
 import { capitalizeFirst } from "@/utils/Capitalize";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 interface User {
   username: string;
@@ -26,6 +26,7 @@ interface ModalRemoveProfilePictureProps {
   accessToken: string;
   setUser: any;
   update: any;
+  setIsLoading: any;
 }
 const ModalRemoveProfilePicture: React.FC<ModalRemoveProfilePictureProps> = ({
   handleCloseModal,
@@ -34,9 +35,9 @@ const ModalRemoveProfilePicture: React.FC<ModalRemoveProfilePictureProps> = ({
   accessToken,
   setUser,
   update,
+  setIsLoading,
 }) => {
   const [message, setMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isError, setIsError] = useState(false);
 
@@ -44,6 +45,8 @@ const ModalRemoveProfilePicture: React.FC<ModalRemoveProfilePictureProps> = ({
   const handleRemoveProfilePicture = async (
     e: React.FormEvent<HTMLButtonElement>
   ) => {
+    e.preventDefault();
+    setIsLoading("remove-profile-image");
     try {
       const response = await fetch(
         "/api/users/update-profile/remove-profile-image",
@@ -63,7 +66,8 @@ const ModalRemoveProfilePicture: React.FC<ModalRemoveProfilePictureProps> = ({
           ...prevUser,
           profileImage: "",
         }));
-
+        setIsSuccess(true);
+        setMessage(data.message);
         await update({
           username: user.username,
           numberPhone: user.numberPhone,
@@ -77,13 +81,35 @@ const ModalRemoveProfilePicture: React.FC<ModalRemoveProfilePictureProps> = ({
           role: user.role,
           profileImage: "",
         });
-
-        setModalRemoveProfilePicture(null);
+        setTimeout(() => {
+          setModalRemoveProfilePicture(null);
+        }, 1500);
+        setIsLoading("");
+      } else {
+        setMessage(data.message);
+        setIsError(true);
+        setTimeout(() => {
+          setModalRemoveProfilePicture(null);
+        }, 1500);
+        setIsLoading("");
       }
     } catch (error) {
       console.error("Error updating profile", error);
+    } finally {
+      setIsLoading("");
     }
   };
+
+  // Delete Message
+  useEffect(() => {
+    if (isError || isSuccess) {
+      const timer = setTimeout(() => {
+        setIsError(false);
+        setIsSuccess(false);
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [isError, isSuccess]);
   return (
     <Modal onClose={handleCloseModal}>
       {" "}

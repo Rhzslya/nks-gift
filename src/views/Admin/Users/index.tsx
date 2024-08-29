@@ -10,6 +10,7 @@ import Header from "@/components/Admin/Header";
 import Table from "@/components/Admin/Table";
 import UtilityBar from "@/components/Admin/UtilityBar";
 import PaginationToolbar from "@/components/Admin/PaginationToolbar";
+import { userSortOptions } from "@/utils/SortOptions";
 
 interface Users {
   username: string;
@@ -308,7 +309,9 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
             isFilterOpen={isFilterOpen}
             filterRef={filterRef}
             isActive={isActive}
+            sortOptions={userSortOptions}
             handleSortChange={handleSortChange}
+            placeholder="User Search"
           />
           <Table
             tableHeaders={tableHeaders}

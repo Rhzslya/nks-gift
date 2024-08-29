@@ -17,3 +17,13 @@ export const tableArchivedUser = [
   { name: "date archived", key: "deletedAt" },
   { name: "", key: "action" },
 ];
+
+export const productsTableHeaders = [
+  { name: "Product Name", key: "productName" },
+  { name: "Product ID", key: "productId" },
+  { name: "Category", key: "category" },
+  { name: "Price", key: "price" },
+  { name: "Stock", key: "stock" },
+  { name: "Date Created", key: "dateCreated" },
+  { name: "", key: "action" },
+];
