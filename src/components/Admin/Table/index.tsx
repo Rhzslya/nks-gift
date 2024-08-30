@@ -6,7 +6,7 @@ import { capitalizeFirst } from "@/utils/Capitalize";
 interface TableProps {
   tableHeaders: { key: string; name: string }[];
   isLoading: boolean;
-  paginatedUsers: any[];
+  paginatedContent: any[];
   userInSession: any;
   clickedButtonId: string | null;
   settingButtonRefs: React.MutableRefObject<{
@@ -28,7 +28,7 @@ interface TableProps {
 const Table: React.FC<TableProps> = ({
   tableHeaders,
   isLoading,
-  paginatedUsers,
+  paginatedContent,
   userInSession,
   clickedButtonId,
   settingButtonRefs,
@@ -81,12 +81,12 @@ const Table: React.FC<TableProps> = ({
                   ))}
                 </tr>
               ))
-          : paginatedUsers.length > 0 &&
-            paginatedUsers.map((user) => (
+          : paginatedContent.length > 0 &&
+            paginatedContent.map((content) => (
               <tr
-                key={user._id}
+                key={content._id}
                 className={`text-gray-500 ${
-                  user._id === userInSession?.id
+                  content._id === userInSession?.id
                     ? "bg-green-200"
                     : `${className[variant]}`
                 }`}
@@ -100,53 +100,56 @@ const Table: React.FC<TableProps> = ({
                         : ""
                     }`}
                   >
+                    {header.key === "productName" &&
+                      capitalizeFirst(content.productName)}
                     {header.key === "username" &&
-                      capitalizeFirst(user.username)}
-                    {header.key === "email" && user.email}
-                    {header.key === "userId" && user.userId}
+                      capitalizeFirst(content.username)}
+                    {header.key === "email" && content.email}
+                    {header.key === "userId" && content.userId}
                     {header.key === "type" &&
-                      capitalizeFirst(user.type.join(", "))}
+                      capitalizeFirst(content.type.join(", "))}
 
-                    {header.key === "accessLevel" && capitalizeFirst(user.role)}
+                    {header.key === "accessLevel" &&
+                      capitalizeFirst(content.role)}
                     {header.key === "verifiedStatus" && (
                       <span
                         className={
-                          user.isVerified ? "text-green-500" : "text-red-500"
+                          content.isVerified ? "text-green-500" : "text-red-500"
                         }
                       >
-                        {user.isVerified ? "Verified" : "Not Verified"}
+                        {content.isVerified ? "Verified" : "Not Verified"}
                       </span>
                     )}
                     {header.key === "dateCreated" &&
-                      new Date(user.createdAt).toLocaleDateString()}
+                      new Date(content.createdAt).toLocaleDateString()}
                     {header.key === "deletedAt" &&
-                      new Date(user.deletedAt).toLocaleDateString()}
+                      new Date(content.deletedAt).toLocaleDateString()}
                     {header.key === "action" && (
                       <div className="relative z-50">
                         <button
                           className={`${
-                            clickedButtonId === user._id
+                            clickedButtonId === content._id
                               ? "bg-gray-200 border-gray-500 border-[1px]"
                               : ""
                           } w-[25px] h-[25px] flex justify-center items-center rounded-full duration-300`}
                           ref={(el) => {
-                            settingButtonRefs.current[user._id] = el;
+                            settingButtonRefs.current[content._id] = el;
                           }}
-                          onClick={(e) => handleSettingToggle(user._id, e)}
+                          onClick={(e) => handleSettingToggle(content._id, e)}
                         >
                           <i className="relative bx bx-dots-vertical-rounded text-[20px]"></i>
                         </button>
-                        {activeUserId === user._id && (
+                        {activeUserId === content._id && (
                           <div
                             ref={(el) => {
-                              menuSettingRefs.current[user._id] = el;
+                              menuSettingRefs.current[content._id] = el;
                             }}
                             className="absolute right-[110%] top-0 bg-white rounded-md shadow flex flex-col"
                           >
                             {handleModalEditUser && (
                               <button
                                 className="px-1 hover:bg-gray-100 duration-300"
-                                onClick={() => handleModalEditUser(user._id)}
+                                onClick={() => handleModalEditUser(content._id)}
                               >
                                 <div className="flex gap-x-2 w-[120px] py-2">
                                   <i className="bx bxs-pencil text-[16px]"></i>
@@ -158,7 +161,7 @@ const Table: React.FC<TableProps> = ({
                               <button
                                 className="px-1 hover:bg-gray-100 duration-300"
                                 onClick={() =>
-                                  handleModalArchivedUser(user._id)
+                                  handleModalArchivedUser(content._id)
                                 }
                               >
                                 <div className="flex gap-x-2 w-[120px] py-2">
@@ -172,7 +175,9 @@ const Table: React.FC<TableProps> = ({
                             {handleModalRestoreUser && (
                               <button
                                 className="px-1 hover:bg-gray-100 duration-300"
-                                onClick={() => handleModalRestoreUser(user._id)}
+                                onClick={() =>
+                                  handleModalRestoreUser(content._id)
+                                }
                               >
                                 <div className="flex gap-x-2 w-[120px] py-2">
                                   <i className="bx bx-undo text-[16px]"></i>
@@ -185,7 +190,9 @@ const Table: React.FC<TableProps> = ({
                             {handleModalViewDetails && (
                               <button
                                 className="px-1 hover:bg-gray-100 duration-300"
-                                onClick={() => handleModalViewDetails(user._id)}
+                                onClick={() =>
+                                  handleModalViewDetails(content._id)
+                                }
                               >
                                 <div className="flex gap-x-2 w-[120px] py-2">
                                   <i className="bx bxs-info-circle text-[16px]"></i>
@@ -197,7 +204,7 @@ const Table: React.FC<TableProps> = ({
                               <button
                                 className="px-1 hover:bg-gray-100 duration-300"
                                 onClick={() =>
-                                  handleModalDeletePermanently(user._id)
+                                  handleModalDeletePermanently(content._id)
                                 }
                               >
                                 <div className="flex gap-x-2 w-[180px] py-2">

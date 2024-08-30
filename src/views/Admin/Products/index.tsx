@@ -14,6 +14,7 @@ interface ProductsManagementViewsProps {
   isLoading: boolean;
   userInSession: any;
   accessToken: any;
+  products: any;
 }
 
 type Role = "user" | "manager" | "admin" | "super_admin";
@@ -25,6 +26,7 @@ const ProductsManagementViews: React.FC<ProductsManagementViewsProps> = ({
   isLoading,
   userInSession,
   accessToken,
+  products,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -51,7 +53,7 @@ const ProductsManagementViews: React.FC<ProductsManagementViewsProps> = ({
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const dropdownButtonRef = useRef<HTMLDivElement | null>(null);
   const [message, setMessage] = useState("");
-  // Always Update Data
+  // Always Update Products
 
   // Open & Close Menu Setting Start
   useEffect(() => {
@@ -276,7 +278,7 @@ const ProductsManagementViews: React.FC<ProductsManagementViewsProps> = ({
           <Table
             tableHeaders={productsTableHeaders}
             isLoading={isLoading}
-            paginatedUsers={[]}
+            paginatedContent={[]}
             userInSession={userInSession}
             clickedButtonId={clickedButtonId}
             settingButtonRefs={settingButtonRefs}

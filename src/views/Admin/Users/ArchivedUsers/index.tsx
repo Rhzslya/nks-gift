@@ -299,7 +299,7 @@ const ArchivedUsersViews: React.FC<ArchivedUsersViewsProps> = ({
           <Table
             tableHeaders={tableArchivedUser}
             isLoading={isLoading}
-            paginatedUsers={paginatedUsers}
+            paginatedContent={paginatedUsers}
             userInSession={userInSession}
             clickedButtonId={clickedButtonId}
             settingButtonRefs={settingButtonRefs}

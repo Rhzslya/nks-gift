@@ -316,7 +316,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
           <Table
             tableHeaders={tableHeaders}
             isLoading={isLoading}
-            paginatedUsers={paginatedUsers}
+            paginatedContent={paginatedUsers}
             userInSession={userInSession}
             clickedButtonId={clickedButtonId}
             settingButtonRefs={settingButtonRefs}
