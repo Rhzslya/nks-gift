@@ -5,7 +5,7 @@ import MyPagination from "@/utils/Pagination";
 interface PaginationToolbarProps {
   usersPerPage: number;
   handleUsersPerPage: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  users: any[]; // Anda dapat mengganti any dengan tipe data yang lebih spesifik jika ada
+  items: any[]; // Anda dapat mengganti any dengan tipe data yang lebih spesifik jika ada
   currentPage: number;
   totalPages: number;
   setCurrentPage: (page: number) => void;
@@ -14,7 +14,7 @@ interface PaginationToolbarProps {
 const PaginationToolbar: React.FC<PaginationToolbarProps> = ({
   usersPerPage,
   handleUsersPerPage,
-  users,
+  items,
   currentPage,
   totalPages,
   setCurrentPage,
@@ -35,7 +35,7 @@ const PaginationToolbar: React.FC<PaginationToolbarProps> = ({
             <option value={10}>10</option>
             <option value={15}>15</option>
           </select>{" "}
-          of {users?.length} items
+          of {items?.length} items
         </p>
       </div>
       <MyPagination

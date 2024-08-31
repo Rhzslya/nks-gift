@@ -10,6 +10,7 @@ const ProductsManagement = () => {
   const accessToken = session?.accessToken;
   const [products, setProducts] = useState([]);
   const [message, setMessage] = useState("");
+  const currentUserRole = userInSession?.role;
 
   useEffect(() => {
     if (accessToken) {
@@ -43,10 +44,12 @@ const ProductsManagement = () => {
   }, [setLoading, accessToken]);
   return (
     <ProductsManagementViews
+      products={products}
       isLoading={isLoading}
       userInSession={userInSession}
       accessToken={accessToken}
-      products={products}
+      message={message}
+      currentUserRole={currentUserRole}
     />
   );
 };

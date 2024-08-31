@@ -6,7 +6,7 @@ import { capitalizeFirst } from "@/utils/Capitalize";
 interface TableProps {
   tableHeaders: { key: string; name: string }[];
   isLoading: boolean;
-  paginatedContent: any[];
+  paginatedItems: any[];
   userInSession: any;
   clickedButtonId: string | null;
   settingButtonRefs: React.MutableRefObject<{
@@ -28,7 +28,7 @@ interface TableProps {
 const Table: React.FC<TableProps> = ({
   tableHeaders,
   isLoading,
-  paginatedContent,
+  paginatedItems,
   userInSession,
   clickedButtonId,
   settingButtonRefs,
@@ -45,6 +45,33 @@ const Table: React.FC<TableProps> = ({
   const className: any = {
     red: "bg-red-200",
     orange: "bg-orange-200",
+  };
+
+  // Function to map the header key to the appropriate data field
+  const getItemField = (item: any, key: string) => {
+    const fieldMap: { [key: string]: any } = {
+      productName: capitalizeFirst(item.productName || ""),
+      price: item.price,
+      category: capitalizeFirst(item.category || ""),
+      stock: item.stock,
+      username: capitalizeFirst(item.username || ""),
+      email: item.email,
+      userId: item.userId,
+      type: item.type ? capitalizeFirst(item.type.join(", ")) : "", // Check if item.type is defined and is an array
+      accessLevel: capitalizeFirst(item.role || ""),
+      verifiedStatus: (
+        <span className={item.isVerified ? "text-green-500" : "text-red-500"}>
+          {item.isVerified ? "Verified" : "Not Verified"}
+        </span>
+      ),
+      dateCreated: item.createdAt
+        ? new Date(item.createdAt).toLocaleDateString()
+        : "",
+      deletedAt: item.deletedAt
+        ? new Date(item.deletedAt).toLocaleDateString()
+        : "",
+    };
+    return fieldMap[key] || null; // Return null if no mapping exists
   };
 
   return (
@@ -75,18 +102,18 @@ const Table: React.FC<TableProps> = ({
               .map((_, index) => (
                 <tr key={index}>
                   {tableHeaders.map((header) => (
-                    <td key={header.key} className="">
+                    <td key={header.key}>
                       <Skeleton className="py-[11.5px]" />
                     </td>
                   ))}
                 </tr>
               ))
-          : paginatedContent.length > 0 &&
-            paginatedContent.map((content) => (
+          : paginatedItems.length > 0 &&
+            paginatedItems.map((item) => (
               <tr
-                key={content._id}
+                key={item._id}
                 className={`text-gray-500 ${
-                  content._id === userInSession?.id
+                  item._id === userInSession?.id
                     ? "bg-green-200"
                     : `${className[variant]}`
                 }`}
@@ -100,56 +127,32 @@ const Table: React.FC<TableProps> = ({
                         : ""
                     }`}
                   >
-                    {header.key === "productName" &&
-                      capitalizeFirst(content.productName)}
-                    {header.key === "username" &&
-                      capitalizeFirst(content.username)}
-                    {header.key === "email" && content.email}
-                    {header.key === "userId" && content.userId}
-                    {header.key === "type" &&
-                      capitalizeFirst(content.type.join(", "))}
-
-                    {header.key === "accessLevel" &&
-                      capitalizeFirst(content.role)}
-                    {header.key === "verifiedStatus" && (
-                      <span
-                        className={
-                          content.isVerified ? "text-green-500" : "text-red-500"
-                        }
-                      >
-                        {content.isVerified ? "Verified" : "Not Verified"}
-                      </span>
-                    )}
-                    {header.key === "dateCreated" &&
-                      new Date(content.createdAt).toLocaleDateString()}
-                    {header.key === "deletedAt" &&
-                      new Date(content.deletedAt).toLocaleDateString()}
-                    {header.key === "action" && (
+                    {header.key === "action" ? (
                       <div className="relative z-50">
                         <button
                           className={`${
-                            clickedButtonId === content._id
+                            clickedButtonId === item._id
                               ? "bg-gray-200 border-gray-500 border-[1px]"
                               : ""
                           } w-[25px] h-[25px] flex justify-center items-center rounded-full duration-300`}
                           ref={(el) => {
-                            settingButtonRefs.current[content._id] = el;
+                            settingButtonRefs.current[item._id] = el;
                           }}
-                          onClick={(e) => handleSettingToggle(content._id, e)}
+                          onClick={(e) => handleSettingToggle(item._id, e)}
                         >
                           <i className="relative bx bx-dots-vertical-rounded text-[20px]"></i>
                         </button>
-                        {activeUserId === content._id && (
+                        {activeUserId === item._id && (
                           <div
                             ref={(el) => {
-                              menuSettingRefs.current[content._id] = el;
+                              menuSettingRefs.current[item._id] = el;
                             }}
                             className="absolute right-[110%] top-0 bg-white rounded-md shadow flex flex-col"
                           >
                             {handleModalEditUser && (
                               <button
                                 className="px-1 hover:bg-gray-100 duration-300"
-                                onClick={() => handleModalEditUser(content._id)}
+                                onClick={() => handleModalEditUser(item._id)}
                               >
                                 <div className="flex gap-x-2 w-[120px] py-2">
                                   <i className="bx bxs-pencil text-[16px]"></i>
@@ -161,7 +164,7 @@ const Table: React.FC<TableProps> = ({
                               <button
                                 className="px-1 hover:bg-gray-100 duration-300"
                                 onClick={() =>
-                                  handleModalArchivedUser(content._id)
+                                  handleModalArchivedUser(item._id)
                                 }
                               >
                                 <div className="flex gap-x-2 w-[120px] py-2">
@@ -175,9 +178,7 @@ const Table: React.FC<TableProps> = ({
                             {handleModalRestoreUser && (
                               <button
                                 className="px-1 hover:bg-gray-100 duration-300"
-                                onClick={() =>
-                                  handleModalRestoreUser(content._id)
-                                }
+                                onClick={() => handleModalRestoreUser(item._id)}
                               >
                                 <div className="flex gap-x-2 w-[120px] py-2">
                                   <i className="bx bx-undo text-[16px]"></i>
@@ -190,9 +191,7 @@ const Table: React.FC<TableProps> = ({
                             {handleModalViewDetails && (
                               <button
                                 className="px-1 hover:bg-gray-100 duration-300"
-                                onClick={() =>
-                                  handleModalViewDetails(content._id)
-                                }
+                                onClick={() => handleModalViewDetails(item._id)}
                               >
                                 <div className="flex gap-x-2 w-[120px] py-2">
                                   <i className="bx bxs-info-circle text-[16px]"></i>
@@ -204,7 +203,7 @@ const Table: React.FC<TableProps> = ({
                               <button
                                 className="px-1 hover:bg-gray-100 duration-300"
                                 onClick={() =>
-                                  handleModalDeletePermanently(content._id)
+                                  handleModalDeletePermanently(item._id)
                                 }
                               >
                                 <div className="flex gap-x-2 w-[180px] py-2">
@@ -218,6 +217,8 @@ const Table: React.FC<TableProps> = ({
                           </div>
                         )}
                       </div>
+                    ) : (
+                      getItemField(item, header.key)
                     )}
                   </td>
                 ))}

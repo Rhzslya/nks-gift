@@ -32,7 +32,7 @@ const SignUpViews = () => {
     handlePasswordChange({
       e,
       setPasswordCriteria,
-      setUser,
+      setData: setUser,
       setErrors,
     });
   };
@@ -61,7 +61,6 @@ const SignUpViews = () => {
     }
   }, [message]);
 
-  console.log(message);
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100">
       <div className="">
@@ -84,7 +83,9 @@ const SignUpViews = () => {
                 name="username"
                 text="username"
                 value={user.username}
-                handleChange={(e) => handleChange({ e, setUser, setErrors })}
+                handleChange={(e) =>
+                  handleChange({ e, setData: setUser, setErrors })
+                }
                 error={errors.username}
               />
             </div>
@@ -96,7 +97,9 @@ const SignUpViews = () => {
                 name="email"
                 text="email"
                 value={user.email}
-                handleChange={(e) => handleChange({ e, setUser, setErrors })}
+                handleChange={(e) =>
+                  handleChange({ e, setData: setUser, setErrors })
+                }
                 error={errors.email}
               />
             </div>

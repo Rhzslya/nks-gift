@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
-import { productsTableHeaders } from "@/utils/TableHeaders";
+import { productsTableHeaders, tableHeaders } from "@/utils/TableHeaders";
 import "react-loading-skeleton/dist/skeleton.css";
 import { useSession } from "next-auth/react";
+import ModalUpdatedUser from "@/components/Admin/ModalUpdatedUser";
+import ModalArchivedUser from "@/components/Admin/ModalArchivedUser";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "@/components/Admin/Header";
@@ -9,12 +11,23 @@ import Table from "@/components/Admin/Table";
 import UtilityBar from "@/components/Admin/UtilityBar";
 import PaginationToolbar from "@/components/Admin/PaginationToolbar";
 import { productSortOptions } from "@/utils/SortOptions";
+import ModalAddData from "@/components/Admin/ModalAddData";
 
-interface ProductsManagementViewsProps {
+interface Products {
+  _id: any;
+  productName: string;
+  price: string;
+  category: any;
+  stock: string;
+}
+
+interface UsersManagementViewsProps {
+  products: Products[];
   isLoading: boolean;
   userInSession: any;
+  currentUserRole: any;
   accessToken: any;
-  products: any;
+  message: string;
 }
 
 type Role = "user" | "manager" | "admin" | "super_admin";
@@ -22,13 +35,15 @@ type RoleOrder = {
   [key in Role]: number;
 };
 
-const ProductsManagementViews: React.FC<ProductsManagementViewsProps> = ({
+const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
+  products,
   isLoading,
   userInSession,
+  currentUserRole,
   accessToken,
-  products,
+  message,
 }) => {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchQuery, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [usersPerPage, setUsersPerPage] = useState(15);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "">("");
@@ -43,6 +58,11 @@ const ProductsManagementViews: React.FC<ProductsManagementViewsProps> = ({
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [activeUserId, setActiveUserId] = useState<string | null>(null);
   const { data: session, update } = useSession();
+  const [usersData, setUsersData] = useState<Products[]>([]);
+  const isUpdatedUser = usersData?.find((user) => user._id === modalEditUser);
+  const isArchivedUser = usersData?.find(
+    (user) => user._id === modalArchivedUser
+  );
   const [clickedButtonId, setClickedButtonId] = useState<string | null>(null);
   const menuSettingRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const settingButtonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>(
@@ -52,8 +72,12 @@ const ProductsManagementViews: React.FC<ProductsManagementViewsProps> = ({
   const filterButtonRef = useRef<HTMLButtonElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const dropdownButtonRef = useRef<HTMLDivElement | null>(null);
-  const [message, setMessage] = useState("");
-  // Always Update Products
+  const [addData, setAddData] = useState(true);
+  const [modalShowAddData, setShowModalAddData] = useState(false);
+  // Always Update Data
+  useEffect(() => {
+    setUsersData(products);
+  }, [products]);
 
   // Open & Close Menu Setting Start
   useEffect(() => {
@@ -91,8 +115,6 @@ const ProductsManagementViews: React.FC<ProductsManagementViewsProps> = ({
   };
 
   // Open & Close Menu Setting End
-
-  // Open & Close Filter Start
   useEffect(() => {
     const handleCloseFilterOutside = (e: MouseEvent) => {
       if (
@@ -141,6 +163,11 @@ const ProductsManagementViews: React.FC<ProductsManagementViewsProps> = ({
   };
   // Open & Close Dropdown End
 
+  // Open Modal Add Product Start
+  const handleModalAddData = () => {
+    setShowModalAddData(!modalShowAddData);
+  };
+  // Open Modal Add Product End
   // open Modal Edit User
   const handleModalEditUser = (_id: string) => {
     setActiveUserId(null);
@@ -156,9 +183,10 @@ const ProductsManagementViews: React.FC<ProductsManagementViewsProps> = ({
   const handleCloseModal = () => {
     setModalEditUser(null);
     setModalArchivedUser(null);
+    setShowModalAddData(false);
   };
 
-  // Search Users
+  // Search Products
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
     setCurrentPage(1);
@@ -185,46 +213,34 @@ const ProductsManagementViews: React.FC<ProductsManagementViewsProps> = ({
     super_admin: 0,
   };
 
-  //   const sortedUsers = Array.isArray(usersData)
-  //     ? [...usersData].sort((a, b) => {
-  //         if (sortBy === "username") {
-  //           if (sortOrder === "asc") {
-  //             return a.username.localeCompare(b.username);
-  //           } else if (sortOrder === "desc") {
-  //             return b.username.localeCompare(a.username);
-  //           }
-  //         } else if (sortBy === "createdAt") {
-  //           if (sortOrder === "asc") {
-  //             return (
-  //               new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-  //             );
-  //           } else if (sortOrder === "desc") {
-  //             return (
-  //               new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  //             );
-  //           }
-  //         } else if (sortBy === "accessLevel") {
-  //           if (sortOrder === "asc") {
-  //             return roleOrder[a.role as Role] - roleOrder[b.role as Role];
-  //           } else if (sortOrder === "desc") {
-  //             return roleOrder[b.role as Role] - roleOrder[a.role as Role];
-  //           }
-  //         }
-  //         return 0;
-  //       })
-  //     : [];
+  const sortedUsers = Array.isArray(usersData)
+    ? [...usersData].sort((a, b) => {
+        if (sortBy === "username") {
+          if (sortOrder === "asc") {
+            return a.productName.localeCompare(b.productName);
+          } else if (sortOrder === "desc") {
+            return b.productName.localeCompare(a.productName);
+          }
+        }
+        return 0;
+      })
+    : [];
 
-  //   const filteredUsers = sortedUsers.filter((user) =>
-  //     user.username.toLowerCase().startsWith(searchTerm.toLowerCase())
-  //   );
+  const filteredUsers = sortedUsers.filter((user) =>
+    user.productName.toLowerCase().startsWith(searchQuery.toLowerCase())
+  );
 
-  const paginatedUsers = 10;
+  const paginatedUsers = filteredUsers.slice(
+    (currentPage - 1) * usersPerPage,
+    currentPage * usersPerPage
+  );
+
   const isActive = (
     order: "asc" | "desc",
     field: "username" | "createdAt" | "accessLevel"
   ) => sortBy === field && sortOrder === order;
 
-  //   const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
 
   // Toast Notify
   useEffect(() => {
@@ -258,27 +274,32 @@ const ProductsManagementViews: React.FC<ProductsManagementViewsProps> = ({
         isDropdownOpen={isDropdownOpen}
         isLoading={isLoading}
         dropdownRef={dropdownRef}
-        title="Products Management"
+        title="User Management"
       />
 
       <div className="p-6 ">
         <div className="bg-gray-100 p-2 rounded-md ">
           <UtilityBar
-            searchTerm={searchTerm}
-            handleSearchChange={handleSearchChange}
-            handleToggleFilter={handleToggleFilter}
-            filterButtonRef={filterButtonRef}
-            isFilterOpen={isFilterOpen}
-            filterRef={filterRef}
-            isActive={isActive}
-            handleSortChange={handleSortChange}
-            sortOptions={productSortOptions}
-            placeholder="Product Search"
+            searchQuery={searchQuery}
+            onSearchChange={handleSearchChange}
+            onToggleFilter={handleToggleFilter}
+            filterToggleButtonRef={filterButtonRef}
+            isFilterMenuOpen={isFilterOpen}
+            filterMenuRef={filterRef}
+            isSortOptionActive={isActive}
+            sortingOptions={productSortOptions}
+            onSortOptionChange={handleSortChange}
+            searchPlaceholder="Product Search"
+            showAddDataButton={true}
+            textAddData="Add Product"
+            onAddData={handleModalAddData}
+            modalShowAddData={modalShowAddData}
+            modalAddData={<ModalAddData handleCloseModal={handleCloseModal} />}
           />
           <Table
             tableHeaders={productsTableHeaders}
             isLoading={isLoading}
-            paginatedContent={[]}
+            paginatedItems={paginatedUsers}
             userInSession={userInSession}
             clickedButtonId={clickedButtonId}
             settingButtonRefs={settingButtonRefs}
@@ -291,15 +312,30 @@ const ProductsManagementViews: React.FC<ProductsManagementViewsProps> = ({
           <PaginationToolbar
             usersPerPage={usersPerPage}
             handleUsersPerPage={handleUsersPerPage}
-            users={[]}
+            items={products}
             currentPage={currentPage}
-            totalPages={10}
+            totalPages={totalPages}
             setCurrentPage={setCurrentPage}
           />
         </div>
+      </div>
+
+      <div className="absolute">
+        <ToastContainer
+          position="bottom-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
       </div>
     </div>
   );
 };
 
-export default ProductsManagementViews;
+export default UsersManagementViews;

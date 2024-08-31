@@ -1,69 +1,81 @@
 import { ChangeEvent, Dispatch, SetStateAction } from "react";
 
-interface HandleChangeParams {
+interface HandleChangeParams<T extends Record<string, any>> {
   e: ChangeEvent<HTMLInputElement>;
-  setUser: Dispatch<SetStateAction<any>>;
+  setData: Dispatch<SetStateAction<T>>;
   setErrors: Dispatch<SetStateAction<Record<string, string>>>;
   setIsModified?: Dispatch<SetStateAction<boolean>>;
 }
 
-export const handleChange = ({
+export const handleChange = <T extends Record<string, any>>({
   e,
-  setUser,
+  setData,
   setErrors,
   setIsModified,
-}: HandleChangeParams) => {
+}: HandleChangeParams<T>) => {
   const { name, value } = e.target;
-  setUser((prevUser: any) => {
-    // Check if the field is part of the address object
-    if (name.startsWith("address.")) {
-      const addressField = name.split(".")[1];
+
+  setData((prevData) => {
+    if (name.includes(".")) {
+      const keys = name.split(".");
+      const [firstKey, secondKey] = keys;
       return {
-        ...prevUser,
-        address: {
-          ...prevUser.address,
-          [addressField]: value,
+        ...prevData,
+        [firstKey]: {
+          ...prevData[firstKey],
+          [secondKey]: value,
         },
       };
     }
 
     return {
-      ...prevUser,
+      ...prevData,
       [name]: value,
     };
   });
 
   // Remove specific error message when user starts typing
-  setErrors((prevErrors: any) => ({
+  setErrors((prevErrors) => ({
     ...prevErrors,
     [name]: "",
   }));
+
+  // Optionally set isModified to true
+  setIsModified?.(true);
 };
 
-interface HandlePasswordChangeProps {
-  e: React.ChangeEvent<HTMLInputElement>;
-  setPasswordCriteria: React.Dispatch<
-    React.SetStateAction<{
+interface HandlePasswordChangeProps<T extends Record<string, any>> {
+  e: ChangeEvent<HTMLInputElement>;
+  setPasswordCriteria: Dispatch<
+    SetStateAction<{
       length: boolean;
       combination: boolean;
       specialChar: boolean;
     }>
   >;
-  setUser: React.Dispatch<React.SetStateAction<any>>;
-  setErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  setData: Dispatch<SetStateAction<T>>;
+  setErrors: Dispatch<SetStateAction<Record<string, string>>>;
 }
 
-export const handlePasswordChange = ({
+export const handlePasswordChange = <T extends Record<string, any>>({
   e,
   setPasswordCriteria,
-  setUser,
+  setData,
   setErrors,
-}: HandlePasswordChangeProps) => {
-  const { value } = e.target;
+}: HandlePasswordChangeProps<T>) => {
+  const { value, name } = e.target;
+
+  // Validate password criteria
   setPasswordCriteria({
     length: value.length >= 8,
     combination: /(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])/.test(value),
     specialChar: /[!@#$%^&*(),.?":{}|<>]/.test(value),
   });
-  handleChange({ e, setUser, setErrors });
+
+  // Use handleChange to update user data and handle errors
+  handleChange({
+    e,
+    setData,
+    setErrors,
+  });
 };

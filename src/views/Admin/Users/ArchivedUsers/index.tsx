@@ -285,21 +285,21 @@ const ArchivedUsersViews: React.FC<ArchivedUsersViewsProps> = ({
       <div className="p-6">
         <div className="bg-gray-100 p-2 rounded-md">
           <UtilityBar
-            searchTerm={searchTerm}
-            handleSearchChange={handleSearchChange}
-            handleToggleFilter={handleToggleFilter}
-            filterButtonRef={filterButtonRef}
-            isFilterOpen={isFilterOpen}
-            filterRef={filterRef}
-            isActive={isActive}
-            handleSortChange={handleSortChange}
-            placeholder="Archived User Search"
-            sortOptions={userSortOptions}
+            searchQuery={searchTerm}
+            onSearchChange={handleSearchChange}
+            onToggleFilter={handleToggleFilter}
+            filterToggleButtonRef={filterButtonRef}
+            isFilterMenuOpen={isFilterOpen}
+            filterMenuRef={filterRef}
+            isSortOptionActive={isActive}
+            onSortOptionChange={handleSortChange}
+            searchPlaceholder="Archived User Search"
+            sortingOptions={userSortOptions}
           />
           <Table
             tableHeaders={tableArchivedUser}
             isLoading={isLoading}
-            paginatedContent={paginatedUsers}
+            paginatedItems={paginatedUsers}
             userInSession={userInSession}
             clickedButtonId={clickedButtonId}
             settingButtonRefs={settingButtonRefs}
@@ -313,7 +313,7 @@ const ArchivedUsersViews: React.FC<ArchivedUsersViewsProps> = ({
           <PaginationToolbar
             usersPerPage={usersPerPage}
             handleUsersPerPage={handleUsersPerPage}
-            users={users}
+            items={users}
             currentPage={currentPage}
             totalPages={totalPages}
             setCurrentPage={setCurrentPage}

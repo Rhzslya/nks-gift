@@ -254,7 +254,9 @@ const ProfileViews = ({ serverSession }: any) => {
                   name="username"
                   text="Username"
                   value={user.username}
-                  handleChange={(e) => handleChange({ e, setUser, setErrors })}
+                  handleChange={(e) =>
+                    handleChange({ e, setData: setUser, setErrors })
+                  }
                   error={errors.username}
                   textStyle="text-sm font-medium text-gray-600"
                 />
@@ -271,7 +273,9 @@ const ProfileViews = ({ serverSession }: any) => {
                   name="numberPhone"
                   text="Phone Number"
                   value={user.numberPhone}
-                  handleChange={(e) => handleChange({ e, setUser, setErrors })}
+                  handleChange={(e) =>
+                    handleChange({ e, setData: setUser, setErrors })
+                  }
                   error={errors.numberPhone}
                   textStyle="text-sm font-medium text-gray-600"
                 />
@@ -292,7 +296,7 @@ const ProfileViews = ({ serverSession }: any) => {
                       text="Street"
                       value={user.address.street}
                       handleChange={(e) =>
-                        handleChange({ e, setUser, setErrors })
+                        handleChange({ e, setData: setUser, setErrors })
                       }
                       error={errors.address}
                       textStyle="text-sm font-medium text-gray-600"
@@ -308,7 +312,7 @@ const ProfileViews = ({ serverSession }: any) => {
                       text="City"
                       value={user.address.city}
                       handleChange={(e) =>
-                        handleChange({ e, setUser, setErrors })
+                        handleChange({ e, setData: setUser, setErrors })
                       }
                       error={errors.address}
                       textStyle="text-sm font-medium text-gray-600"
@@ -323,7 +327,7 @@ const ProfileViews = ({ serverSession }: any) => {
                       text="State"
                       value={user.address.state}
                       handleChange={(e) =>
-                        handleChange({ e, setUser, setErrors })
+                        handleChange({ e, setData: setUser, setErrors })
                       }
                       error={errors.address}
                       textStyle="text-sm font-medium text-gray-600"
@@ -338,7 +342,7 @@ const ProfileViews = ({ serverSession }: any) => {
                       text="Postal Code"
                       value={user.address.postalCode}
                       handleChange={(e) =>
-                        handleChange({ e, setUser, setErrors })
+                        handleChange({ e, setData: setUser, setErrors })
                       }
                       error={errors.address}
                       textStyle="text-sm font-medium text-gray-600"
@@ -353,7 +357,7 @@ const ProfileViews = ({ serverSession }: any) => {
                       text="Country"
                       value={user.address.country}
                       handleChange={(e) =>
-                        handleChange({ e, setUser, setErrors })
+                        handleChange({ e, setData: setUser, setErrors })
                       }
                       error={errors.address}
                       textStyle="text-sm font-medium text-gray-600"

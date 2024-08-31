@@ -62,7 +62,6 @@ const ModalUpdatedUser: React.FC<ModalUpdatedUserProps> = ({
     setIsModified(value !== isUpdatedUser.role);
   };
 
-  console.log(updatedUser);
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);

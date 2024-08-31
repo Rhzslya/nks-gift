@@ -2,29 +2,39 @@ import React, { RefObject } from "react";
 import { SortOption } from "@/utils/SortOptions";
 
 interface UtilityBarProps {
-  searchTerm: string;
-  handleSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleToggleFilter: () => void;
-  filterButtonRef: RefObject<HTMLButtonElement>;
-  isFilterOpen: boolean;
-  filterRef: RefObject<HTMLDivElement>;
-  isActive: (order: "asc" | "desc", field: any) => boolean;
-  handleSortChange: (order: "asc" | "desc", field: any) => void;
-  placeholder: string;
-  sortOptions: SortOption[];
+  searchQuery: string;
+  onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onToggleFilter: () => void;
+  filterToggleButtonRef: RefObject<HTMLButtonElement>;
+  isFilterMenuOpen: boolean;
+  filterMenuRef: RefObject<HTMLDivElement>;
+  isSortOptionActive: (order: "asc" | "desc", field: any) => boolean;
+  onSortOptionChange: (order: "asc" | "desc", field: any) => void;
+  searchPlaceholder: string;
+  sortingOptions: SortOption[];
+  showAddDataButton?: boolean;
+  textAddData?: string;
+  onAddData?: any;
+  modalShowAddData?: boolean;
+  modalAddData?: any;
 }
 
 const UtilityBar: React.FC<UtilityBarProps> = ({
-  searchTerm,
-  handleSearchChange,
-  handleToggleFilter,
-  filterButtonRef,
-  isFilterOpen,
-  filterRef,
-  isActive,
-  handleSortChange,
-  placeholder,
-  sortOptions,
+  searchQuery,
+  onSearchChange,
+  onToggleFilter,
+  filterToggleButtonRef,
+  isFilterMenuOpen,
+  filterMenuRef,
+  isSortOptionActive,
+  onSortOptionChange,
+  searchPlaceholder,
+  sortingOptions,
+  showAddDataButton,
+  textAddData,
+  onAddData,
+  modalShowAddData,
+  modalAddData,
 }) => {
   return (
     <div className="relative py-2 flex items-center">
@@ -34,34 +44,34 @@ const UtilityBar: React.FC<UtilityBarProps> = ({
         </span>
         <input
           type="text"
-          placeholder={placeholder}
+          placeholder={searchPlaceholder}
           className="px-2 py-1 border rounded text-sm pl-10 focus:border-sky-300 focus:outline-none"
-          value={searchTerm}
-          onChange={handleSearchChange}
+          value={searchQuery}
+          onChange={onSearchChange}
         />
       </div>
       <div className="relative pl-10">
-        <button onClick={handleToggleFilter} ref={filterButtonRef}>
+        <button onClick={onToggleFilter} ref={filterToggleButtonRef}>
           <i
             className={`bx bx-filter text-[28px] text-gray-500 cursor-pointer rounded-md hover:bg-gray-200 duration-300 ${
-              isFilterOpen && "bg-gray-200"
+              isFilterMenuOpen && "bg-gray-200"
             }`}
           ></i>
         </button>
 
-        {isFilterOpen && (
+        {isFilterMenuOpen && (
           <div
-            ref={filterRef}
+            ref={filterMenuRef}
             className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg z-50"
           >
-            {sortOptions.map((option) => (
+            {sortingOptions.map((option) => (
               <button
                 key={`${option.field}-${option.order}`}
                 className={`block px-4 py-2 text-xs text-gray-500 hover:bg-gray-100 w-full text-left ${
-                  isActive(option.order, option.field) &&
+                  isSortOptionActive(option.order, option.field) &&
                   "bg-gray-300 text-gray-700"
                 }`}
-                onClick={() => handleSortChange(option.order, option.field)}
+                onClick={() => onSortOptionChange(option.order, option.field)}
               >
                 {option.label}
               </button>
@@ -69,6 +79,17 @@ const UtilityBar: React.FC<UtilityBarProps> = ({
           </div>
         )}
       </div>
+      {showAddDataButton && (
+        <div className="ml-auto text-white">
+          <button
+            onClick={onAddData}
+            className="px-2 py-1 bg-sky-300 text-sm hover:bg-sky-200 duration-300"
+          >
+            {textAddData}
+          </button>
+          {modalShowAddData && modalAddData}
+        </div>
+      )}
     </div>
   );
 };

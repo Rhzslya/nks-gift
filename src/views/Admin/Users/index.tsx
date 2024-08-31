@@ -302,21 +302,21 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
       <div className="p-6 ">
         <div className="bg-gray-100 p-2 rounded-md ">
           <UtilityBar
-            searchTerm={searchTerm}
-            handleSearchChange={handleSearchChange}
-            handleToggleFilter={handleToggleFilter}
-            filterButtonRef={filterButtonRef}
-            isFilterOpen={isFilterOpen}
-            filterRef={filterRef}
-            isActive={isActive}
-            sortOptions={userSortOptions}
-            handleSortChange={handleSortChange}
-            placeholder="User Search"
+            searchQuery={searchTerm}
+            onSearchChange={handleSearchChange}
+            onToggleFilter={handleToggleFilter}
+            filterToggleButtonRef={filterButtonRef}
+            isFilterMenuOpen={isFilterOpen}
+            filterMenuRef={filterRef}
+            isSortOptionActive={isActive}
+            sortingOptions={userSortOptions}
+            onSortOptionChange={handleSortChange}
+            searchPlaceholder="User Search"
           />
           <Table
             tableHeaders={tableHeaders}
             isLoading={isLoading}
-            paginatedContent={paginatedUsers}
+            paginatedItems={paginatedUsers}
             userInSession={userInSession}
             clickedButtonId={clickedButtonId}
             settingButtonRefs={settingButtonRefs}
@@ -329,7 +329,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
           <PaginationToolbar
             usersPerPage={usersPerPage}
             handleUsersPerPage={handleUsersPerPage}
-            users={users}
+            items={users}
             currentPage={currentPage}
             totalPages={totalPages}
             setCurrentPage={setCurrentPage}

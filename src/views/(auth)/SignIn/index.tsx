@@ -71,7 +71,9 @@ const SignInViews = () => {
                 name="email"
                 text="email"
                 value={user.email}
-                handleChange={(e) => handleChange({ e, setUser, setErrors })}
+                handleChange={(e) =>
+                  handleChange({ e, setData: setUser, setErrors })
+                }
                 error={errors.email}
               />
             </div>
@@ -83,7 +85,9 @@ const SignInViews = () => {
                 name="password"
                 text="password"
                 value={user.password}
-                handleChange={(e) => handleChange({ e, setUser, setErrors })}
+                handleChange={(e) =>
+                  handleChange({ e, setData: setUser, setErrors })
+                }
                 error={errors.password}
               />
             </div>
