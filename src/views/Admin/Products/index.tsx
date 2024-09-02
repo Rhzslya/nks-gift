@@ -58,9 +58,11 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [activeUserId, setActiveUserId] = useState<string | null>(null);
   const { data: session, update } = useSession();
-  const [usersData, setUsersData] = useState<Products[]>([]);
-  const isUpdatedUser = usersData?.find((user) => user._id === modalEditUser);
-  const isArchivedUser = usersData?.find(
+  const [productsData, setProductsData] = useState<Products[]>([]);
+  const isUpdatedUser = productsData?.find(
+    (user) => user._id === modalEditUser
+  );
+  const isArchivedUser = productsData?.find(
     (user) => user._id === modalArchivedUser
   );
   const [clickedButtonId, setClickedButtonId] = useState<string | null>(null);
@@ -76,9 +78,12 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   const [modalShowAddData, setShowModalAddData] = useState(false);
   // Always Update Data
   useEffect(() => {
-    setUsersData(products);
+    setProductsData(products);
   }, [products]);
 
+  const handleProductAdded = (newProduct: Products) => {
+    setProductsData((prevProducts) => [...prevProducts, newProduct]);
+  };
   // Open & Close Menu Setting Start
   useEffect(() => {
     const handleCloseSettingOutside = (e: MouseEvent) => {
@@ -213,8 +218,8 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
     super_admin: 0,
   };
 
-  const sortedUsers = Array.isArray(usersData)
-    ? [...usersData].sort((a, b) => {
+  const sortedUsers = Array.isArray(productsData)
+    ? [...productsData].sort((a, b) => {
         if (sortBy === "username") {
           if (sortOrder === "asc") {
             return a.productName.localeCompare(b.productName);
@@ -274,7 +279,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
         isDropdownOpen={isDropdownOpen}
         isLoading={isLoading}
         dropdownRef={dropdownRef}
-        title="User Management"
+        title="Products Management"
       />
 
       <div className="p-6 ">
@@ -294,7 +299,12 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
             textAddData="Add Product"
             onAddData={handleModalAddData}
             modalShowAddData={modalShowAddData}
-            modalAddData={<ModalAddData handleCloseModal={handleCloseModal} />}
+            modalAddData={
+              <ModalAddData
+                handleCloseModal={handleCloseModal}
+                accessToken={accessToken}
+              />
+            }
           />
           <Table
             tableHeaders={productsTableHeaders}

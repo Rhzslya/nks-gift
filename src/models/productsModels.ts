@@ -7,6 +7,10 @@ const productSchema = new mongoose.Schema(
       type: String,
       require: true,
     },
+    productId: {
+      type: String,
+      require: true,
+    },
     category: {
       type: String,
       require: true,
@@ -20,9 +24,6 @@ const productSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-productSchema.plugin(AutoIncrement, { inc_field: "productId", unique: true });
-
-productSchema.index({ productId: 1 }, { unique: true });
 
 const Product =
   mongoose.models.products || mongoose.model("products", productSchema);

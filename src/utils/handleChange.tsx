@@ -79,3 +79,45 @@ export const handlePasswordChange = <T extends Record<string, any>>({
     setErrors,
   });
 };
+
+interface HandlePriceChangeProps<T extends Record<string, any>> {
+  e: ChangeEvent<HTMLInputElement>;
+  setData: Dispatch<SetStateAction<T>>;
+  setErrors: Dispatch<SetStateAction<Record<string, string>>>;
+  setRawPrice: Dispatch<SetStateAction<string>>; // Menyimpan nilai asli (tanpa titik)
+}
+
+export const handlePriceChange = <T extends Record<string, any>>({
+  e,
+  setData,
+  setErrors,
+  setRawPrice,
+}: HandlePriceChangeProps<T>) => {
+  const { name, value } = e.target;
+
+  // Remove dots for storing raw value
+  const rawValue = value.replace(/\./g, "");
+
+  // Check if the raw value is a valid number
+  if (isNaN(Number(rawValue))) return;
+
+  // Format the number with thousand separators
+  const formattedValue = new Intl.NumberFormat("id-ID").format(
+    Number(rawValue)
+  );
+
+  // Update the state with the formatted value for display
+  setData((prevData) => ({
+    ...prevData,
+    [name]: formattedValue,
+  }));
+
+  // Store the raw value without formatting for further processing
+  setRawPrice(rawValue);
+
+  // Clear error for the price field when user starts typing
+  setErrors((prevErrors) => ({
+    ...prevErrors,
+    [name]: "",
+  }));
+};

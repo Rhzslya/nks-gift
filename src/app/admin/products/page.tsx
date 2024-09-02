@@ -42,6 +42,7 @@ const ProductsManagement = () => {
       getAllProducts();
     }
   }, [setLoading, accessToken]);
+
   return (
     <ProductsManagementViews
       products={products}

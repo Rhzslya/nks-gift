@@ -6,7 +6,7 @@ import SubmitButton from "@/components/Button/SubmitButton";
 import { capitalizeFirst } from "@/utils/Capitalize";
 import MessageFromAPI from "@/components/Form/MessageFromAPI";
 import { useRouter } from "next/navigation";
-import { handleChange } from "@/utils/handleChange";
+import { handleChange, handlePriceChange } from "@/utils/handleChange";
 interface Product {
   productName: string;
   productId: string;
@@ -17,10 +17,12 @@ interface Product {
 
 interface ModalUpdatedUserProps {
   handleCloseModal: () => void;
+  accessToken: any;
 }
 
 const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
   handleCloseModal,
+  accessToken,
 }) => {
   const [product, setProduct] = useState({
     productName: "",
@@ -29,16 +31,36 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
     stock: "",
     price: "",
   });
+  const [rawPrice, setRawPrice] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {};
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const products = {
+      ...product,
+      price: rawPrice, // Use raw price for actual data submission
+    };
+    console.log(products);
+    const response = await fetch("/api/products", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      method: "POST",
+      body: JSON.stringify({ products }),
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+    }
+  };
   return (
     <Modal onClose={handleCloseModal}>
       <div className="w-[300px] text-black">
         <div className="text-xl font-bold text-center mb-4 text-black">
           <h3>Add Product</h3>
         </div>
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className="flex flex-col mb-4 ">
             <LabelAndInput
               id="productName"
@@ -94,13 +116,18 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
           <div className="flex flex-col text-md mb-4">
             <LabelAndInput
               id="price"
-              type="number"
+              type="text"
               name="price"
               text="price"
               value={product.price}
               textStyle="text-xs font-medium"
               handleChange={(e) =>
-                handleChange({ e, setData: setProduct, setErrors })
+                handlePriceChange({
+                  e,
+                  setData: setProduct,
+                  setErrors,
+                  setRawPrice,
+                })
               }
             />
           </div>
