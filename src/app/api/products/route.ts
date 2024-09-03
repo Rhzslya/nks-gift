@@ -84,7 +84,7 @@ const handler = async (request: NextRequest) => {
       const { products } = reqBody;
       const stock = parseInt(products.stock);
       const price = parseInt(products.price);
-      const productId = products.productId;
+      const category = products.category;
 
       // Periksa token
       if (!token) {
@@ -105,8 +105,6 @@ const handler = async (request: NextRequest) => {
         });
       });
 
-      console.log(decoded);
-
       // Cek peran pengguna dari decoded token
       if (!allowedRoles.includes(decoded.role)) {
         return NextResponse.json(
@@ -119,22 +117,29 @@ const handler = async (request: NextRequest) => {
         );
       }
 
-      const product = await Product.findOne({
-        productId,
-      });
+      // Ambil huruf pertama dari kategori untuk productId
+      const categoryInitial = category.charAt(0).toUpperCase();
 
-      if (product) {
-        return NextResponse.json(
-          {
-            message: "Product Already Exist",
-          },
-          { status: 400 }
-        );
+      // Cari produk terakhir berdasarkan productId yang dimulai dengan huruf kategori tersebut
+      const lastProduct = await Product.findOne({ category })
+        .sort({ productId: -1 }) // Mengurutkan secara descending berdasarkan productId
+        .limit(1); // Ambil produk terakhir
+
+      let newProductId;
+      if (lastProduct) {
+        // Ambil nomor urut dari produk terakhir dan tambahkan 1
+        const lastProductId = lastProduct.productId;
+        const lastNumber = parseInt(lastProductId.slice(1), 10); // Mengambil bagian nomor setelah huruf
+        const newNumber = (lastNumber + 1).toString().padStart(3, "0"); // Membuat nomor baru dengan format tiga digit
+        newProductId = `${categoryInitial}${newNumber}`; // Gabungkan huruf kategori dan nomor baru
+      } else {
+        // Jika tidak ada produk sebelumnya, mulai dari 001
+        newProductId = `${categoryInitial}001`;
       }
 
       const newProduct = new Product({
         ...products,
-        productId,
+        productId: newProductId,
         stock,
         price,
       });

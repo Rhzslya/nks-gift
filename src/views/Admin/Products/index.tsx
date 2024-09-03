@@ -19,6 +19,7 @@ interface Products {
   price: string;
   category: any;
   stock: string;
+  productId: string;
 }
 
 interface UsersManagementViewsProps {
@@ -43,12 +44,12 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   accessToken,
   message,
 }) => {
-  const [searchQuery, setSearchTerm] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [usersPerPage, setUsersPerPage] = useState(15);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "">("");
   const [sortBy, setSortBy] = useState<
-    "username" | "createdAt" | "accessLevel" | ""
+    "productName" | "createdAt" | "accessLevel" | ""
   >("");
   const [modalEditUser, setModalEditUser] = useState<string | null>(null);
   const [modalArchivedUser, setModalArchivedUser] = useState<string | null>(
@@ -193,14 +194,14 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
 
   // Search Products
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
+    setSearchQuery(e.target.value);
     setCurrentPage(1);
   };
 
   // Sort User
   const handleSortChange = (
     order: "asc" | "desc",
-    sortBy: "username" | "createdAt" | "accessLevel"
+    sortBy: "productName" | "createdAt" | "accessLevel"
   ) => {
     setSortOrder(order);
     setSortBy(sortBy);
@@ -220,7 +221,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
 
   const sortedUsers = Array.isArray(productsData)
     ? [...productsData].sort((a, b) => {
-        if (sortBy === "username") {
+        if (sortBy === "productName") {
           if (sortOrder === "asc") {
             return a.productName.localeCompare(b.productName);
           } else if (sortOrder === "desc") {
@@ -242,7 +243,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
 
   const isActive = (
     order: "asc" | "desc",
-    field: "username" | "createdAt" | "accessLevel"
+    field: "productName" | "createdAt" | "accessLevel"
   ) => sortBy === field && sortOrder === order;
 
   const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
@@ -303,6 +304,8 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
               <ModalAddData
                 handleCloseModal={handleCloseModal}
                 accessToken={accessToken}
+                onProductAdded={handleProductAdded}
+                setShowModalAddData={setShowModalAddData}
               />
             }
           />

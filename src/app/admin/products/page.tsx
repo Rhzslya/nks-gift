@@ -27,6 +27,7 @@ const ProductsManagement = () => {
           });
 
           const data = await response.json();
+          console.log(data);
           if (response.ok) {
             setProducts(data.data);
             setLoading(false);
@@ -34,7 +35,7 @@ const ProductsManagement = () => {
             setMessage(data.message);
           }
         } catch (error) {
-          console.error("Failed to fetch users:", error);
+          console.error("Failed to fetch products:", error);
         } finally {
           setLoading(false);
         }

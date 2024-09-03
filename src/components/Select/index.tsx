@@ -21,7 +21,7 @@ const Select: React.FC<SelectProps> = ({
   disabled,
 }) => {
   return (
-    <div className="flex flex-col mb-4">
+    <div className="flex flex-col">
       <label htmlFor={id} className={textStyle}>
         {capitalizeFirst(name)}
       </label>
@@ -30,7 +30,7 @@ const Select: React.FC<SelectProps> = ({
         name={name}
         value={value}
         onChange={onChange}
-        className="px-2 py-[5px] rounded bg-transparent border-[1px] border-gray-400 text-xs w-full"
+        className="px-2 py-[5px] mt-2 rounded bg-transparent border-[1px] border-gray-400 text-xs w-full"
         disabled={disabled}
       >
         {options.map((option) => (

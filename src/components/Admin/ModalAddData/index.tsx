@@ -9,7 +9,6 @@ import { useRouter } from "next/navigation";
 import { handleChange, handlePriceChange } from "@/utils/handleChange";
 interface Product {
   productName: string;
-  productId: string;
   category: string;
   stock: string;
   price: string;
@@ -18,21 +17,41 @@ interface Product {
 interface ModalUpdatedUserProps {
   handleCloseModal: () => void;
   accessToken: any;
+  onProductAdded: any;
+  setShowModalAddData: any;
 }
 
 const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
   handleCloseModal,
   accessToken,
+  onProductAdded,
+  setShowModalAddData,
 }) => {
   const [product, setProduct] = useState({
     productName: "",
-    productId: "",
     category: "",
     stock: "",
     price: "",
   });
   const [rawPrice, setRawPrice] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const filteredOptions = [
+    { value: "", label: "Select Category" },
+    { value: "gift", label: "Gift" },
+    { value: "flower", label: "Flower" },
+    { value: "suprize", label: "Suprize" },
+    { value: "snack", label: "Snack" },
+  ];
+
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setProduct((prev) => ({
+      ...prev,
+      category: e.target.value, // Extract the value from the event
+    }));
+  };
+
+  console.log(product.category);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -52,8 +71,11 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
 
     const data = await response.json();
     if (response.ok) {
+      onProductAdded(data.product);
+      setShowModalAddData(false);
     }
   };
+
   return (
     <Modal onClose={handleCloseModal}>
       <div className="w-[300px] text-black">
@@ -75,29 +97,13 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
             />
           </div>
           <div className="flex flex-col text-md mb-4">
-            <LabelAndInput
-              id="productId"
-              type="text"
-              name="productId"
-              text="product ID"
-              value={product.productId}
-              textStyle="text-xs font-medium"
-              handleChange={(e) =>
-                handleChange({ e, setData: setProduct, setErrors })
-              }
-            />
-          </div>
-          <div className="flex flex-col text-md mb-4">
-            <LabelAndInput
+            <Select
               id="category"
-              type="text"
               name="category"
-              text="category"
+              options={filteredOptions}
               value={product.category}
+              onChange={handleSelectChange}
               textStyle="text-xs font-medium"
-              handleChange={(e) =>
-                handleChange({ e, setData: setProduct, setErrors })
-              }
             />
           </div>
           <div className="flex flex-col text-md mb-4">
