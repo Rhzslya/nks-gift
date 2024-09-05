@@ -1,26 +1,36 @@
 import mongoose from "mongoose";
-const AutoIncrement = require("mongoose-sequence")(mongoose);
 
 const productSchema = new mongoose.Schema(
   {
     productName: {
       type: String,
-      require: true,
+      required: true, // Typo: should be "required" instead of "require"
     },
     productId: {
       type: String,
-      require: true,
+      required: true, // Use auto-increment number for product ID
     },
     category: {
       type: String,
-      require: true,
+      required: true, // Typo: should be "required" instead of "require"
     },
     price: {
       type: Number,
+      required: true, // To ensure price is provided
     },
-    stock: {
-      type: Number,
-    },
+    stock: [
+      {
+        variant: {
+          type: String,
+          required: true, // Each variant is required
+        },
+        quantity: {
+          type: Number,
+          required: true, // Each quantity for a variant is required
+          min: 0, // Ensure quantity is not negative
+        },
+      },
+    ],
   },
   { timestamps: true }
 );

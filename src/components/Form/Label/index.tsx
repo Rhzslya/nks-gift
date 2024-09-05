@@ -8,7 +8,7 @@ interface LabelAndInputProps {
   type: string;
   name: string;
   text: string;
-  value: string;
+  value: string | string[];
   handleChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handlePasswordChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   error?: string | string[] | null;

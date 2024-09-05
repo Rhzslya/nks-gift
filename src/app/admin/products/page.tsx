@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import ProductsManagementViews from "@/views/Admin/Products";
 const ProductsManagement = () => {
-  const [isLoading, setLoading] = useState(false);
+  const [isLoading, setLoading] = useState(true);
   const { data: session } = useSession();
   const userInSession = session?.user;
   const accessToken = session?.accessToken;
@@ -27,7 +27,6 @@ const ProductsManagement = () => {
           });
 
           const data = await response.json();
-          console.log(data);
           if (response.ok) {
             setProducts(data.data);
             setLoading(false);

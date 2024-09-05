@@ -82,7 +82,6 @@ const handler = async (request: NextRequest) => {
 
       const reqBody = await request.json();
       const { products } = reqBody;
-      const stock = parseInt(products.stock);
       const price = parseInt(products.price);
       const category = products.category;
 
@@ -137,12 +136,21 @@ const handler = async (request: NextRequest) => {
         newProductId = `${categoryInitial}001`;
       }
 
+      console.log(newProductId);
+      const stock = products.stock.map(
+        (item: { variant: string; quantity: string }) => ({
+          variant: item.variant,
+          quantity: parseInt(item.quantity), // Pastikan setiap kuantitas diparsing menjadi integer
+        })
+      );
+
       const newProduct = new Product({
         ...products,
         productId: newProductId,
-        stock,
         price,
+        stock,
       });
+      console.log(newProduct);
 
       const savedProduct = await newProduct.save();
 

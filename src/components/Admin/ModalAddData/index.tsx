@@ -7,6 +7,7 @@ import { capitalizeFirst } from "@/utils/Capitalize";
 import MessageFromAPI from "@/components/Form/MessageFromAPI";
 import { useRouter } from "next/navigation";
 import { handleChange, handlePriceChange } from "@/utils/handleChange";
+
 interface Product {
   productName: string;
   category: string;
@@ -30,9 +31,15 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
   const [product, setProduct] = useState({
     productName: "",
     category: "",
-    stock: "",
+    stock: [
+      {
+        variant: "", // Ubah jadi string untuk input sementara
+        quantity: "", // Ubah jadi string untuk input sementara
+      },
+    ], // Ubah jadi array of objects untuk mendukung duplikasi
     price: "",
   });
+
   const [rawPrice, setRawPrice] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -51,7 +58,28 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
     }));
   };
 
-  console.log(product.category);
+  const handleAddStockField = () => {
+    setProduct((prev) => ({
+      ...prev,
+      stock: [
+        ...prev.stock,
+        { variant: "", quantity: "" }, // Menambahkan input baru untuk stock
+      ],
+    }));
+  };
+
+  const handleStockChange = (
+    index: number,
+    field: keyof (typeof product)["stock"][number],
+    value: string
+  ) => {
+    const newStock = [...product.stock];
+    newStock[index][field] = value;
+    setProduct((prev) => ({
+      ...prev,
+      stock: newStock,
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -78,7 +106,7 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
 
   return (
     <Modal onClose={handleCloseModal}>
-      <div className="w-[300px] text-black">
+      <div className="w-[400px] text-black">
         <div className="text-xl font-bold text-center mb-4 text-black">
           <h3>Add Product</h3>
         </div>
@@ -90,7 +118,7 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
               name="productName"
               text="product name"
               value={product.productName}
-              textStyle="text-xs font-medium"
+              textStyle="text-base font-medium"
               handleChange={(e) =>
                 handleChange({ e, setData: setProduct, setErrors })
               }
@@ -103,21 +131,48 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
               options={filteredOptions}
               value={product.category}
               onChange={handleSelectChange}
-              textStyle="text-xs font-medium"
+              textStyle="text-base font-medium"
             />
           </div>
-          <div className="flex flex-col text-md mb-4">
-            <LabelAndInput
-              id="stock"
-              type="number"
-              name="stock"
-              text="stock"
-              value={product.stock}
-              textStyle="text-xs font-medium"
-              handleChange={(e) =>
-                handleChange({ e, setData: setProduct, setErrors })
-              }
-            />
+          <div className="flex flex-col text-md">
+            <h2 className="text-base font-medium">Stock</h2>
+            {product.stock.map((stockItem, index) => (
+              <div key={index} className="flex gap-2 mb-4">
+                <div className="flex flex-col text-md">
+                  <LabelAndInput
+                    id={`variant-${index}`}
+                    type="text"
+                    name={`stock[${index}].variant`}
+                    text="variant"
+                    value={stockItem.variant}
+                    textStyle="text-xs font-medium"
+                    handleChange={(e) =>
+                      handleStockChange(index, "variant", e.target.value)
+                    }
+                  />
+                </div>
+                <div className="flex flex-col text-md">
+                  <LabelAndInput
+                    id={`quantity-${index}`}
+                    type="number"
+                    name={`stock[${index}].quantity`}
+                    text="quantity"
+                    value={stockItem.quantity}
+                    textStyle="text-xs font-medium"
+                    handleChange={(e) =>
+                      handleStockChange(index, "quantity", e.target.value)
+                    }
+                  />
+                </div>
+              </div>
+            ))}
+            <button
+              type="button"
+              className="w-fit ml-auto flex justify-center items-center"
+              onClick={handleAddStockField}
+            >
+              <i className="bx bxs-plus-circle text-gray-500 text-[20px]"></i>
+            </button>
           </div>
           <div className="flex flex-col text-md mb-4">
             <LabelAndInput
@@ -126,7 +181,7 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
               name="price"
               text="price"
               value={product.price}
-              textStyle="text-xs font-medium"
+              textStyle="text-base font-medium"
               handleChange={(e) =>
                 handlePriceChange({
                   e,
