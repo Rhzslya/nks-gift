@@ -136,7 +136,6 @@ const handler = async (request: NextRequest) => {
         newProductId = `${categoryInitial}001`;
       }
 
-      console.log(newProductId);
       const stock = products.stock.map(
         (item: { variant: string; quantity: string }) => ({
           variant: item.variant,
@@ -155,9 +154,11 @@ const handler = async (request: NextRequest) => {
       const savedProduct = await newProduct.save();
 
       return NextResponse.json({
-        message: "Product created successfully",
+        status: true,
+        statusCode: 200,
         success: true,
-        product: savedProduct,
+        message: "Product created successfully",
+        data: savedProduct,
       });
     } catch (error) {
       console.error("Error:", error);

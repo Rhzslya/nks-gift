@@ -60,12 +60,15 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   const [activeUserId, setActiveUserId] = useState<string | null>(null);
   const { data: session, update } = useSession();
   const [productsData, setProductsData] = useState<Products[]>([]);
-  const isUpdatedUser = productsData?.find(
-    (user) => user._id === modalEditUser
-  );
-  const isArchivedUser = productsData?.find(
-    (user) => user._id === modalArchivedUser
-  );
+  // const isUpdatedProduct = productsData?.find(
+  //   (product) => product._id === modalEditUser
+  // );
+  // const isArchivedProduct = productsData?.find(
+  //   (product) => product._id === modalArchivedUser
+  // );
+
+  // Gunakan isUpdatedProduct dan isArchivedProduct di tempat lain dalam kode Anda
+
   const [clickedButtonId, setClickedButtonId] = useState<string | null>(null);
   const menuSettingRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const settingButtonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>(
@@ -81,6 +84,8 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   useEffect(() => {
     setProductsData(products);
   }, [products]);
+
+  console.log(productsData);
 
   const handleProductAdded = (newProduct: Products) => {
     setProductsData((prevProducts) => [...prevProducts, newProduct]);

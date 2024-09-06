@@ -29,6 +29,17 @@ type UserUpdatedProfile = {
   };
   numberPhone: string;
 };
+
+type Product = {
+  productName: string;
+  category: string;
+  stock: {
+    variant: string;
+    quantity: string;
+  }[];
+  price: string;
+};
+
 export const validationRegister = (user: User) => {
   const errors: Record<string, string> = {};
 
@@ -160,6 +171,41 @@ export const validationUpdateProfile = (
     ) {
       errors.numberPhone = "Number must start with 0 or 62";
     }
+  }
+
+  return errors;
+};
+
+export const validationAddProduct = (product: Product) => {
+  const errors: Record<string, string> = {};
+
+  // Validasi Product Name
+  if (!product.productName.trim()) {
+    errors.productName = "Product name is required";
+  }
+
+  // Validasi Category
+  if (!product.category.trim()) {
+    errors.category = "Category is required";
+  }
+
+  // Validasi Stock (Variant & Quantity)
+  product.stock.forEach((stockItem, index) => {
+    if (!stockItem.variant.trim()) {
+      errors[`stock[${index}].variant`] = `Variant is required`;
+    }
+    if (!stockItem.quantity.trim() || isNaN(Number(stockItem.quantity))) {
+      errors[`stock[${index}].quantity`] = `Quantity is Required`;
+    } else if (Number(stockItem.quantity) <= 0) {
+      errors[`stock[${index}].quantity`] = `Quantity must be greater than 0`;
+    }
+  });
+
+  // Validasi Price
+  if (!product.price.toString().trim() || isNaN(Number(product.price))) {
+    errors.price = "Price is required and must be a number";
+  } else if (Number(product.price) <= 0) {
+    errors.price = "Price must be greater than 0";
   }
 
   return errors;

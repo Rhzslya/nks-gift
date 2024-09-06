@@ -106,7 +106,12 @@ const TableRow: React.FC<TableRowProps> = ({
         }`}
       >
         {headerKey === "action" ? (
-          <div className="relative z-50">
+          <div
+            className="relative z-50"
+            ref={(el) => {
+              menuSettingRefs.current[item._id] = el;
+            }}
+          >
             <button
               className={`${
                 clickedButtonId === item._id

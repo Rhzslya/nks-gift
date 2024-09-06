@@ -9,6 +9,7 @@ interface SelectProps {
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   textStyle?: string;
   disabled?: boolean;
+  error?: string | string[] | null;
 }
 
 const Select: React.FC<SelectProps> = ({
@@ -19,6 +20,7 @@ const Select: React.FC<SelectProps> = ({
   onChange,
   textStyle,
   disabled,
+  error,
 }) => {
   return (
     <div className="flex flex-col">
@@ -39,6 +41,13 @@ const Select: React.FC<SelectProps> = ({
           </option>
         ))}
       </select>
+      {error && (
+        <div className="password-criteria flex flex-col mt-2 text-[12px] ">
+          <p className="text-red-500">
+            {Array.isArray(error) ? error.join(", ") : error}
+          </p>
+        </div>
+      )}
     </div>
   );
 };

@@ -6,12 +6,19 @@ import SubmitButton from "@/components/Button/SubmitButton";
 import { capitalizeFirst } from "@/utils/Capitalize";
 import MessageFromAPI from "@/components/Form/MessageFromAPI";
 import { useRouter } from "next/navigation";
-import { handleChange, handlePriceChange } from "@/utils/handleChange";
-
+import {
+  handleChange,
+  handlePriceChange,
+  handleSelectChange,
+} from "@/utils/handleChange";
+import { validationAddProduct } from "@/utils/Validations";
 interface Product {
   productName: string;
   category: string;
-  stock: string;
+  stock: {
+    variant: string;
+    quantity: string;
+  }[];
   price: string;
 }
 
@@ -41,7 +48,9 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
   });
 
   const [rawPrice, setRawPrice] = useState("");
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<Record<string, any>>({});
+  const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   const filteredOptions = [
     { value: "", label: "Select Category" },
@@ -51,21 +60,24 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
     { value: "snack", label: "Snack" },
   ];
 
-  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setProduct((prev) => ({
-      ...prev,
-      category: e.target.value, // Extract the value from the event
-    }));
-  };
-
   const handleAddStockField = () => {
-    setProduct((prev) => ({
-      ...prev,
-      stock: [
-        ...prev.stock,
-        { variant: "", quantity: "" }, // Menambahkan input baru untuk stock
-      ],
-    }));
+    // Cek apakah semua stock item sudah memiliki nilai untuk variant dan quantity
+    const allFieldsFilled = product.stock.every(
+      (stockItem) => stockItem.variant !== "" && stockItem.quantity !== ""
+    );
+
+    if (allFieldsFilled) {
+      setProduct((prev) => ({
+        ...prev,
+        stock: [
+          ...prev.stock,
+          { variant: "", quantity: "" }, // Menambahkan input baru untuk stock
+        ],
+      }));
+    } else {
+      // Tambahkan pesan error atau alert jika ada field yang belum diisi
+      alert("Please fill in all existing fields before adding more.");
+    }
   };
 
   const handleStockChange = (
@@ -83,30 +95,47 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const validationErrors = validationAddProduct(product);
+    setIsLoading(true);
+    setErrors(validationErrors);
     const products = {
       ...product,
       price: rawPrice, // Use raw price for actual data submission
     };
-    console.log(products);
-    const response = await fetch("/api/products", {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-      method: "POST",
-      body: JSON.stringify({ products }),
-    });
+    try {
+      if (Object.keys(validationErrors).length === 0) {
+        const response = await fetch("/api/products", {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          method: "POST",
+          body: JSON.stringify({ products }),
+        });
 
-    const data = await response.json();
-    if (response.ok) {
-      onProductAdded(data.product);
-      setShowModalAddData(false);
+        const data = await response.json();
+        console.log(data);
+        if (response.ok) {
+          onProductAdded(data.data);
+          setShowModalAddData(false);
+        }
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error instanceof Error) {
+          console.log(error);
+        }
+      } else {
+        setMessage("Signup failed");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <Modal onClose={handleCloseModal}>
-      <div className="w-[400px] text-black">
+      <div className="w-[500px]  overflow-y-auto max-h-[550px] text-black">
         <div className="text-xl font-bold text-center mb-4 text-black">
           <h3>Add Product</h3>
         </div>
@@ -122,6 +151,9 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
               handleChange={(e) =>
                 handleChange({ e, setData: setProduct, setErrors })
               }
+              padding="p-[4px]"
+              placeholder="Product Name"
+              error={errors.productName}
             />
           </div>
           <div className="flex flex-col text-md mb-4">
@@ -130,15 +162,22 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
               name="category"
               options={filteredOptions}
               value={product.category}
-              onChange={handleSelectChange}
+              onChange={(e) =>
+                handleSelectChange({
+                  e,
+                  setData: setProduct,
+                  setErrors,
+                })
+              }
               textStyle="text-base font-medium"
+              error={errors.category}
             />
           </div>
           <div className="flex flex-col text-md">
             <h2 className="text-base font-medium">Stock</h2>
             {product.stock.map((stockItem, index) => (
-              <div key={index} className="flex gap-2 mb-4">
-                <div className="flex flex-col text-md">
+              <div key={index} className="relative flex gap-2 mb-4">
+                <div className="w-full flex flex-col text-md p-">
                   <LabelAndInput
                     id={`variant-${index}`}
                     type="text"
@@ -149,9 +188,12 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
                     handleChange={(e) =>
                       handleStockChange(index, "variant", e.target.value)
                     }
+                    padding="p-[6px]"
+                    placeholder="Variant"
+                    error={errors?.[`stock[${index}].variant`]}
                   />
                 </div>
-                <div className="flex flex-col text-md">
+                <div className="w-full flex flex-col text-md">
                   <LabelAndInput
                     id={`quantity-${index}`}
                     type="number"
@@ -162,6 +204,9 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
                     handleChange={(e) =>
                       handleStockChange(index, "quantity", e.target.value)
                     }
+                    padding="p-[6px]"
+                    placeholder="Quantity"
+                    error={errors?.[`stock[${index}].quantity`]}
                   />
                 </div>
               </div>
@@ -190,6 +235,9 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
                   setRawPrice,
                 })
               }
+              padding="p-[4px]"
+              placeholder="Price"
+              error={errors.price}
             />
           </div>
           <div className="mb-4">

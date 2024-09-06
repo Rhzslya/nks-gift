@@ -1,5 +1,19 @@
 import mongoose from "mongoose";
 
+const stockSchema = new mongoose.Schema(
+  {
+    variant: {
+      type: String,
+      required: true, // Each variant is required
+    },
+    quantity: {
+      type: Number,
+      required: true, // Each quantity for a variant is required
+      min: 0, // Ensure quantity is not negative
+    },
+  },
+  { _id: false }
+);
 const productSchema = new mongoose.Schema(
   {
     productName: {
@@ -18,19 +32,7 @@ const productSchema = new mongoose.Schema(
       type: Number,
       required: true, // To ensure price is provided
     },
-    stock: [
-      {
-        variant: {
-          type: String,
-          required: true, // Each variant is required
-        },
-        quantity: {
-          type: Number,
-          required: true, // Each quantity for a variant is required
-          min: 0, // Ensure quantity is not negative
-        },
-      },
-    ],
+    stock: [stockSchema],
   },
   { timestamps: true }
 );

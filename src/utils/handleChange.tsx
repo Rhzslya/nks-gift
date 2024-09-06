@@ -121,3 +121,29 @@ export const handlePriceChange = <T extends Record<string, any>>({
     [name]: "",
   }));
 };
+
+export const handleSelectChange = <T extends Record<string, any>>({
+  e,
+  setData,
+  setErrors,
+}: {
+  e: React.ChangeEvent<HTMLSelectElement>;
+  setData: React.Dispatch<React.SetStateAction<T>>;
+  setErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+}) => {
+  const { name, value } = e.target;
+
+  // Update the state with the selected value
+  setData((prevData) => ({
+    ...prevData,
+    [name]: value,
+  }));
+
+  // Clear error for the field when user selects a valid option
+  if (value) {
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: "",
+    }));
+  }
+};

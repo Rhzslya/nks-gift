@@ -21,6 +21,7 @@ interface LabelAndInputProps {
   disabled?: boolean;
   textStyle?: string;
   padding?: string;
+  placeholder?: string;
 }
 
 const LabelAndInput: React.FC<LabelAndInputProps> = ({
@@ -37,6 +38,7 @@ const LabelAndInput: React.FC<LabelAndInputProps> = ({
   disabled,
   textStyle = "text-sm text-black",
   padding = "p-2",
+  placeholder,
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [hasBeenTouched, setHasBeenTouched] = useState(false);
@@ -75,7 +77,7 @@ const LabelAndInput: React.FC<LabelAndInputProps> = ({
   } ${textStyle} ${type === "number" ? "no-spinner" : ""}`;
 
   return (
-    <div className="">
+    <div className="w-full">
       <label htmlFor={id} className={textStyle}>
         {capitalizeFirst(text)}
       </label>
@@ -90,6 +92,7 @@ const LabelAndInput: React.FC<LabelAndInputProps> = ({
           className={inputClassName}
           disabled={disabled}
           autoComplete="off"
+          placeholder={placeholder}
         />
         {type === "password" && (
           <span
