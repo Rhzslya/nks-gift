@@ -147,3 +147,36 @@ export const handleSelectChange = <T extends Record<string, any>>({
     }));
   }
 };
+
+export const handleStockChange = <T extends Record<string, any>>({
+  index,
+  field,
+  value,
+  setData,
+  setErrors,
+}: {
+  index: number;
+  field: keyof T["stock"][number];
+  value: string;
+  setData: React.Dispatch<React.SetStateAction<T>>;
+  setErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+}) => {
+  // Update the stock data
+  setData((prevData) => {
+    const newStock = [...prevData.stock];
+    newStock[index][String(field)] = value; // Convert field to string
+
+    return {
+      ...prevData,
+      stock: newStock,
+    };
+  });
+
+  // Clear error for the field when user changes to a valid value
+  if (value) {
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [`stock[${index}].${String(field)}`]: "", // Convert field to string
+    }));
+  }
+};

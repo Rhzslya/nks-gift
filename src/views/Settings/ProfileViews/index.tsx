@@ -82,8 +82,7 @@ const ProfileViews = ({ serverSession }: any) => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     setSelectedImage(file);
-    console.log(file);
-    console.log(selectedImage);
+
     if (file) {
       const previewUrl = URL.createObjectURL(file);
       setUser((prevUser: User) => ({

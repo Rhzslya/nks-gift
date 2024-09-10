@@ -20,6 +20,7 @@ interface LabelAndInputProps {
   };
   disabled?: boolean;
   textStyle?: string;
+  inputTextStyle?: string;
   padding?: string;
   placeholder?: string;
 }
@@ -37,6 +38,7 @@ const LabelAndInput: React.FC<LabelAndInputProps> = ({
   passwordCriteria,
   disabled,
   textStyle = "text-sm text-black",
+  inputTextStyle = "text-xs",
   padding = "p-2",
   placeholder,
 }) => {
@@ -72,9 +74,9 @@ const LabelAndInput: React.FC<LabelAndInputProps> = ({
         ? "border-red-500"
         : "border-gray-400"
       : "border-gray-400"
-  } text-sm w-full ${
+  } ${inputTextStyle} w-full ${
     disabled ? "opacity-70 cursor-not-allowed" : ""
-  } ${textStyle} ${type === "number" ? "no-spinner" : ""}`;
+  }  ${type === "number" ? "no-spinner" : ""}`;
 
   return (
     <div className="w-full">
@@ -131,7 +133,7 @@ const LabelAndInput: React.FC<LabelAndInputProps> = ({
       )}
 
       {error && (
-        <div className="password-criteria flex flex-col mt-2 text-[12px] ">
+        <div className="password-criteria flex flex-col mt-2 text-[12px]">
           <p className="text-red-500">
             {Array.isArray(error) ? error.join(", ") : error}
           </p>

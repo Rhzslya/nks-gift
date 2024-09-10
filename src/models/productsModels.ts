@@ -20,6 +20,10 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: true, // Typo: should be "required" instead of "require"
     },
+    productImage: {
+      type: String,
+      required: true,
+    },
     productId: {
       type: String,
       required: true, // Use auto-increment number for product ID

@@ -172,7 +172,7 @@ const TableRow: React.FC<TableRowProps> = ({
         ))
       ) : (
         <tr className="text-gray-500">
-          <td colSpan={tableHeaders.length} className="text-center py-4">
+          <td colSpan={tableHeaders.length + 1} className="text-center py-4">
             No data available.
           </td>
         </tr>

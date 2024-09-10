@@ -32,7 +32,7 @@ const Select: React.FC<SelectProps> = ({
         name={name}
         value={value}
         onChange={onChange}
-        className="px-2 py-[5px] mt-2 rounded bg-transparent border-[1px] border-gray-400 text-xs w-full"
+        className="py-[6px] px-1 mt-2 rounded bg-transparent border-[1px] border-gray-400 text-xs w-full"
         disabled={disabled}
       >
         {options.map((option) => (

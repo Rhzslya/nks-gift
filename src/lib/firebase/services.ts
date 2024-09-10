@@ -57,3 +57,52 @@ export async function uploadFile(
     return false;
   }
 }
+
+export async function uploadProductImage(
+  productId: string,
+  file: File,
+  progressCallback: (progress: number) => void
+): Promise<string | false> {
+  if (!file) return false;
+
+  if (file.size >= 1048576) {
+    // File lebih dari 1MB
+    return false;
+  }
+
+  const newName = `product.${file.name.split(".").pop()}`;
+  const productFolderRef = ref(storage, `images/products/${productId}/`);
+
+  // List all files in the product's folder and delete the old product image
+  const files = await listAll(productFolderRef);
+  console.log(files);
+  for (const item of files.items) {
+    await deleteObject(item);
+  }
+
+  const storageRef = ref(storage, `images/products/${productId}/${newName}`);
+  try {
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    return await new Promise<string>((resolve, reject) => {
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          progressCallback(progress);
+        },
+        (error) => {
+          reject(`Upload failed: ${error.message}`);
+        },
+        async () => {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          resolve(downloadURL);
+        }
+      );
+    });
+  } catch (error) {
+    console.error("Error uploading product image", error);
+    return false;
+  }
+}
