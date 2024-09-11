@@ -8,6 +8,7 @@ import MessageFromAPI from "@/components/Form/MessageFromAPI";
 import { useRouter } from "next/navigation";
 import {
   handleChange,
+  handleInputFileChange,
   handlePriceChange,
   handleSelectChange,
   handleStockChange,
@@ -15,6 +16,7 @@ import {
 import { validationAddProduct } from "@/utils/Validations";
 import Image from "next/image";
 import { uploadProductImage } from "@/lib/firebase/services";
+import InputFile from "@/components/Form/Label/InputFile";
 interface Product {
   productImage: string;
   productName: string;
@@ -182,6 +184,8 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
       return () => clearTimeout(timer);
     }
   }, [message]);
+
+  console.log(selectedImage);
   return (
     <Modal onClose={handleCloseModal}>
       <div className="w-[500px]  overflow-y-auto max-h-[550px] text-black">
@@ -312,7 +316,7 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
                 Product Picture
               </h3>
             </div>
-            <div className="flex items-center bg-gray-100 p-2 rounded-full">
+            <div className="flex items-center bg-gray-100 p-2 rounded-sm">
               {product.productImage ? (
                 <Image
                   src={product.productImage}
@@ -320,7 +324,7 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
                   height={100}
                   alt={product.productName || ""}
                   quality={100}
-                  className="h-24 w-24 object-cover rounded-full"
+                  className="h-24 w-24 object-cover rounded-sm"
                 />
               ) : (
                 <Image
@@ -329,7 +333,7 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
                   height={100}
                   alt={product.productName || ""}
                   quality={100}
-                  className="h-24 w-24 object-cover rounded-full"
+                  className="h-24 w-24 object-cover rounded-sm"
                 />
               )}
             </div>
@@ -378,10 +382,11 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
                   </>
                 )}
               </button>
+              <p>{errors.productImage}</p>
               <div className="absolute w-full h-full top-0 -z-10 opacity-0  flex justify-center items-center">
                 <input
                   type="file"
-                  accept="image"
+                  accept="image/png, image/jpeg, image/jpg"
                   id="product_image"
                   onChange={handleInputChange}
                   ref={fileInputRef}
@@ -389,6 +394,28 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
               </div>
             </label>
           </div>
+          {/* <div className="flex flex-col justify-center items-center gap-2 flex-grow mb-4">
+            <InputFile
+              id="product_image"
+              title="Product Image"
+              text="Click to Upload Product Image"
+              imageField="productImage" // Sesuaikan dengan key yang ada di data product
+              altField="productName" // Sesuaikan dengan key yang ada di data product
+              data={product}
+              error={errors.productImage}
+              handleChange={(e) =>
+                handleInputFileChange({
+                  e,
+                  setData: setProduct,
+                  setErrors,
+                  // Jika kamu ingin menandai perubahan
+                })
+              }
+              selectedFile={selectedImage}
+              handleClickLabel={handleClickLabel}
+              fileInputRef={fileInputRef} // Pastikan `fileInputRef` diinisialisasi
+            />
+          </div> */}
 
           <div className="mb-4">
             <SubmitButton

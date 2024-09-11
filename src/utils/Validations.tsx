@@ -31,6 +31,7 @@ type UserUpdatedProfile = {
 };
 
 type Product = {
+  productImage: string;
   productName: string;
   category: string;
   stock: {
@@ -202,11 +203,16 @@ export const validationAddProduct = (product: Product) => {
   });
 
   // Validasi Price
-  if (!product.price.toString().trim() || isNaN(Number(product.price))) {
+  const cleanedPrice = product.price.toString().trim().replace(/\./g, ""); // Menghapus titik sebagai pemisah ribuan
+
+  if (!cleanedPrice || isNaN(Number(cleanedPrice))) {
     errors.price = "Price is required and must be a number";
-  } else if (Number(product.price) <= 0) {
+  } else if (Number(cleanedPrice) <= 0) {
     errors.price = "Price must be greater than 0";
   }
 
+  if (!product.productImage.trim()) {
+    errors.productImage = "Product image is required";
+  }
   return errors;
 };

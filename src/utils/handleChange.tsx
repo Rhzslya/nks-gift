@@ -180,3 +180,58 @@ export const handleStockChange = <T extends Record<string, any>>({
     }));
   }
 };
+
+export const handleInputFileChange = <T extends Record<string, any>>({
+  e,
+  setData,
+  setErrors,
+  setIsModified,
+}: {
+  e: React.ChangeEvent<HTMLInputElement>;
+  setData: React.Dispatch<React.SetStateAction<T>>;
+  setErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  setIsModified?: React.Dispatch<React.SetStateAction<boolean>>; // Opsional, hanya digunakan jika dibutuhkan
+}) => {
+  const file = e.target.files?.[0] || null;
+  const { name } = e.target;
+
+  // Jika input memiliki key dengan tanda titik (.), kita perlu menangani key bersarang
+  if (file) {
+    const previewUrl = URL.createObjectURL(file);
+
+    setData((prevData) => {
+      if (name.includes(".")) {
+        const keys = name.split(".");
+        const [firstKey, secondKey] = keys;
+        return {
+          ...prevData,
+          [firstKey]: {
+            ...prevData[firstKey],
+            [secondKey]: previewUrl,
+          },
+        };
+      }
+
+      return {
+        ...prevData,
+        [name]: previewUrl,
+      };
+    });
+
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: "",
+    }));
+  } else {
+    // Jika tidak ada file yang dipilih atau file tidak valid
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: "Please select a valid image file",
+    }));
+  }
+
+  // Menandai data sebagai telah diubah (opsional)
+  if (setIsModified) {
+    setIsModified(true);
+  }
+};

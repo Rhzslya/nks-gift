@@ -4,6 +4,7 @@ import "react-loading-skeleton/dist/skeleton.css";
 import { capitalizeFirst } from "@/utils/Capitalize";
 import { formatPriceToIDR } from "@/utils/FormatPrice";
 import { ActionMenu } from "../../ActionMenu";
+import Image from "next/image";
 
 interface TableRowProps {
   paginatedItems: any[];
@@ -136,6 +137,15 @@ const TableRow: React.FC<TableRowProps> = ({
               />
             )}
           </div>
+        ) : headerKey === "productImage" ? (
+          <Image
+            src={item.productImage}
+            alt={item.productName}
+            className="w-24 h-24 object-cover m-auto rounded-sm border-4 border-gray-100 "
+            width={100}
+            height={100}
+            quality={100}
+          />
         ) : (
           getItemField(item, headerKey)
         )}

@@ -458,7 +458,7 @@ const ProfileViews = ({ serverSession }: any) => {
                 <div className="absolute w-full h-full top-0 -z-10 opacity-0  flex justify-center items-center">
                   <input
                     type="file"
-                    accept="image"
+                    accept="image/png, image/jpeg, image/jpg"
                     id="profile_image"
                     onChange={handleInputChange}
                     ref={fileInputRef}

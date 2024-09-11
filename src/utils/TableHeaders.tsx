@@ -19,7 +19,7 @@ export const tableArchivedUser = [
 ];
 
 export const productsTableHeaders = [
-  { name: "image", key: "image" },
+  { name: "Image", key: "productImage" },
   { name: "Product Name", key: "productName" },
   { name: "Product ID", key: "productId" },
   { name: "Category", key: "category" },
