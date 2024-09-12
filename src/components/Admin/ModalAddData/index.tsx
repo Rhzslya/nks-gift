@@ -89,7 +89,7 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     setSelectedImage(file);
-    console.log(file);
+
     if (file) {
       const previewUrl = URL.createObjectURL(file);
       setProduct((prevProduct: Product) => ({
@@ -152,9 +152,6 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
               });
 
               const product = await putResponse.json();
-              console.log(product);
-              console.log(data.data);
-              // Pastikan data yang dikirim ke onProductAdded sudah benar
               onProductAdded(product.data);
               setShowModalAddData(false);
             }
@@ -185,7 +182,6 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
     }
   }, [message]);
 
-  console.log(selectedImage);
   return (
     <Modal onClose={handleCloseModal}>
       <div className="w-[500px]  overflow-y-auto max-h-[550px] text-black">
@@ -311,111 +307,27 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
             />
           </div>
           <div className="flex flex-col justify-center items-center gap-2 flex-grow mb-4">
-            <div>
-              <h3 className="text-sm font-medium text-gray-600">
-                Product Picture
-              </h3>
-            </div>
-            <div className="flex items-center bg-gray-100 p-2 rounded-sm">
-              {product.productImage ? (
-                <Image
-                  src={product.productImage}
-                  width={100}
-                  height={100}
-                  alt={product.productName || ""}
-                  quality={100}
-                  className="h-24 w-24 object-cover rounded-sm"
-                />
-              ) : (
-                <Image
-                  src={"/default.jpg"}
-                  width={100}
-                  height={100}
-                  alt={product.productName || ""}
-                  quality={100}
-                  className="h-24 w-24 object-cover rounded-sm"
-                />
-              )}
-            </div>
-            <label
-              title="Click to Upload Your Product Picture"
-              htmlFor="product_image"
-              className="relative w-full"
-            >
-              <button
-                type="button"
-                onClick={handleClickLabel}
-                className="relative border-dashed border-[2px] border-gray-200 p-6 rounded-md text-gray-600 w-full"
-              >
-                {selectedImage ? (
-                  <div className="relative z-10 flex flex-col justify-center items-center text-gray-600 min-h-[76.75px]">
-                    <small>
-                      <strong>{selectedImage.name}</strong>
-                    </small>
-                    <small>
-                      Click Save and Upload to save and upload your new Product
-                      Picture.
-                    </small>
-                    <small>
-                      If you wish to change the image, please select a different
-                      file.
-                    </small>
-                  </div>
-                ) : (
-                  <>
-                    <div className="absolute inset-0 flex justify-center items-center z-0">
-                      <i className="bx bx-upload text-[80px] text-gray-300"></i>
-                    </div>
-
-                    <div className="relative z-10 flex flex-col justify-center items-center text-gray-600 min-h-[76.75px]">
-                      <small className="">
-                        Click here to upload a Product picture.
-                      </small>
-                      <small className="">
-                        Accepted formats: JPG, PNG (Max size: 1MB).
-                      </small>
-                      <small className="">
-                        For best results, use a clear image with a minimum
-                        resolution of 300x300 pixels.
-                      </small>
-                    </div>
-                  </>
-                )}
-              </button>
-              <p>{errors.productImage}</p>
-              <div className="absolute w-full h-full top-0 -z-10 opacity-0  flex justify-center items-center">
-                <input
-                  type="file"
-                  accept="image/png, image/jpeg, image/jpg"
-                  id="product_image"
-                  onChange={handleInputChange}
-                  ref={fileInputRef}
-                />
-              </div>
-            </label>
-          </div>
-          {/* <div className="flex flex-col justify-center items-center gap-2 flex-grow mb-4">
             <InputFile
               id="product_image"
+              htmlfor="product_image"
               title="Product Image"
               text="Click to Upload Product Image"
-              imageField="productImage" // Sesuaikan dengan key yang ada di data product
-              altField="productName" // Sesuaikan dengan key yang ada di data product
-              data={product}
+              data={product.productImage}
               error={errors.productImage}
               handleChange={(e) =>
                 handleInputFileChange({
                   e,
                   setData: setProduct,
                   setErrors,
-                  // Jika kamu ingin menandai perubahan
+                  setSelectedImage,
+                  fieldName: "productImage", // Field yang di-update
                 })
               }
-              selectedFile={selectedImage}
+              selectedImage={selectedImage}
               handleClickLabel={handleClickLabel}
-              fileInputRef={fileInputRef} // Pastikan `fileInputRef` diinisialisasi
+              ref={fileInputRef}
             />
-          </div> */}
+          </div>
 
           <div className="mb-4">
             <SubmitButton

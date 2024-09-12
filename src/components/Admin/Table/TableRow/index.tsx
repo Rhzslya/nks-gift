@@ -26,6 +26,7 @@ interface TableRowProps {
   handleModalRestoreUser?: (userId: string) => void;
   handleModalViewDetails?: (userId: string) => void;
   handleModalDeletePermanently?: (userId: string) => void;
+  handleModalEditProduct?: (productId: string) => void;
   variant?: string;
 }
 
@@ -45,6 +46,7 @@ const TableRow: React.FC<TableRowProps> = ({
   handleModalRestoreUser,
   handleModalViewDetails,
   handleModalDeletePermanently,
+  handleModalEditProduct,
   variant = "bg-white",
 }) => {
   const className: Record<string, string> = {
@@ -134,6 +136,7 @@ const TableRow: React.FC<TableRowProps> = ({
                 handleModalRestoreUser={handleModalRestoreUser}
                 handleModalViewDetails={handleModalViewDetails}
                 handleModalDeletePermanently={handleModalDeletePermanently}
+                handleModalEditProduct={handleModalEditProduct}
               />
             )}
           </div>

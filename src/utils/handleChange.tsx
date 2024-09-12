@@ -186,51 +186,43 @@ export const handleInputFileChange = <T extends Record<string, any>>({
   setData,
   setErrors,
   setIsModified,
+  setSelectedImage,
+  fieldName, // Field yang akan diupdate di dalam state
 }: {
   e: React.ChangeEvent<HTMLInputElement>;
   setData: React.Dispatch<React.SetStateAction<T>>;
   setErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
-  setIsModified?: React.Dispatch<React.SetStateAction<boolean>>; // Opsional, hanya digunakan jika dibutuhkan
+  setIsModified?: React.Dispatch<React.SetStateAction<boolean>>;
+  setSelectedImage: React.Dispatch<React.SetStateAction<File | null>>;
+  fieldName: string; // Ditambahkan agar lebih fleksibel, misalnya untuk field 'productImage'
 }) => {
   const file = e.target.files?.[0] || null;
-  const { name } = e.target;
+  setSelectedImage(file);
 
-  // Jika input memiliki key dengan tanda titik (.), kita perlu menangani key bersarang
   if (file) {
+    // Membuat preview URL dari file yang diunggah
     const previewUrl = URL.createObjectURL(file);
 
-    setData((prevData) => {
-      if (name.includes(".")) {
-        const keys = name.split(".");
-        const [firstKey, secondKey] = keys;
-        return {
-          ...prevData,
-          [firstKey]: {
-            ...prevData[firstKey],
-            [secondKey]: previewUrl,
-          },
-        };
-      }
+    // Set data untuk field yang sesuai (misal: productImage atau lainnya)
+    setData((prevData) => ({
+      ...prevData,
+      [fieldName]: previewUrl, // Menggunakan fieldName yang dinamis
+    }));
 
-      return {
-        ...prevData,
-        [name]: previewUrl,
-      };
-    });
-
+    // Reset error untuk field ini
     setErrors((prevErrors) => ({
       ...prevErrors,
-      [name]: "",
+      [fieldName]: "", // Menggunakan fieldName yang dinamis
     }));
   } else {
     // Jika tidak ada file yang dipilih atau file tidak valid
     setErrors((prevErrors) => ({
       ...prevErrors,
-      [name]: "Please select a valid image file",
+      [fieldName]: "Please select a valid image file",
     }));
   }
 
-  // Menandai data sebagai telah diubah (opsional)
+  // Menandai bahwa data telah diubah (jika opsi setIsModified disediakan)
   if (setIsModified) {
     setIsModified(true);
   }

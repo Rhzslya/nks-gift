@@ -12,13 +12,18 @@ import UtilityBar from "@/components/Admin/UtilityBar";
 import PaginationToolbar from "@/components/Admin/PaginationToolbar";
 import { productSortOptions } from "@/utils/SortOptions";
 import ModalAddData from "@/components/Admin/ModalAddData";
+import ModalUpdatedProduct from "@/components/Admin/ModalUpdatedProduct";
 
 interface Products {
   _id: any;
+  productImage: string;
   productName: string;
   price: string;
   category: any;
-  stock: string;
+  stock: {
+    variant: string;
+    quantity: string;
+  }[];
   productId: string;
 }
 
@@ -51,7 +56,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   const [sortBy, setSortBy] = useState<
     "productName" | "createdAt" | "accessLevel" | ""
   >("");
-  const [modalEditUser, setModalEditUser] = useState<string | null>(null);
+  const [modalEditProduct, setModalEditProduct] = useState<string | null>(null);
   const [modalArchivedUser, setModalArchivedUser] = useState<string | null>(
     null
   );
@@ -60,6 +65,9 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   const [activeUserId, setActiveUserId] = useState<string | null>(null);
   const { data: session, update } = useSession();
   const [productsData, setProductsData] = useState<Products[]>([]);
+  const isUpdatedProduct = productsData?.find(
+    (product) => product._id === modalEditProduct
+  );
   // const isUpdatedProduct = productsData?.find(
   //   (product) => product._id === modalEditUser
   // );
@@ -84,8 +92,6 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   useEffect(() => {
     setProductsData(products);
   }, [products]);
-
-  console.log(productsData);
 
   const handleProductAdded = (newProduct: Products) => {
     setProductsData((prevProducts) => [...prevProducts, newProduct]);
@@ -180,9 +186,9 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   };
   // Open Modal Add Product End
   // open Modal Edit User
-  const handleModalEditUser = (_id: string) => {
+  const handleModalEditProduct = (_id: string) => {
     setActiveUserId(null);
-    setModalEditUser(modalEditUser === _id ? null : _id);
+    setModalEditProduct(modalEditProduct === _id ? null : _id);
   };
 
   // open Modal Delete User
@@ -192,7 +198,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   };
 
   const handleCloseModal = () => {
-    setModalEditUser(null);
+    setModalEditProduct(null);
     setModalArchivedUser(null);
     setShowModalAddData(false);
   };
@@ -324,7 +330,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
             handleSettingToggle={handleSettingToggle}
             activeUserId={activeUserId}
             menuSettingRefs={menuSettingRefs}
-            handleModalEditUser={handleModalEditUser}
+            handleModalEditProduct={handleModalEditProduct}
             handleModalArchivedUser={handleModalArchivedUser}
           />
           <PaginationToolbar
@@ -337,6 +343,13 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
           />
         </div>
       </div>
+
+      {modalEditProduct !== null && isUpdatedProduct ? (
+        <ModalUpdatedProduct
+          handleCloseModal={handleCloseModal}
+          isUpdatedProduct={isUpdatedProduct}
+        />
+      ) : null}
 
       <div className="absolute">
         <ToastContainer

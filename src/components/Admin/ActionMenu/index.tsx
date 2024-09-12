@@ -5,6 +5,7 @@ type ActionMenuProps = {
   handleModalRestoreUser?: (id: string) => void;
   handleModalViewDetails?: (id: string) => void;
   handleModalDeletePermanently?: (id: string) => void;
+  handleModalEditProduct?: (id: string) => void;
 };
 
 export const ActionMenu: React.FC<ActionMenuProps> = ({
@@ -14,6 +15,7 @@ export const ActionMenu: React.FC<ActionMenuProps> = ({
   handleModalRestoreUser,
   handleModalViewDetails,
   handleModalDeletePermanently,
+  handleModalEditProduct,
 }) => {
   return (
     <div className="absolute right-[110%] top-0 bg-white rounded-md shadow flex flex-col">
@@ -25,6 +27,17 @@ export const ActionMenu: React.FC<ActionMenuProps> = ({
           <div className="flex gap-x-2 w-[120px] py-2">
             <i className="bx bxs-pencil text-[16px]"></i>
             <p className="text-xs">Edit</p>
+          </div>
+        </button>
+      )}
+      {handleModalEditProduct && (
+        <button
+          className="px-1 hover:bg-gray-100 duration-300"
+          onClick={() => handleModalEditProduct(itemId)}
+        >
+          <div className="flex gap-x-2 w-[120px] py-2">
+            <i className="bx bxs-pencil text-[16px]"></i>
+            <p className="text-xs">Edit Product</p>
           </div>
         </button>
       )}

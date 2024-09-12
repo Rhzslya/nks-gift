@@ -25,6 +25,7 @@ interface TableProps {
   handleModalRestoreUser?: (userId: string) => void;
   handleModalViewDetails?: (userId: string) => void;
   handleModalDeletePermanently?: (userId: string) => void;
+  handleModalEditProduct?: (productId: string) => void;
   variant?: string;
 }
 
@@ -43,6 +44,7 @@ const Table: React.FC<TableProps> = ({
   handleModalRestoreUser,
   handleModalViewDetails,
   handleModalDeletePermanently,
+  handleModalEditProduct,
   variant = "bg-white",
 }) => {
   const className: any = {
@@ -112,6 +114,7 @@ const Table: React.FC<TableProps> = ({
         activeUserId={activeUserId}
         menuSettingRefs={menuSettingRefs}
         handleModalEditUser={handleModalEditUser}
+        handleModalEditProduct={handleModalEditProduct}
         handleModalArchivedUser={handleModalArchivedUser}
         handleModalRestoreUser={handleModalRestoreUser}
         handleModalViewDetails={handleModalViewDetails}
