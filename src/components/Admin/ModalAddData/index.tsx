@@ -86,18 +86,18 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
-    setSelectedImage(file);
+  // const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0] || null;
+  //   setSelectedImage(file);
 
-    if (file) {
-      const previewUrl = URL.createObjectURL(file);
-      setProduct((prevProduct: Product) => ({
-        ...prevProduct,
-        productImage: previewUrl,
-      }));
-    }
-  };
+  //   if (file) {
+  //     const previewUrl = URL.createObjectURL(file);
+  //     setProduct((prevProduct: Product) => ({
+  //       ...prevProduct,
+  //       productImage: previewUrl,
+  //     }));
+  //   }
+  // };
 
   const handleClickLabel = (e: any) => {
     e.preventDefault();
@@ -182,6 +182,7 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
     }
   }, [message]);
 
+  console.log(product);
   return (
     <Modal onClose={handleCloseModal}>
       <div className="w-[500px]  overflow-y-auto max-h-[550px] text-black">
@@ -189,6 +190,28 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
           <h3>Add New Product</h3>
         </div>
         <form onSubmit={handleSubmit}>
+          <div className="flex flex-col justify-center items-center gap-2 flex-grow mb-4">
+            <InputFile
+              id="product_image"
+              htmlfor="product_image"
+              title="Product Image"
+              text="Click to Upload Product Image"
+              data={product.productImage}
+              error={errors.productImage}
+              handleChange={(e) =>
+                handleInputFileChange({
+                  e,
+                  setData: setProduct,
+                  setErrors,
+                  setSelectedImage,
+                  fieldName: "productImage", // Field yang di-update
+                })
+              }
+              selectedImage={selectedImage}
+              handleClickLabel={handleClickLabel}
+              ref={fileInputRef}
+            />
+          </div>
           <div className="flex flex-col mb-4">
             <LabelAndInput
               id="productName"
@@ -304,28 +327,6 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
               padding="p-2"
               placeholder="Price"
               error={errors.price}
-            />
-          </div>
-          <div className="flex flex-col justify-center items-center gap-2 flex-grow mb-4">
-            <InputFile
-              id="product_image"
-              htmlfor="product_image"
-              title="Product Image"
-              text="Click to Upload Product Image"
-              data={product.productImage}
-              error={errors.productImage}
-              handleChange={(e) =>
-                handleInputFileChange({
-                  e,
-                  setData: setProduct,
-                  setErrors,
-                  setSelectedImage,
-                  fieldName: "productImage", // Field yang di-update
-                })
-              }
-              selectedImage={selectedImage}
-              handleClickLabel={handleClickLabel}
-              ref={fileInputRef}
             />
           </div>
 

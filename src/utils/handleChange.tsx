@@ -84,7 +84,9 @@ interface HandlePriceChangeProps<T extends Record<string, any>> {
   e: ChangeEvent<HTMLInputElement>;
   setData: Dispatch<SetStateAction<T>>;
   setErrors: Dispatch<SetStateAction<Record<string, string>>>;
-  setRawPrice: Dispatch<SetStateAction<string>>; // Menyimpan nilai asli (tanpa titik)
+  setRawPrice: Dispatch<SetStateAction<string>>;
+  setIsModified?: Dispatch<SetStateAction<boolean>>;
+  // Menyimpan nilai asli (tanpa titik)
 }
 
 export const handlePriceChange = <T extends Record<string, any>>({
@@ -92,34 +94,36 @@ export const handlePriceChange = <T extends Record<string, any>>({
   setData,
   setErrors,
   setRawPrice,
+  setIsModified,
 }: HandlePriceChangeProps<T>) => {
   const { name, value } = e.target;
 
-  // Remove dots for storing raw value
+  // Hapus titik dari nilai yang diformat untuk mendapatkan angka murni (raw value)
   const rawValue = value.replace(/\./g, "");
 
-  // Check if the raw value is a valid number
+  // Cek apakah raw value adalah angka yang valid
   if (isNaN(Number(rawValue))) return;
 
-  // Format the number with thousand separators
+  // Format angka dengan pemisah ribuan
   const formattedValue = new Intl.NumberFormat("id-ID").format(
     Number(rawValue)
   );
 
-  // Update the state with the formatted value for display
+  // Simpan raw value tanpa titik untuk pemrosesan lebih lanjut
+  setRawPrice(rawValue);
+
+  // Perbarui state dengan nilai yang diformat untuk ditampilkan di UI
   setData((prevData) => ({
     ...prevData,
     [name]: formattedValue,
   }));
 
-  // Store the raw value without formatting for further processing
-  setRawPrice(rawValue);
-
-  // Clear error for the price field when user starts typing
+  // Hapus error untuk field price jika user mengetik ulang
   setErrors((prevErrors) => ({
     ...prevErrors,
     [name]: "",
   }));
+  setIsModified?.(true);
 };
 
 export const handleSelectChange = <T extends Record<string, any>>({
@@ -161,22 +165,21 @@ export const handleStockChange = <T extends Record<string, any>>({
   setData: React.Dispatch<React.SetStateAction<T>>;
   setErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
 }) => {
-  // Update the stock data
   setData((prevData) => {
-    const newStock = [...prevData.stock];
-    newStock[index][String(field)] = value; // Convert field to string
+    // Deep copy the stock array
+    const newStock = prevData.stock.map((stockItem: any) => ({ ...stockItem }));
+    newStock[index][String(field)] = value;
 
     return {
       ...prevData,
-      stock: newStock,
+      stock: newStock, // Assign the deeply cloned stock array
     };
   });
 
-  // Clear error for the field when user changes to a valid value
   if (value) {
     setErrors((prevErrors) => ({
       ...prevErrors,
-      [`stock[${index}].${String(field)}`]: "", // Convert field to string
+      [`stock[${index}].${String(field)}`]: "",
     }));
   }
 };

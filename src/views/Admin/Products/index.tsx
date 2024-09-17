@@ -18,7 +18,7 @@ interface Products {
   _id: any;
   productImage: string;
   productName: string;
-  price: string;
+  price: number;
   category: any;
   stock: {
     variant: string;
@@ -77,6 +77,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
 
   // Gunakan isUpdatedProduct dan isArchivedProduct di tempat lain dalam kode Anda
 
+  console.log(productsData);
   const [clickedButtonId, setClickedButtonId] = useState<string | null>(null);
   const menuSettingRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const settingButtonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>(
@@ -348,6 +349,8 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
         <ModalUpdatedProduct
           handleCloseModal={handleCloseModal}
           isUpdatedProduct={isUpdatedProduct}
+          accessToken={accessToken}
+          setProductsData={setProductsData}
         />
       ) : null}
 

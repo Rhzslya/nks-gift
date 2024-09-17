@@ -183,6 +183,16 @@ const handler = async (request: NextRequest) => {
       const reqBody = await request.json();
       const { _id, data } = reqBody;
 
+      const stock = data.stock.map(
+        (item: { variant: string; quantity: string }) => ({
+          variant: item.variant,
+          quantity: parseInt(item.quantity), // Pastikan setiap kuantitas diparsing menjadi integer
+        })
+      );
+
+      console.log(data);
+      console.log(stock);
+
       if (!token) {
         return NextResponse.json(
           { status: false, statusCode: 401, message: "No Token Provided" },
@@ -223,7 +233,7 @@ const handler = async (request: NextRequest) => {
 
       const updatedProduct = await Product.findByIdAndUpdate(
         _id,
-        { ...data }, // Update semua field di dalam data, termasuk productImage
+        { ...data, stock }, // Update semua field di dalam data, termasuk productImage
         { new: true }
       );
 
