@@ -45,7 +45,7 @@ const ModalUpdatedProduct = ({
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isModified, setIsModified] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState("");
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [updatedProduct, setUpdatedProduct] = useState<Product>({
     ...isUpdatedProduct,
@@ -111,14 +111,9 @@ const ModalUpdatedProduct = ({
       return () => clearTimeout(timer);
     }
   }, [message]);
-
-  console.log(updatedProduct.price);
-  console.log(updatedProduct.stock);
-  console.log(errors);
-  console.log(errors.productName);
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // Mencegah refresh halaman
-    setIsLoading(true); // Menampilkan loading saat proses berjalan
+    setIsLoading("submit-edit-product"); // Menampilkan loading saat proses berjalan
 
     const updatedStock = updatedProduct.stock.map((stockItem) => ({
       ...stockItem,
@@ -175,6 +170,7 @@ const ModalUpdatedProduct = ({
 
         // Jika berhasil, update data produk di tampilan
         if (response.ok) {
+          setMessage(data.message);
           setProductsData((prevData: Product[]) =>
             prevData.map((product) =>
               product._id === updatedProduct._id
@@ -182,14 +178,22 @@ const ModalUpdatedProduct = ({
                 : product
             )
           );
+
+          setTimeout(() => {
+            handleCloseModal();
+          }, 1000);
+        } else {
+          setMessage(data.message);
         }
       }
     } catch (error) {
       console.error(error); // Tangani error jika ada
     } finally {
-      setIsLoading(false); // Sembunyikan loading setelah proses selesai
+      setIsLoading(""); // Sembunyikan loading setelah proses selesai
     }
   };
+
+  console.log(message);
 
   return (
     <Modal onClose={handleCloseModal}>
@@ -352,7 +356,12 @@ const ModalUpdatedProduct = ({
             />
           </div>
           <div className="flex flex-col mb-4">
-            <SubmitButton type="submit" disabled={!isModified} text="Save" />
+            <SubmitButton
+              type="submit"
+              disabled={!isModified}
+              text="Save"
+              isLoading={isLoading === "submit-edit-product" ? isLoading : ""}
+            />
           </div>
         </form>
       </div>
