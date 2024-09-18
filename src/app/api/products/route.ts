@@ -83,8 +83,7 @@ const handler = async (request: NextRequest) => {
 
       const reqBody = await request.json();
       const { products } = reqBody;
-      const price = parseInt(products.price);
-      const category = products.category;
+      const categoryInitial = products.categoryInitial;
 
       // Periksa token
       if (!token) {
@@ -117,11 +116,8 @@ const handler = async (request: NextRequest) => {
         );
       }
 
-      // Ambil huruf pertama dari kategori untuk productId
-      const categoryInitial = category.charAt(0).toUpperCase();
-
       // Cari produk terakhir berdasarkan productId yang dimulai dengan huruf kategori tersebut
-      const lastProduct = await Product.findOne({ category })
+      const lastProduct = await Product.findOne({ category: products.category })
         .sort({ productId: -1 }) // Mengurutkan secara descending berdasarkan productId
         .limit(1); // Ambil produk terakhir
 
@@ -147,7 +143,6 @@ const handler = async (request: NextRequest) => {
       const newProduct = new Product({
         ...products,
         productId: newProductId,
-        price,
         stock,
       });
 
@@ -182,16 +177,6 @@ const handler = async (request: NextRequest) => {
 
       const reqBody = await request.json();
       const { _id, data } = reqBody;
-
-      const stock = data.stock.map(
-        (item: { variant: string; quantity: string }) => ({
-          variant: item.variant,
-          quantity: parseInt(item.quantity), // Pastikan setiap kuantitas diparsing menjadi integer
-        })
-      );
-
-      console.log(data);
-      console.log(stock);
 
       if (!token) {
         return NextResponse.json(
@@ -233,7 +218,7 @@ const handler = async (request: NextRequest) => {
 
       const updatedProduct = await Product.findByIdAndUpdate(
         _id,
-        { ...data, stock }, // Update semua field di dalam data, termasuk productImage
+        { ...data }, // Update semua field di dalam data, termasuk productImage
         { new: true }
       );
 

@@ -104,15 +104,30 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
     fileInputRef.current?.click();
   };
 
+  console.log(errors);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const validationErrors = validationAddProduct(product);
     setIsLoading(true);
+
     setErrors(validationErrors);
+
+    const stock = product.stock.map(
+      (item: { variant: string; quantity: string }) => ({
+        variant: item.variant,
+        quantity: parseInt(item.quantity), // Parsing kuantitas di frontend
+      })
+    );
+
     const products = {
       ...product,
-      price: rawPrice, // Use raw price for actual data submission
+      price: Number(rawPrice),
+      stock,
+      categoryInitial: product.category.charAt(0).toUpperCase(), // Kirimkan huruf kategori saja
+      // Use raw price for actual data submission
     };
+
     try {
       if (Object.keys(validationErrors).length === 0) {
         const response = await fetch("/api/products", {
@@ -121,7 +136,7 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
             Authorization: `Bearer ${accessToken}`,
           },
           method: "POST",
-          body: JSON.stringify({ products, selectedImage }),
+          body: JSON.stringify({ products }),
         });
 
         const data = await response.json();

@@ -27,6 +27,13 @@ interface Product {
   productId: string;
 }
 
+interface ProductErrors {
+  productName?: string;
+  price?: string;
+  stock?: { variant?: string; quantity?: string }[];
+  [key: string]: any; // Optional: Jika kamu ingin memperluas secara dinamis
+}
+
 const ModalUpdatedProduct = ({
   handleCloseModal,
   isUpdatedProduct,
@@ -46,7 +53,7 @@ const ModalUpdatedProduct = ({
       Number(isUpdatedProduct.price)
     ),
   });
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<ProductErrors>({});
 
   // Cek apakah ada perubahan pada updatedProduct
   useEffect(() => {
@@ -105,51 +112,48 @@ const ModalUpdatedProduct = ({
     }
   }, [message]);
 
+  console.log(updatedProduct.price);
+  console.log(updatedProduct.stock);
+  console.log(errors);
+  console.log(errors.productName);
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // const validationErrors = validationAddProduct(updatedProduct);
-    setIsLoading(true);
+    e.preventDefault(); // Mencegah refresh halaman
+    setIsLoading(true); // Menampilkan loading saat proses berjalan
 
+    const updatedStock = updatedProduct.stock.map((stockItem) => ({
+      ...stockItem,
+      quantity: stockItem.quantity.toString(),
+    }));
+    const validationErrors = validationAddProduct({
+      ...updatedProduct,
+      stock: updatedStock, // Pass stock with string quantities for validation
+    });
+    setErrors(validationErrors);
     try {
-      if (selectedImage) {
-        const newImageURL = await uploadProductImage(
-          updatedProduct._id,
-          selectedImage,
-          setUploadProgress
-        );
-        if (newImageURL && typeof newImageURL === "string") {
-          const response = await fetch(`/api/products`, {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
-            method: "PUT",
-            body: JSON.stringify({
-              _id: updatedProduct._id,
-              data: {
-                ...updatedProduct,
-                productImage: newImageURL,
-                price: Number(rawPrice),
-              },
-            }),
-          });
+      if (Object.keys(validationErrors).length === 0) {
+        let productImage = updatedProduct.productImage; // Inisialisasi gambar produk
 
-          const data = await response.json();
-
-          if (response.ok) {
-            setProductsData((prevData: Product[]) =>
-              prevData.map((product) =>
-                product._id === updatedProduct._id
-                  ? {
-                      ...product,
-                      ...data.data,
-                    }
-                  : product
-              )
-            );
+        // Jika ada gambar baru yang dipilih, upload dan dapatkan URL baru
+        if (selectedImage) {
+          const newImageURL = await uploadProductImage(
+            updatedProduct._id,
+            selectedImage,
+            setUploadProgress
+          );
+          if (newImageURL && typeof newImageURL === "string") {
+            productImage = newImageURL;
           }
         }
-      } else {
+
+        // Parsing stock sebelum dikirim ke backend
+        const stock = updatedProduct.stock.map(
+          (item: { variant: string; quantity: string }) => ({
+            variant: item.variant,
+            quantity: parseInt(item.quantity), // Parsing kuantitas di frontend
+          })
+        );
+
+        // Kirim permintaan untuk mengupdate produk
         const response = await fetch(`/api/products`, {
           headers: {
             "Content-Type": "application/json",
@@ -160,31 +164,33 @@ const ModalUpdatedProduct = ({
             _id: updatedProduct._id,
             data: {
               ...updatedProduct,
-              productImage: updatedProduct.productImage,
-              price: Number(rawPrice),
+              productImage,
+              stock, // Gambar produk (baru atau lama)
+              price: Number(rawPrice), // Harga produk yang diubah menjadi angka
             },
           }),
         });
 
         const data = await response.json();
-        console.log(data);
+
+        // Jika berhasil, update data produk di tampilan
         if (response.ok) {
           setProductsData((prevData: Product[]) =>
             prevData.map((product) =>
               product._id === updatedProduct._id
-                ? {
-                    ...product,
-                    ...data.data,
-                  }
+                ? { ...product, ...data.data }
                 : product
             )
           );
         }
       }
-    } catch (error) {}
+    } catch (error) {
+      console.error(error); // Tangani error jika ada
+    } finally {
+      setIsLoading(false); // Sembunyikan loading setelah proses selesai
+    }
   };
 
-  console.log(updatedProduct);
   return (
     <Modal onClose={handleCloseModal}>
       <div className="w-[500px]  overflow-y-auto max-h-[550px] text-black">
@@ -201,7 +207,7 @@ const ModalUpdatedProduct = ({
               title="Product Image"
               text="Click to Upload Product Image"
               data={updatedProduct.productImage}
-              // error={errors.productImage}
+              error={errors.productImage}
               handleChange={(e) =>
                 handleInputFileChange({
                   e,
@@ -232,6 +238,7 @@ const ModalUpdatedProduct = ({
                 })
               }
               textStyle="text-xs font-medium"
+              error={errors.productName}
             />
           </div>
           <div className="flex flex-col mb-4">
@@ -279,7 +286,7 @@ const ModalUpdatedProduct = ({
                     }
                     padding="p-[6px]"
                     placeholder="Variant"
-                    // error={errors?.[`stock[${index}].variant`]}
+                    error={errors?.[`stock[${index}].variant`]}
                   />
                 </div>
                 <div className="w-full flex flex-col text-md">
@@ -301,7 +308,7 @@ const ModalUpdatedProduct = ({
                     }
                     padding="p-[6px]"
                     placeholder="Quantity"
-                    // error={errors?.[`stock[${index}].quantity`]}
+                    error={errors?.[`stock[${index}].quantity`]}
                   />
                 </div>
                 <button
@@ -341,7 +348,7 @@ const ModalUpdatedProduct = ({
               }
               padding="p-2"
               placeholder="Price"
-              // error={errors.price}
+              error={errors.price}
             />
           </div>
           <div className="flex flex-col mb-4">
