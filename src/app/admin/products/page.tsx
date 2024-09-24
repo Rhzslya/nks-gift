@@ -50,7 +50,6 @@ const ProductsManagement = () => {
       userInSession={userInSession}
       accessToken={accessToken}
       message={message}
-      currentUserRole={currentUserRole}
     />
   );
 };

@@ -3,6 +3,7 @@ import Modal from "@/components/fragements/Modal";
 import { capitalizeFirst } from "@/utils/Capitalize";
 import { signOut } from "next-auth/react";
 import ConfirmButton from "@/components/Button/ConfirmButton";
+import { deleteFile } from "@/lib/firebase/services";
 
 interface User {
   username: string;
@@ -71,6 +72,9 @@ const ModalDeletePermanently: React.FC<ModalDeletePermanentlyUserProps> = ({
             )
           );
         }, 1500);
+
+        // Hapus file dari Firebase Storage
+        await deleteFile(isDeletedPermanentlyUser._id, "user");
 
         if (userInSession.id === deletedPermanentlyUser._id) {
           await signOut();

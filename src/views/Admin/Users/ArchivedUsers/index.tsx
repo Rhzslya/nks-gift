@@ -8,7 +8,7 @@ import Header from "@/components/Admin/Header";
 import UtilityBar from "@/components/Admin/UtilityBar";
 import Table from "@/components/Admin/Table";
 import PaginationToolbar from "@/components/Admin/PaginationToolbar";
-import ModalDeletePermanently from "@/components/Admin/ModalDeletePermanently";
+import ModalDeletePermanently from "@/components/Admin/ModalDeletePermanentlyUser";
 import ModalRestoreUser from "@/components/Admin/ModalRestoreUser";
 import { userSortOptions } from "@/utils/SortOptions";
 

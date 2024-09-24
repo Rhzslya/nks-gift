@@ -2,8 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { productsTableHeaders, tableHeaders } from "@/utils/TableHeaders";
 import "react-loading-skeleton/dist/skeleton.css";
 import { useSession } from "next-auth/react";
-import ModalUpdatedUser from "@/components/Admin/ModalUpdatedUser";
-import ModalArchivedUser from "@/components/Admin/ModalArchivedUser";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "@/components/Admin/Header";
@@ -13,25 +11,26 @@ import PaginationToolbar from "@/components/Admin/PaginationToolbar";
 import { productSortOptions } from "@/utils/SortOptions";
 import ModalAddData from "@/components/Admin/ModalAddData";
 import ModalUpdatedProduct from "@/components/Admin/ModalUpdatedProduct";
+import ModalDeletePermanently from "@/components/Admin/ModalDeletePermanentlyProduct";
 
 interface Products {
   _id: any;
   productImage: string;
   productName: string;
-  price: number;
+  price: number | string;
   category: any;
   stock: {
     variant: string;
     quantity: string;
   }[];
   productId: string;
+  createdAt: string;
 }
 
 interface UsersManagementViewsProps {
   products: Products[];
   isLoading: boolean;
   userInSession: any;
-  currentUserRole: any;
   accessToken: any;
   message: string;
 }
@@ -45,7 +44,6 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   products,
   isLoading,
   userInSession,
-  currentUserRole,
   accessToken,
   message,
 }) => {
@@ -54,12 +52,12 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   const [usersPerPage, setUsersPerPage] = useState(15);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "">("");
   const [sortBy, setSortBy] = useState<
-    "productName" | "createdAt" | "accessLevel" | ""
+    "productName" | "createdAt" | "price" | ""
   >("");
   const [modalEditProduct, setModalEditProduct] = useState<string | null>(null);
-  const [modalArchivedUser, setModalArchivedUser] = useState<string | null>(
-    null
-  );
+  const [modalDeletePermanentlyProduct, setModalDeletePermanentlyProduct] =
+    useState<string | null>(null);
+
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [activeUserId, setActiveUserId] = useState<string | null>(null);
@@ -68,16 +66,15 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   const isUpdatedProduct = productsData?.find(
     (product) => product._id === modalEditProduct
   );
-  // const isUpdatedProduct = productsData?.find(
-  //   (product) => product._id === modalEditUser
-  // );
+  const isDeletedPermanentlyProduct = productsData?.find(
+    (product) => product._id === modalDeletePermanentlyProduct
+  );
   // const isArchivedProduct = productsData?.find(
-  //   (product) => product._id === modalArchivedUser
+  //   (product) => product._id === modalDeletePermanentlyProduct
   // );
 
   // Gunakan isUpdatedProduct dan isArchivedProduct di tempat lain dalam kode Anda
 
-  console.log(productsData);
   const [clickedButtonId, setClickedButtonId] = useState<string | null>(null);
   const menuSettingRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const settingButtonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>(
@@ -193,14 +190,16 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   };
 
   // open Modal Delete User
-  const handleModalArchivedUser = (_id: string) => {
+  const handleModalDeletePermanently = (_id: string) => {
     setActiveUserId(null);
-    setModalArchivedUser(modalArchivedUser === _id ? null : _id);
+    setModalDeletePermanentlyProduct(
+      modalDeletePermanentlyProduct === _id ? null : _id
+    );
   };
 
   const handleCloseModal = () => {
     setModalEditProduct(null);
-    setModalArchivedUser(null);
+    setModalDeletePermanentlyProduct(null);
     setShowModalAddData(false);
   };
 
@@ -213,7 +212,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   // Sort User
   const handleSortChange = (
     order: "asc" | "desc",
-    sortBy: "productName" | "createdAt" | "accessLevel"
+    sortBy: "productName" | "createdAt" | "price"
   ) => {
     setSortOrder(order);
     setSortBy(sortBy);
@@ -231,7 +230,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
     super_admin: 0,
   };
 
-  const sortedUsers = Array.isArray(productsData)
+  const sortedProducts = Array.isArray(productsData)
     ? [...productsData].sort((a, b) => {
         if (sortBy === "productName") {
           if (sortOrder === "asc") {
@@ -239,13 +238,37 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
           } else if (sortOrder === "desc") {
             return b.productName.localeCompare(a.productName);
           }
+        } else if (sortBy === "createdAt") {
+          if (sortOrder === "asc") {
+            return (
+              new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+            );
+          } else if (sortOrder === "desc") {
+            return (
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+          }
+        } else if (sortBy === "price") {
+          const priceA =
+            typeof a.price === "string" ? parseFloat(a.price) : a.price;
+          const priceB =
+            typeof b.price === "string" ? parseFloat(b.price) : b.price;
+
+          if (sortOrder === "asc") {
+            return priceA - priceB; // Mengurutkan berdasarkan price secara ascending
+          } else if (sortOrder === "desc") {
+            return priceB - priceA; // Mengurutkan berdasarkan price secara descending
+          }
         }
         return 0;
       })
     : [];
 
-  const filteredUsers = sortedUsers.filter((user) =>
-    user.productName.toLowerCase().startsWith(searchQuery.toLowerCase())
+  const filteredUsers = sortedProducts.filter(
+    (product) =>
+      product.productName.toLowerCase().startsWith(searchQuery.toLowerCase()) ||
+      product.productId.toLowerCase().startsWith(searchQuery.toLowerCase()) ||
+      product.category.toLowerCase().startsWith(searchQuery.toLowerCase())
   );
 
   const paginatedUsers = filteredUsers.slice(
@@ -255,11 +278,14 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
 
   const isActive = (
     order: "asc" | "desc",
-    field: "productName" | "createdAt" | "accessLevel"
+    field: "productName" | "createdAt" | "price"
   ) => sortBy === field && sortOrder === order;
 
   const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
 
+  console.log(isActive);
+  console.log(sortBy);
+  console.log(sortOrder);
   // Toast Notify
   useEffect(() => {
     if (message) {
@@ -332,7 +358,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
             activeUserId={activeUserId}
             menuSettingRefs={menuSettingRefs}
             handleModalEditProduct={handleModalEditProduct}
-            handleModalArchivedUser={handleModalArchivedUser}
+            handleModalDeletePermanently={handleModalDeletePermanently}
           />
           <PaginationToolbar
             usersPerPage={usersPerPage}
@@ -349,6 +375,16 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
         <ModalUpdatedProduct
           handleCloseModal={handleCloseModal}
           isUpdatedProduct={isUpdatedProduct}
+          accessToken={accessToken}
+          setProductsData={setProductsData}
+        />
+      ) : null}
+      {modalDeletePermanentlyProduct !== null && isDeletedPermanentlyProduct ? (
+        <ModalDeletePermanently
+          handleCloseModal={handleCloseModal}
+          isDeletedPermanentlyProduct={isDeletedPermanentlyProduct}
+          userInSession={userInSession}
+          setModalDeletePermanentlyProduct={setModalDeletePermanentlyProduct}
           accessToken={accessToken}
           setProductsData={setProductsData}
         />

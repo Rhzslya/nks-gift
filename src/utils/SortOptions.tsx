@@ -36,12 +36,12 @@ export const productSortOptions: SortOption[] = [
   { label: "Sort by Price (High to Low)", field: "price", order: "desc" },
   {
     label: "Sort by Date Created (Oldest First)",
-    field: "dateCreated",
+    field: "createdAt",
     order: "asc",
   },
   {
     label: "Sort by Date Created (Newest First)",
-    field: "dateCreated",
+    field: "createdAt",
     order: "desc",
   },
 ];

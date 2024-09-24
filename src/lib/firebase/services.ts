@@ -106,3 +106,19 @@ export async function uploadProductImage(
     return false;
   }
 }
+
+export async function deleteFile(id: string, type: string): Promise<void> {
+  try {
+    const userFolderRef = ref(storage, `images/${type}s/${id}/`);
+
+    // List all files in the user's folder
+    const files = await listAll(userFolderRef);
+
+    // Delete each file in the folder
+    for (const fileRef of files.items) {
+      await deleteObject(fileRef);
+    }
+  } catch (error) {
+    console.error("Error deleting file(s): ", error);
+  }
+}
