@@ -12,6 +12,7 @@ import { productSortOptions } from "@/utils/SortOptions";
 import ModalAddData from "@/components/Admin/ModalAddData";
 import ModalUpdatedProduct from "@/components/Admin/ModalUpdatedProduct";
 import ModalDeletePermanently from "@/components/Admin/ModalDeletePermanentlyProduct";
+import ModalViewDetailsProduct from "@/components/Admin/ModalViewDetailsProduct";
 
 interface Products {
   _id: any;
@@ -57,6 +58,9 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   const [modalEditProduct, setModalEditProduct] = useState<string | null>(null);
   const [modalDeletePermanentlyProduct, setModalDeletePermanentlyProduct] =
     useState<string | null>(null);
+  const [modalViewDetailsProduct, setModalViewDetailsProduct] = useState<
+    string | null
+  >(null);
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -68,6 +72,9 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   );
   const isDeletedPermanentlyProduct = productsData?.find(
     (product) => product._id === modalDeletePermanentlyProduct
+  );
+  const isViewDetailsProduct = productsData?.find(
+    (product) => product._id === modalViewDetailsProduct
   );
   // const isArchivedProduct = productsData?.find(
   //   (product) => product._id === modalDeletePermanentlyProduct
@@ -197,10 +204,17 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
     );
   };
 
+  // Open Modal Views Details
+  const handleModalViewDetails = (_id: string) => {
+    setActiveUserId(null);
+    setModalViewDetailsProduct(modalViewDetailsProduct === _id ? null : _id);
+  };
+
   const handleCloseModal = () => {
     setModalEditProduct(null);
     setModalDeletePermanentlyProduct(null);
     setShowModalAddData(false);
+    setModalViewDetailsProduct(null);
   };
 
   // Search Products
@@ -283,9 +297,6 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
 
   const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
 
-  console.log(isActive);
-  console.log(sortBy);
-  console.log(sortOrder);
   // Toast Notify
   useEffect(() => {
     if (message) {
@@ -303,6 +314,8 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
     }
   }, [message]);
 
+  console.log(isViewDetailsProduct);
+  console.log(modalViewDetailsProduct);
   return (
     <div className="w-full relative">
       <Header
@@ -359,6 +372,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
             menuSettingRefs={menuSettingRefs}
             handleModalEditProduct={handleModalEditProduct}
             handleModalDeletePermanently={handleModalDeletePermanently}
+            handleModalViewDetails={handleModalViewDetails}
           />
           <PaginationToolbar
             usersPerPage={usersPerPage}
@@ -385,6 +399,16 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
           isDeletedPermanentlyProduct={isDeletedPermanentlyProduct}
           userInSession={userInSession}
           setModalDeletePermanentlyProduct={setModalDeletePermanentlyProduct}
+          accessToken={accessToken}
+          setProductsData={setProductsData}
+        />
+      ) : null}
+      {modalViewDetailsProduct !== null && isViewDetailsProduct ? (
+        <ModalViewDetailsProduct
+          handleCloseModal={handleCloseModal}
+          isViewDetailsProduct={isViewDetailsProduct}
+          userInSession={userInSession}
+          setModalViewDetailsProduct={setModalViewDetailsProduct}
           accessToken={accessToken}
           setProductsData={setProductsData}
         />

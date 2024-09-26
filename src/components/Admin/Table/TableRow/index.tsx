@@ -1,8 +1,6 @@
 import React from "react";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import { capitalizeFirst } from "@/utils/Capitalize";
-import { formatPriceToIDR } from "@/utils/FormatPrice";
 import { ActionMenu } from "../../ActionMenu";
 import Image from "next/image";
 
@@ -24,7 +22,7 @@ interface TableRowProps {
   handleModalEditUser?: (userId: string) => void;
   handleModalArchivedUser?: (userId: string) => void;
   handleModalRestoreUser?: (userId: string) => void;
-  handleModalViewDetails?: (userId: string) => void;
+  handleModalViewDetails?: (productId: string) => void;
   handleModalDeletePermanently?: (userId: string) => void;
   handleModalEditProduct?: (productId: string) => void;
   variant?: string;
@@ -134,9 +132,9 @@ const TableRow: React.FC<TableRowProps> = ({
                 handleModalEditUser={handleModalEditUser}
                 handleModalArchivedUser={handleModalArchivedUser}
                 handleModalRestoreUser={handleModalRestoreUser}
-                handleModalViewDetails={handleModalViewDetails}
                 handleModalDeletePermanently={handleModalDeletePermanently}
                 handleModalEditProduct={handleModalEditProduct}
+                handleModalViewDetails={handleModalViewDetails}
               />
             )}
           </div>

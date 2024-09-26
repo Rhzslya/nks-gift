@@ -18,26 +18,26 @@ interface Product {
   productId: string;
 }
 
-interface ModalDeletePermanentlyUserProps {
-  isDeletedPermanentlyProduct: Product;
+interface ModalViewDetailsProductProps {
+  isViewDetailsProduct: Product;
   handleCloseModal: () => void;
   setProductsData: any;
   userInSession: any; // Menjadikan properti ini opsional
-  setModalDeletePermanentlyProduct: React.Dispatch<
+  setModalViewDetailsProduct: React.Dispatch<
     React.SetStateAction<string | null>
   >;
   accessToken?: string;
 }
 
-const ModalDeletePermanently: React.FC<ModalDeletePermanentlyUserProps> = ({
+const ModalViewDetailsProduct: React.FC<ModalViewDetailsProductProps> = ({
   handleCloseModal,
-  isDeletedPermanentlyProduct,
+  isViewDetailsProduct,
   setProductsData,
-  setModalDeletePermanentlyProduct,
+  setModalViewDetailsProduct,
   accessToken,
 }) => {
   const [deletePermanentlyProduct, setDeletedPermanentlyUser] =
-    useState<Product>(isDeletedPermanentlyProduct);
+    useState<Product>(isViewDetailsProduct);
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -61,7 +61,7 @@ const ModalDeletePermanently: React.FC<ModalDeletePermanentlyUserProps> = ({
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({ _id: isDeletedPermanentlyProduct._id }),
+        body: JSON.stringify({ _id: isViewDetailsProduct._id }),
       });
 
       const data = await response.json();
@@ -71,13 +71,13 @@ const ModalDeletePermanently: React.FC<ModalDeletePermanentlyUserProps> = ({
         setTimeout(() => {
           setProductsData((prevUsers: Product[]) =>
             prevUsers.filter(
-              (item: Product) => item._id !== isDeletedPermanentlyProduct._id
+              (item: Product) => item._id !== isViewDetailsProduct._id
             )
           );
         }, 1500);
 
         // Hapus file dari Firebase Storage
-        await deleteFile(isDeletedPermanentlyProduct._id, "product");
+        await deleteFile(isViewDetailsProduct._id, "product");
       } else {
         setMessage(data.message);
         setIsError(true);
@@ -110,7 +110,7 @@ const ModalDeletePermanently: React.FC<ModalDeletePermanentlyUserProps> = ({
       <div className="w-[400px]">
         <div className="text-xl text-center mb-4 flex justify-center items-center gap-2 text-red-500">
           <i className="bx bx-error-circle text-[24px] text-red-500"></i>
-          <h4>Product Deletion Confirmation</h4>
+          <h4>Product View Confirmation</h4>
         </div>
 
         <div className="flex flex-col">
@@ -140,7 +140,7 @@ const ModalDeletePermanently: React.FC<ModalDeletePermanentlyUserProps> = ({
             />
             <ConfirmButton
               text="No, Cancel"
-              onClick={() => setModalDeletePermanentlyProduct(null)}
+              onClick={() => setModalViewDetailsProduct(null)}
               variant="cancel"
             />
           </div>
@@ -162,4 +162,4 @@ const ModalDeletePermanently: React.FC<ModalDeletePermanentlyUserProps> = ({
   );
 };
 
-export default ModalDeletePermanently;
+export default ModalViewDetailsProduct;
