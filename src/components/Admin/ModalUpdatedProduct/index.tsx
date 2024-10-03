@@ -193,8 +193,6 @@ const ModalUpdatedProduct = ({
     }
   };
 
-  console.log(message);
-
   return (
     <Modal onClose={handleCloseModal}>
       <div className="w-[500px]  overflow-y-auto max-h-[550px] text-black">
