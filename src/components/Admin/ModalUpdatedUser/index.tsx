@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Modal from "@/components/fragements/Modal";
+import Modal from "@/components/Fragments/Modal";
 import LabelAndInput from "@/components/Form/Label";
 import Select from "@/components/Select";
 import SubmitButton from "@/components/Button/SubmitButton";

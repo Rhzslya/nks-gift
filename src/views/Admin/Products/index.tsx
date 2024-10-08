@@ -314,8 +314,6 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
     }
   }, [message]);
 
-  console.log(isViewDetailsProduct);
-  console.log(modalViewDetailsProduct);
   return (
     <div className="w-full relative">
       <Header

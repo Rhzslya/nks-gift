@@ -1,4 +1,4 @@
-import Sidebar from "@/components/fragements/Sidebar/Admin";
+import Sidebar from "@/components/Fragments/Sidebar/Admin";
 import React from "react";
 import { listSidebarItem } from "@/utils/ListSidebar";
 

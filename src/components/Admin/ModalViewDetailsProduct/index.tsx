@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Modal from "@/components/fragements/Modal";
+import Modal from "@/components/Fragments/Modal";
 import { capitalizeFirst } from "@/utils/Capitalize";
 import { signOut } from "next-auth/react";
 import ConfirmButton from "@/components/Button/ConfirmButton";

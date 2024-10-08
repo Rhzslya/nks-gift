@@ -1,11 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
-import Modal from "@/components/fragements/Modal";
+import Modal from "@/components/Fragments/Modal";
 import LabelAndInput from "@/components/Form/Label";
 import Select from "@/components/Select";
 import SubmitButton from "@/components/Button/SubmitButton";
-import { capitalizeFirst } from "@/utils/Capitalize";
-import MessageFromAPI from "@/components/Form/MessageFromAPI";
-import { useRouter } from "next/navigation";
 import {
   handleChange,
   handleInputFileChange,
@@ -14,9 +11,9 @@ import {
   handleStockChange,
 } from "@/utils/handleChange";
 import { validationAddProduct } from "@/utils/Validations";
-import Image from "next/image";
 import { uploadProductImage } from "@/lib/firebase/services";
 import InputFile from "@/components/Form/Label/InputFile";
+import { ProductCategories } from "@/utils/ProductCategories";
 interface Product {
   productImage: string;
   productName: string;
@@ -61,14 +58,6 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
-
-  const filteredOptions = [
-    { value: "", label: "Select Category" },
-    { value: "gift", label: "Gift" },
-    { value: "flower", label: "Flower" },
-    { value: "suprize", label: "Suprize" },
-    { value: "snack", label: "Snack" },
-  ];
 
   const handleAddStockField = () => {
     // Cek apakah semua stock item sudah memiliki nilai untuk variant dan quantity
@@ -197,7 +186,6 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
     }
   }, [message]);
 
-  console.log(product);
   return (
     <Modal onClose={handleCloseModal}>
       <div className="w-[500px]  overflow-y-auto max-h-[550px] text-black">
@@ -247,7 +235,10 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
             <Select
               id="category"
               name="category"
-              options={filteredOptions}
+              options={[
+                { value: "", label: "Select Category" },
+                ...ProductCategories,
+              ]}
               value={product.category}
               onChange={(e) =>
                 handleSelectChange({

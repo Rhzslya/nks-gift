@@ -2,7 +2,7 @@ import SubmitButton from "@/components/Button/SubmitButton";
 import LabelAndInput from "@/components/Form/Label";
 import InputFile from "@/components/Form/Label/InputFile";
 import MessageFromAPI from "@/components/Form/MessageFromAPI";
-import Modal from "@/components/fragements/Modal";
+import Modal from "@/components/Fragments/Modal";
 import { uploadProductImage } from "@/lib/firebase/services";
 import { capitalizeFirst } from "@/utils/Capitalize";
 import {

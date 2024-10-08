@@ -1,1 +1,1 @@
-export const sectionsNav = ["about", "profile", "product"];
+export const sectionsNav = ["about", "profile", "products"];

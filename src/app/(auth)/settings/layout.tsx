@@ -1,6 +1,6 @@
 "use server";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOption";
-import Sidebar from "@/components/fragements/Sidebar/Settings";
+import Sidebar from "@/components/Fragments/Sidebar/Settings";
 import Header from "@/components/Settings/Header";
 import { getServerSession } from "next-auth";
 import React from "react";

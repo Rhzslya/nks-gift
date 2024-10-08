@@ -1,5 +1,5 @@
 import ConfirmButton from "@/components/Button/ConfirmButton";
-import Modal from "@/components/fragements/Modal";
+import Modal from "@/components/Fragments/Modal";
 import { capitalizeFirst } from "@/utils/Capitalize";
 import React, { useEffect, useState } from "react";
 

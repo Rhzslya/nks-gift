@@ -8,7 +8,14 @@ type NavLinkProps = {
   path: string;
 };
 
-const NavLink: React.FC<NavLinkProps> = ({
+type NavigationMenuProps = {
+  items: { value: string; label: string }[];
+  path: string;
+  basePath: string;
+  isActiveLink: (path: string, linkPath: string) => boolean;
+};
+
+export const NavLink: React.FC<NavLinkProps> = ({
   sectionsNav,
   isActiveLink,
   path,
@@ -49,4 +56,39 @@ const NavLink: React.FC<NavLinkProps> = ({
   );
 };
 
-export default NavLink;
+export const NavigationMenuProduct: React.FC<NavigationMenuProps> = ({
+  items,
+  path,
+  basePath,
+  isActiveLink,
+}) => {
+  return (
+    <nav className="w-full flex items-center justify-center text-base text-neutral-700 font-semi-bold h-14">
+      {items
+        .filter((option) => option.value !== "")
+        .map((option) => {
+          // Tambahkan basePath jika path tidak memulai dengan basePath
+          const linkPath = path.startsWith(basePath)
+            ? `${basePath}/${option.value}`
+            : `/${basePath}/${option.value}`;
+
+          const isActive =
+            typeof isActiveLink === "function"
+              ? isActiveLink(path, linkPath)
+              : false;
+
+          return (
+            <Link
+              href={linkPath}
+              key={option.value}
+              className={`mx-2 link border-b-2 ${
+                isActive ? "border-neutral-700" : "border-transparent"
+              } hover:border-neutral-700 duration-300 text-[15px] font-medium`}
+            >
+              {capitalizeFirst(option.label)}
+            </Link>
+          );
+        })}
+    </nav>
+  );
+};
