@@ -21,7 +21,6 @@ const ProductsManagement = () => {
             headers: {
               "Cache-Control": "no-cache",
               "Content-Type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
             },
             method: "GET",
           });

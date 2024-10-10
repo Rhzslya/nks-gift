@@ -4,7 +4,7 @@ import Product from "@/models/productsModels";
 import jwt from "jsonwebtoken";
 import { revalidatePath } from "next/cache";
 import mongoose from "mongoose";
-
+import NextCors from "nextjs-cors";
 interface DecodedToken {
   role: string;
 }
@@ -14,38 +14,6 @@ const handler = async (request: NextRequest) => {
       connect();
       // Fetch all products excluding certain fields
       const allowedRoles = ["manager", "admin", "super_admin"];
-      const token = request.headers.get("authorization")?.split(" ")[1] || "";
-
-      // Periksa token
-      if (!token) {
-        return NextResponse.json(
-          { status: false, statusCode: 401, message: "No Token Provided" },
-          { status: 401 }
-        );
-      }
-
-      // Verifikasi token dan ambil informasi pengguna
-      const decoded = await new Promise<DecodedToken>((resolve, reject) => {
-        jwt.verify(token, process.env.TOKEN_SECRET || "", (err, decoded) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(decoded as DecodedToken);
-          }
-        });
-      });
-
-      // Cek peran pengguna dari decoded token
-      if (!allowedRoles.includes(decoded.role)) {
-        return NextResponse.json(
-          {
-            status: false,
-            statusCode: 403,
-            message: "Forbidden: Insufficient Permissions",
-          },
-          { status: 403 }
-        );
-      }
 
       const products = await Product.find();
 

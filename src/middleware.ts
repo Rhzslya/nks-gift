@@ -5,7 +5,7 @@ import { connect } from "@/dbConfig/dbConfig";
 
 export async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
-
+  const res = NextResponse.next();
   // Define paths that are considered public (accessible without a token)
   const isPublicPath = [
     "/",
@@ -16,6 +16,26 @@ export async function middleware(req: NextRequest) {
     "/reset-password",
     "/forgot-password",
   ].includes(path);
+
+  // Capture Origins
+  const allowedOrigins = ["http://localhost:3000"];
+  req.headers.get("origin");
+
+  // Append CORS headers if the origin is allowed
+  if (allowedOrigins.includes(origin)) {
+    res.headers.append("Access-Control-Allow-Origin", origin);
+  }
+
+  // add the remaining CORS headers to the response
+  res.headers.append("Access-Control-Allow-Credentials", "true");
+  res.headers.append(
+    "Access-Control-Allow-Methods",
+    "GET,DELETE,PATCH,POST,PUT"
+  );
+  res.headers.append(
+    "Access-Control-Allow-Headers",
+    "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
+  );
 
   // Define paths that are restricted to admin users
   const onlyAdmin = path.startsWith("/admin");
@@ -53,7 +73,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/", req.nextUrl));
   }
 
-  return NextResponse.next();
+  return res;
 }
 
 // It specifies the paths for which this middleware should be executed.
