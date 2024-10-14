@@ -4,11 +4,31 @@ import Product from "@/models/productsModels";
 import jwt from "jsonwebtoken";
 import { revalidatePath } from "next/cache";
 import mongoose from "mongoose";
-import NextCors from "nextjs-cors";
 interface DecodedToken {
   role: string;
 }
+
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",")
+  : [];
+
 const handler = async (request: NextRequest) => {
+  const referer = request.headers.get("referer");
+  const origin =
+    request.headers.get("origin") ||
+    (referer ? referer.split("/").slice(0, 3).join("/") : ""); // Ambil skema dan host
+
+  if (!allowedOrigins.includes(origin)) {
+    return NextResponse.json(
+      {
+        status: false,
+        statusCode: 403,
+        message: "Forbidden: Access from unknown origin",
+      },
+      { status: 403 }
+    );
+  }
+
   if (request.method === "GET") {
     try {
       connect();
@@ -53,6 +73,7 @@ const handler = async (request: NextRequest) => {
       const { products } = reqBody;
       const categoryInitial = products.categoryInitial;
 
+      console.log(products);
       // Periksa token
       if (!token) {
         return NextResponse.json(

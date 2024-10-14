@@ -67,6 +67,7 @@ export async function uploadProductImage(
 
   if (file.size >= 1048576) {
     // File lebih dari 1MB
+    console.log(file);
     return false;
   }
 

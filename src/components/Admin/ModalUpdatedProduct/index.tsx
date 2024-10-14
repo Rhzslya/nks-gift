@@ -130,6 +130,16 @@ const ModalUpdatedProduct = ({
 
         // Jika ada gambar baru yang dipilih, upload dan dapatkan URL baru
         if (selectedImage) {
+          // Pengecekan ukuran file, jika lebih dari 1MB
+          if (selectedImage.size >= 1048576) {
+            setErrors((prevErrors) => ({
+              ...prevErrors,
+              productImage: "Image size must be less than 1MB",
+            }));
+            setIsLoading(""); // Sembunyikan loading karena ada error
+            return; // Hentikan proses jika file terlalu besar
+          }
+
           const newImageURL = await uploadProductImage(
             updatedProduct._id,
             selectedImage,

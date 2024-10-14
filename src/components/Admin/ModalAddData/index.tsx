@@ -93,8 +93,6 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
     fileInputRef.current?.click();
   };
 
-  console.log(errors);
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const validationErrors = validationAddProduct(product);
@@ -119,6 +117,15 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
 
     try {
       if (Object.keys(validationErrors).length === 0) {
+        if (selectedImage && selectedImage.size >= 1048576) {
+          setErrors((prevErrors) => ({
+            ...prevErrors,
+            productImage: "Image size must be less than 1MB",
+          }));
+          setIsLoading(false); // Sembunyikan loading karena ada error
+          return; // Hentikan proses jika file terlalu besar
+        }
+
         const response = await fetch("/api/products", {
           headers: {
             "Content-Type": "application/json",

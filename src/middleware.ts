@@ -1,7 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
-import User from "@/models/userModels";
-import { connect } from "@/dbConfig/dbConfig";
 
 export async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
@@ -15,17 +13,27 @@ export async function middleware(req: NextRequest) {
     "/checkemail",
     "/reset-password",
     "/forgot-password",
+    "/products",
   ].includes(path);
 
   // Capture Origins
-  const allowedOrigins = ["http://localhost:3000"];
-  req.headers.get("origin");
+  const allowedOrigins = [
+    "http://localhost:3000",
+    "https://nks-gift.vercel.app",
+  ];
+  const origin = req.headers.get("origin") || "";
 
   // Append CORS headers if the origin is allowed
   if (allowedOrigins.includes(origin)) {
     res.headers.append("Access-Control-Allow-Origin", origin);
   }
 
+  if (origin && !allowedOrigins.includes(origin)) {
+    // Jika origin tidak diizinkan, kembalikan response 403 Forbidden
+    return new NextResponse("Forbidden", { status: 403 });
+  }
+  console.log("Origin: ", req.headers.get("origin"));
+  console.log("Referer: ", req.headers.get("referer"));
   // add the remaining CORS headers to the response
   res.headers.append("Access-Control-Allow-Credentials", "true");
   res.headers.append(
