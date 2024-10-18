@@ -9,6 +9,7 @@ interface PaginationToolbarProps {
   currentPage: number;
   totalPages: number;
   setCurrentPage: (page: number) => void;
+  rowsPerPageOptions?: number[]; // Tambahkan prop untuk opsi jumlah baris per halaman
 }
 
 const PaginationToolbar: React.FC<PaginationToolbarProps> = ({
@@ -18,6 +19,7 @@ const PaginationToolbar: React.FC<PaginationToolbarProps> = ({
   currentPage,
   totalPages,
   setCurrentPage,
+  rowsPerPageOptions = [5, 10, 15], // Tetapkan default opsi jika tidak ada prop yang diberikan
 }) => {
   return (
     <div className="py-2 px-2 flex justify-between items-center">
@@ -31,9 +33,11 @@ const PaginationToolbar: React.FC<PaginationToolbarProps> = ({
             }}
             className="ml-2 border rounded text-xs"
           >
-            <option value={5}>5</option>
-            <option value={10}>10</option>
-            <option value={15}>15</option>
+            {rowsPerPageOptions.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
           </select>{" "}
           of {items?.length} items
         </p>

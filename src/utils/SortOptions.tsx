@@ -45,3 +45,8 @@ export const productSortOptions: SortOption[] = [
     order: "desc",
   },
 ];
+
+export const productPageSortOptions = [
+  { label: "Popular", field: "sold" },
+  { label: "Price", field: "price" },
+];

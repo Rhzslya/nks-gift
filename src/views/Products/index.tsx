@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { ProductCategories } from "@/utils/ProductCategories";
 import { NavigationMenuProduct } from "@/components/NavLink";
 import { usePathname } from "next/navigation";
@@ -9,11 +9,32 @@ import Image from "next/image";
 import { capitalizeFirst } from "@/utils/Capitalize";
 import { formatPriceToIDR } from "@/utils/FormatPrice";
 import Link from "next/link";
+import { productPageSortOptions } from "@/utils/SortOptions";
 
 const ProductsViews = ({ productsData }: any) => {
   const path = usePathname();
+  const [sortBy, setSortBy] = useState("sold");
+
+  const sortProducts = (products: any[], sortBy: string) => {
+    return [...products].sort((a, b) => {
+      if (sortBy === "sold") {
+        return b.sold - a.sold;
+      } else if (sortBy === "price") {
+        const priceA =
+          typeof a.price === "string" ? parseFloat(a.price) : a.price;
+        const priceB =
+          typeof b.price === "string" ? parseFloat(b.price) : b.price;
+        return priceB - priceA;
+      }
+      return 0;
+    });
+  };
+
+  const sortedProducts = sortProducts(productsData, sortBy);
+  console.log(sortedProducts);
+  console.log(sortBy);
   return (
-    <div>
+    <div className="max-w-[1400px] m-auto">
       <div className="flex justify-center px-6 bg-white">
         <NavigationMenuProduct
           items={[
@@ -25,10 +46,34 @@ const ProductsViews = ({ productsData }: any) => {
           isActiveLink={isActiveLink}
         />
       </div>
+      <div className="flex px-6 py-4 mx-8 justify-between text-sm border-b-[1px] border-gray-200">
+        <div className="">
+          <p>({productsData.length}) Items Found</p>
+        </div>
+        <div className="flex items-center">
+          <p>Sort By :</p>
+          <div className="relative ml-2">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="appearance-none outline-none cursor-pointer bg-transparent border-none text-sm font-medium text-sky-300 pr-8 py-1" // perhatikan pr-8
+            >
+              {productPageSortOptions.map((option) => (
+                <option key={option.label} value={option.field}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+              <i className="bx bx-chevron-down text-[20px]"></i>
+            </span>
+          </div>
+        </div>
+      </div>
 
       <div className="product-list grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 p-6">
-        {productsData.length > 0 ? (
-          productsData.map((product: any) => (
+        {sortedProducts.length > 0 ? (
+          sortedProducts.map((product: any) => (
             <Link
               href={`products/${product.category}/${product.productId}`}
               key={product._id}
@@ -38,9 +83,11 @@ const ProductsViews = ({ productsData }: any) => {
                 <Image
                   src={product.productImage}
                   alt={product.productName}
-                  className="object-cover rounded-sm"
-                  layout="fill" // Membuat gambar responsif mengisi div induk
+                  className="object-cover rounded-sm w-full h-full"
                   quality={100}
+                  width={300}
+                  height={300}
+                  priority
                 />
               </div>
               <h3 className="text-xl font-bold mb-2 truncate">

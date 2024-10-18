@@ -50,7 +50,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [usersPerPage, setUsersPerPage] = useState(15);
+  const [usersPerPage, setUsersPerPage] = useState(5);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "">("");
   const [sortBy, setSortBy] = useState<
     "productName" | "createdAt" | "price" | ""
@@ -237,12 +237,12 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
     setCurrentPage(1);
   };
 
-  const roleOrder: RoleOrder = {
-    user: 3,
-    manager: 2,
-    admin: 1,
-    super_admin: 0,
-  };
+  // const roleOrder: RoleOrder = {
+  //   user: 3,
+  //   manager: 2,
+  //   admin: 1,
+  //   super_admin: 0,
+  // };
 
   const sortedProducts = Array.isArray(productsData)
     ? [...productsData].sort((a, b) => {
@@ -278,14 +278,14 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
       })
     : [];
 
-  const filteredUsers = sortedProducts.filter(
+  const filteredProducts = sortedProducts.filter(
     (product) =>
       product.productName.toLowerCase().startsWith(searchQuery.toLowerCase()) ||
       product.productId.toLowerCase().startsWith(searchQuery.toLowerCase()) ||
       product.category.toLowerCase().startsWith(searchQuery.toLowerCase())
   );
 
-  const paginatedUsers = filteredUsers.slice(
+  const paginatedUsers = filteredProducts.slice(
     (currentPage - 1) * usersPerPage,
     currentPage * usersPerPage
   );
@@ -295,7 +295,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
     field: "productName" | "createdAt" | "price"
   ) => sortBy === field && sortOrder === order;
 
-  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+  const totalPages = Math.ceil(filteredProducts.length / usersPerPage);
 
   // Toast Notify
   useEffect(() => {
@@ -379,6 +379,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
             currentPage={currentPage}
             totalPages={totalPages}
             setCurrentPage={setCurrentPage}
+            rowsPerPageOptions={[5]}
           />
         </div>
       </div>
