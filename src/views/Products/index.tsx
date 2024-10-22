@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { ProductCategories } from "@/utils/ProductCategories";
 import { NavigationMenuProduct } from "@/components/NavLink";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation"; // Import useRouter
 import { isActiveLink } from "@/utils/ActiveLink";
 import Image from "next/image";
 import { capitalizeFirst } from "@/utils/Capitalize";
@@ -13,7 +13,9 @@ import { productPageSortOptions } from "@/utils/SortOptions";
 
 const ProductsViews = ({ productsData }: any) => {
   const path = usePathname();
+  const router = useRouter(); // Inisialisasi router
   const [sortBy, setSortBy] = useState("sold");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const sortProducts = (products: any[], sortBy: string) => {
     return [...products].sort((a, b) => {
@@ -30,9 +32,18 @@ const ProductsViews = ({ productsData }: any) => {
     });
   };
 
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      // Arahkan pengguna ke halaman pencarian dengan query
+      router.push(`products/search?q=${searchQuery}`);
+    }
+  };
+
   const sortedProducts = sortProducts(productsData, sortBy);
-  console.log(sortedProducts);
-  console.log(sortBy);
   return (
     <div className="max-w-[1400px] m-auto">
       <div className="flex justify-center px-6 bg-white">
@@ -56,7 +67,7 @@ const ProductsViews = ({ productsData }: any) => {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="appearance-none outline-none cursor-pointer bg-transparent border-none text-sm font-medium text-sky-300 pr-8 py-1" // perhatikan pr-8
+              className="appearance-none outline-none cursor-pointer bg-transparent border-none text-sm font-medium text-sky-300 pr-8 py-1"
             >
               {productPageSortOptions.map((option) => (
                 <option key={option.label} value={option.field}>
@@ -68,6 +79,23 @@ const ProductsViews = ({ productsData }: any) => {
               <i className="bx bx-chevron-down text-[20px]"></i>
             </span>
           </div>
+        </div>
+      </div>
+
+      <div className="flex justify-between px-6 pt-4 mx-8">
+        <div className="route">Tes</div>
+        <div className="relative w-full max-w-xs">
+          <span className="absolute inset-y-0 left-0 flex items-center pl-3 pr-2 border-r-[1px] border-gray-300">
+            <i className="bx bx-search text-[20px] text-gray-600"></i>
+          </span>
+          <input
+            type="text"
+            placeholder="Search Product"
+            className="w-full px-2 py-1 border rounded-full text-sm pl-12 focus:border-sky-300 focus:outline-none"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            onKeyDown={handleKeyDown} // Tangkap event Enter
+          />
         </div>
       </div>
 

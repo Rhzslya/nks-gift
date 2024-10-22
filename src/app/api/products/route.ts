@@ -34,8 +34,16 @@ const handler = async (request: NextRequest) => {
       connect();
       // Fetch all products excluding certain fields
       const allowedRoles = ["manager", "admin", "super_admin"];
+      const searchQuery = request.nextUrl.searchParams.get("q") || "";
 
-      const products = await Product.find();
+      let products;
+      if (searchQuery) {
+        products = await Product.find({
+          productName: { $regex: `^${searchQuery}`, $options: "i" },
+        });
+      } else {
+        products = await Product.find();
+      }
 
       const path = request.nextUrl.searchParams.get("path") || "/";
       revalidatePath(path);
