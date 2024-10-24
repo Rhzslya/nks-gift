@@ -32,6 +32,10 @@ const ProductsViews = ({ productsData }: any) => {
     });
   };
 
+  const filteredProducts = productsData.filter((product: any) =>
+    product.productName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
@@ -42,6 +46,16 @@ const ProductsViews = ({ productsData }: any) => {
       router.push(`products/search?q=${searchQuery}`);
     }
   };
+
+  const generateBreadcrumbs = () => {
+    const segments = path.split("/").filter(Boolean);
+    return segments.map((segment, index) => {
+      const href = "/" + segments.slice(0, index + 1).join("/");
+      const label = capitalizeFirst(segment);
+      return { href, label };
+    });
+  };
+  const breadcrumbs = generateBreadcrumbs();
 
   const sortedProducts = sortProducts(productsData, sortBy);
   return (
@@ -57,10 +71,26 @@ const ProductsViews = ({ productsData }: any) => {
           isActiveLink={isActiveLink}
         />
       </div>
-      <div className="flex px-6 py-4 mx-8 justify-between text-sm border-b-[1px] border-gray-200">
-        <div className="">
-          <p>({productsData.length}) Items Found</p>
-        </div>
+      <div className="breadcrumbs w-full px-6">
+        <nav className="flex  py-2 text-sm text-gray-500 space-x-2">
+          <Link href="/" className="hover:underline">
+            Home
+          </Link>
+          {breadcrumbs.map((breadcrumb, index) => (
+            <React.Fragment key={index}>
+              <span>&gt;</span>
+              {breadcrumb.href === path ? (
+                <span className="text-sky-300">{breadcrumb.label}</span>
+              ) : (
+                <Link href={breadcrumb.href} className="hover:underline">
+                  {breadcrumb.label}
+                </Link>
+              )}
+            </React.Fragment>
+          ))}
+        </nav>
+      </div>
+      <div className="flex py-4 px-6  text-sm text-gray-500 border-b-[1px] border-gray-200 ">
         <div className="flex items-center">
           <p>Sort By :</p>
           <div className="relative ml-2">
@@ -82,10 +112,12 @@ const ProductsViews = ({ productsData }: any) => {
         </div>
       </div>
 
-      <div className="flex justify-between px-6 pt-4 mx-8">
-        <div className="route">Tes</div>
-        <div className="relative w-full max-w-xs">
-          <span className="absolute inset-y-0 left-0 flex items-center pl-3 pr-2 border-r-[1px] border-gray-300">
+      <div className="flex justify-between pt-4 py-1 px-6 text-sm text-gray-500">
+        <div className="">
+          <p>({productsData.length}) Items Found</p>
+        </div>
+        <div className="relative w-full max-w-xs flex">
+          <span className="absolute inset-y-0 left-0 top-0 flex items-center pl-3 pr-2 border-r-[1px] border-gray-300">
             <i className="bx bx-search text-[20px] text-gray-600"></i>
           </span>
           <input
@@ -94,8 +126,44 @@ const ProductsViews = ({ productsData }: any) => {
             className="w-full px-2 py-1 border rounded-full text-sm pl-12 focus:border-sky-300 focus:outline-none"
             value={searchQuery}
             onChange={handleSearchChange}
-            onKeyDown={handleKeyDown} // Tangkap event Enter
+            onKeyDown={handleKeyDown}
           />
+          {searchQuery && (
+            <div className="absolute w-full top-6 py-2 z-10">
+              {filteredProducts.length > 0 ? (
+                <ul
+                  className={`bg-white border shadow-lg divide-y ${
+                    filteredProducts.length <= 5 ? "rounded-lg" : "rounded-t-lg"
+                  }`}
+                >
+                  {filteredProducts.slice(0, 5).map((product: any) => (
+                    <li key={product._id} className="block hover:bg-gray-100">
+                      <Link
+                        href={`products/${product.category}/${product.productId}`}
+                        className="block p-2"
+                      >
+                        {product.productName}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="bg-white border rounded-lg shadow-lg divide-y">
+                  No products found.
+                </p>
+              )}
+              {filteredProducts.length > 5 && (
+                <button
+                  onClick={() =>
+                    router.push(`/products/search?q=${searchQuery}`)
+                  }
+                  className="block w-full text-center py-2 bg-gray-400 hover:bg-gray-200 rounded-b-lg"
+                >
+                  View More Results
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
