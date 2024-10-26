@@ -148,7 +148,7 @@ const ProductsViews = ({ productsData }: any) => {
                   ))}
                 </ul>
               ) : (
-                <p className="bg-white border rounded-lg shadow-lg divide-y">
+                <p className="bg-white border rounded-lg shadow-lg divide-y p-2">
                   No products found.
                 </p>
               )}
@@ -157,7 +157,7 @@ const ProductsViews = ({ productsData }: any) => {
                   onClick={() =>
                     router.push(`/products/search?q=${searchQuery}`)
                   }
-                  className="block w-full text-center py-2 bg-gray-400 hover:bg-gray-200 rounded-b-lg"
+                  className="block w-full text-center py-2 bg-white border-b border-x hover:bg-gray-200 rounded-b-lg"
                 >
                   View More Results
                 </button>
@@ -167,7 +167,7 @@ const ProductsViews = ({ productsData }: any) => {
         </div>
       </div>
 
-      <div className="product-list grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 p-6">
+      <div className="product-list grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-4 p-6">
         {sortedProducts.length > 0 ? (
           sortedProducts.map((product: any) => (
             <Link
@@ -175,7 +175,7 @@ const ProductsViews = ({ productsData }: any) => {
               key={product._id}
               className="product-item flex flex-col border p-4 rounded-lg shadow-lg"
             >
-              <div className="relative w-full h-64 mb-4">
+              <div className="relative w-full h-48 mb-4">
                 <Image
                   src={product.productImage}
                   alt={product.productName}
@@ -197,7 +197,7 @@ const ProductsViews = ({ productsData }: any) => {
                   {formatPriceToIDR(product.price)}
                 </p>
               </div>
-              <div className="flex items-center justify-between text-sm space-x-2 mb-2 pt-2">
+              <div className="flex items-center justify-between  text-xs space-x-2 mb-2 pt-2">
                 <p className="text-gray-600 font-medium">
                   Sold: <span className="text-black font-semibold">500+</span>
                 </p>
@@ -217,7 +217,6 @@ const ProductsViews = ({ productsData }: any) => {
                     <path d="M12 .587l3.668 7.431 8.215 1.176-5.941 5.782 1.404 8.181L12 18.899l-7.346 3.86 1.404-8.181-5.941-5.782 8.215-1.176z"></path>
                   </svg>
                   <span className="text-black font-semibold">3.9</span>
-                  <span className="text-gray-500 ml-1">(47 Reviews)</span>
                 </div>
               </div>
             </Link>

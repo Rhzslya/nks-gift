@@ -35,12 +35,17 @@ const handler = async (request: NextRequest) => {
       // Fetch all products excluding certain fields
       const allowedRoles = ["manager", "admin", "super_admin"];
       const searchQuery = request.nextUrl.searchParams.get("q") || "";
+      const category = request.nextUrl.searchParams.get("category") || "";
 
       let products;
+      const query: any = {};
       if (searchQuery) {
         products = await Product.find({
-          productName: { $regex: `^${searchQuery}`, $options: "i" },
+          productName: { $regex: `${searchQuery}`, $options: "i" },
         });
+      } else if (category) {
+        query.category = category;
+        products = await Product.find(query);
       } else {
         products = await Product.find();
       }

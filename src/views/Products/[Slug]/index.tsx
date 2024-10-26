@@ -3,16 +3,37 @@
 import { capitalizeFirst } from "@/utils/Capitalize";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 interface ProductCategoryViewsProps {
-  title: string; // Tipe 'string' untuk prop title
+  slug: string; // Tipe 'string' untuk prop slug
 }
 
 const ProductCategoryViews: React.FC<ProductCategoryViewsProps> = ({
-  title,
+  slug,
 }) => {
   const path = usePathname();
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProductsByCategory = async () => {
+      if (slug) {
+        setLoading(true);
+        try {
+          const response = await fetch(`/api/products?category=${slug}`);
+          const data = await response.json();
+          setProducts(data?.data || []);
+        } catch (error) {
+          console.error("Error fetching products:", error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchProductsByCategory();
+  }, [slug]);
 
   const generateBreadcrumbs = () => {
     const segments = path.split("/").filter(Boolean);
@@ -23,6 +44,9 @@ const ProductCategoryViews: React.FC<ProductCategoryViewsProps> = ({
     });
   };
   const breadcrumbs = generateBreadcrumbs();
+
+  console.log(products);
+  console.log(slug);
   return (
     <div>
       <nav className="flex px-6 py-2 text-sm text-gray-500 space-x-2">
@@ -43,8 +67,19 @@ const ProductCategoryViews: React.FC<ProductCategoryViewsProps> = ({
         ))}
       </nav>
       <div className="mt-4 text-center">
-        <h1 className="text-2xl font-bold capitalize">{title}</h1>
-        <p className="mt-2">This is the page for the product: {title}</p>
+        <h1 className="text-2xl font-bold capitalize">{slug}</h1>
+        <p className="mt-2">This is the page for the product: {slug}</p>
+        <div className="">
+          {products.length > 0 ? (
+            <ul>
+              {products.map((product: any) => (
+                <li key={product._id}>{product.productName}</li>
+              ))}
+            </ul>
+          ) : (
+            <p>No products found</p>
+          )}
+        </div>
       </div>
     </div>
   );

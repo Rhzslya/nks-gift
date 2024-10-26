@@ -7,9 +7,8 @@ interface ProductPageProps {
 
 const ProductCategoryPage: React.FC<ProductPageProps> = ({ params }) => {
   const { slug } = params;
-  const title = slug;
 
-  return <ProductCategoryViews title={title} />;
+  return <ProductCategoryViews slug={slug} />;
 };
 
 export default ProductCategoryPage;
