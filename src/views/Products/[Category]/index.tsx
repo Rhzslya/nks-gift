@@ -6,22 +6,25 @@ import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 interface ProductCategoryViewsProps {
-  slug: string; // Tipe 'string' untuk prop slug
+  category: string; // Tipe 'string' untuk prop category
 }
 
 const ProductCategoryViews: React.FC<ProductCategoryViewsProps> = ({
-  slug,
+  category,
 }) => {
   const path = usePathname();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const productCategory = category.replace(/-/, " ");
 
   useEffect(() => {
     const fetchProductsByCategory = async () => {
-      if (slug) {
+      if (productCategory) {
         setLoading(true);
         try {
-          const response = await fetch(`/api/products?category=${slug}`);
+          const response = await fetch(
+            `/api/products?category=${productCategory}`
+          );
           const data = await response.json();
           setProducts(data?.data || []);
         } catch (error) {
@@ -33,20 +36,18 @@ const ProductCategoryViews: React.FC<ProductCategoryViewsProps> = ({
     };
 
     fetchProductsByCategory();
-  }, [slug]);
+  }, [productCategory]);
 
   const generateBreadcrumbs = () => {
     const segments = path.split("/").filter(Boolean);
     return segments.map((segment, index) => {
       const href = "/" + segments.slice(0, index + 1).join("/");
-      const label = capitalizeFirst(segment);
+      const label = capitalizeFirst(segment.replace(/-/, " "));
       return { href, label };
     });
   };
   const breadcrumbs = generateBreadcrumbs();
 
-  console.log(products);
-  console.log(slug);
   return (
     <div>
       <nav className="flex px-6 py-2 text-sm text-gray-500 space-x-2">
@@ -67,8 +68,10 @@ const ProductCategoryViews: React.FC<ProductCategoryViewsProps> = ({
         ))}
       </nav>
       <div className="mt-4 text-center">
-        <h1 className="text-2xl font-bold capitalize">{slug}</h1>
-        <p className="mt-2">This is the page for the product: {slug}</p>
+        <h1 className="text-2xl font-bold capitalize">{productCategory}</h1>
+        <p className="mt-2">
+          This is the page for the product: {productCategory}
+        </p>
         <div className="">
           {products.length > 0 ? (
             <ul>

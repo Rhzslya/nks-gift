@@ -36,6 +36,7 @@ const handler = async (request: NextRequest) => {
       const allowedRoles = ["manager", "admin", "super_admin"];
       const searchQuery = request.nextUrl.searchParams.get("q") || "";
       const category = request.nextUrl.searchParams.get("category") || "";
+      const id = request.nextUrl.searchParams.get("id") || "";
 
       let products;
       const query: any = {};
@@ -45,6 +46,9 @@ const handler = async (request: NextRequest) => {
         });
       } else if (category) {
         query.category = category;
+        products = await Product.find(query);
+      } else if (id) {
+        query.productId = id;
         products = await Product.find(query);
       } else {
         products = await Product.find();
