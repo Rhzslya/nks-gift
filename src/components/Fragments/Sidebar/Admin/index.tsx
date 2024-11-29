@@ -51,11 +51,13 @@ const Sidebar: React.FC<ListsTypes> = ({ lists }) => {
     <div className="w-[250px] h-screen panel p-2 flex flex-col justify-between shadow-right z-10">
       <div>
         <div className="flex items-center text-md mb-4 gap-2">
-          <h1
-            className={`${bebasNeue.className} font-semibold text-2xl text-sky-300 border-b-[1px] border-gray-200`}
-          >
-            NKS Gift.
-          </h1>
+          <Link href={"/"}>
+            <h1
+              className={`${bebasNeue.className} font-semibold text-2xl text-sky-300 border-b-[1px] border-gray-200`}
+            >
+              NKS Gift.
+            </h1>
+          </Link>
         </div>
 
         {/* Overview Section */}

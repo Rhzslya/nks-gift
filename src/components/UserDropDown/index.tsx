@@ -30,7 +30,7 @@ const UserDropDown = forwardRef<HTMLDivElement, UserDropDownProps>(
           className="flex gap-1 justify-center items-center cursor-pointer"
           onClick={handleToggleDropdown}
         >
-          <div className="flex items-center bg-gray-100 p-1 rounded-full hover:bg-gray-200 duration-300">
+          <div className="flex items-center bg-gray-1=00 p-1 rounded-full hover:bg-gray-200 duration-300 ">
             {user.profileImage ? (
               <Image
                 src={user.profileImage}
@@ -52,7 +52,7 @@ const UserDropDown = forwardRef<HTMLDivElement, UserDropDownProps>(
         {isDropdownOpen && (
           <div
             ref={ref as React.RefObject<HTMLDivElement>}
-            className="absolute right-0 top-[110%] mt-2 w-48 bg-white border rounded shadow-md z-10"
+            className="absolute right-0 top-[110%] mt-2 w-48 bg-white border rounded shadow-md z-50"
           >
             <div className="border-b-[1px]">
               <div className="profile relative flex flex-col justify-center items-center gap-1 py-2 z-10">

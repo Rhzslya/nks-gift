@@ -8,4 +8,5 @@ export const disableNavAndFooter = [
   "forgot-password",
   "reset-password",
   "not-found",
+  "dashboard",
 ];

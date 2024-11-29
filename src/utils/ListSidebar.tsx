@@ -2,77 +2,77 @@ export const listSidebarItem = {
   overview: [
     {
       title: "dashboard",
-      url: "/admin",
+      url: "/dashboard",
       icon: "bxs-dashboard",
     },
     {
       title: "analytics",
-      url: "/admin/analytics",
+      url: "/dashboard/analytics",
       icon: "bx-bar-chart",
     },
   ],
   management: [
     {
       title: "products",
-      url: "/admin/products",
+      url: "/dashboard/products",
       icon: "bxs-box",
     },
     {
       title: "categories",
-      url: "/admin/categories",
+      url: "/dashboard/categories",
       icon: "bxs-category",
     },
     {
       title: "inventory",
-      url: "/admin/inventory",
+      url: "/dashboard/inventory",
       icon: "bxs-cube",
     },
     {
       title: "orders",
-      url: "/admin/orders",
+      url: "/dashboard/orders",
       icon: "bxs-cart",
     },
   ],
   settings: [
     {
       title: "users",
-      url: ["/admin/users", "/admin/users/archived-users"],
+      url: ["/dashboard/users", "/dashboard/users/archived-users"],
       icon: "bxs-group",
       hasSubMenu: true,
       subMenu: [
         {
           title: "manage users",
-          url: "/admin/users",
+          url: "/dashboard/users",
         },
         {
           title: "archived users",
-          url: "/admin/users/archived-users",
+          url: "/dashboard/users/archived-users",
         },
       ],
     },
     {
       title: "customer support",
-      url: "/admin/support",
+      url: "/dashboard/support",
       icon: "bxs-message-detail",
     },
     {
       title: "blog",
-      url: "/admin/blog",
+      url: "/dashboard/blog",
       icon: "bxs-pencil",
     },
     {
       title: "pages",
-      url: "/admin/pages",
+      url: "/dashboard/pages",
       icon: "bxs-file",
     },
     {
       title: "site settings",
-      url: "/admin/settings",
+      url: "/dashboard/settings",
       icon: "bxs-cog",
     },
     {
       title: "security",
-      url: "/admin/security",
+      url: "/dashboard/security",
       icon: "bxs-lock-alt",
     },
   ],
@@ -102,3 +102,5 @@ export const listSidebarSettingsItem = {
     },
   ],
 };
+
+export const listBarProduct = {};

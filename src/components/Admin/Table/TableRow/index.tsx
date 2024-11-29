@@ -108,7 +108,7 @@ const TableRow: React.FC<TableRowProps> = ({
       >
         {headerKey === "action" ? (
           <div
-            className="relative z-50"
+            className="relative"
             ref={(el) => {
               menuSettingRefs.current[item._id] = el;
             }}
@@ -124,7 +124,7 @@ const TableRow: React.FC<TableRowProps> = ({
               }}
               onClick={(e) => handleSettingToggle(item._id, e)}
             >
-              <i className="relative bx bx-dots-vertical-rounded text-[20px]"></i>
+              <i className="bx bx-dots-vertical-rounded text-[20px]"></i>
             </button>
             {activeUserId === item._id && (
               <ActionMenu
