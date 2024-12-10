@@ -90,7 +90,6 @@ const handler = async (request: NextRequest) => {
       const { products } = reqBody;
       const categoryInitial = products.categoryInitial;
 
-      console.log(products);
       // Periksa token
       if (!token) {
         return NextResponse.json(
@@ -122,20 +121,17 @@ const handler = async (request: NextRequest) => {
         );
       }
 
-      // Cari produk terakhir berdasarkan productId yang dimulai dengan huruf kategori tersebut
       const lastProduct = await Product.findOne({ category: products.category })
         .sort({ productId: -1 }) // Mengurutkan secara descending berdasarkan productId
-        .limit(1); // Ambil produk terakhir
+        .limit(1);
 
       let newProductId;
       if (lastProduct) {
-        // Ambil nomor urut dari produk terakhir dan tambahkan 1
         const lastProductId = lastProduct.productId;
         const lastNumber = parseInt(lastProductId.slice(1), 10); // Mengambil bagian nomor setelah huruf
         const newNumber = (lastNumber + 1).toString().padStart(3, "0"); // Membuat nomor baru dengan format tiga digit
         newProductId = `${categoryInitial}${newNumber}`; // Gabungkan huruf kategori dan nomor baru
       } else {
-        // Jika tidak ada produk sebelumnya, mulai dari 001
         newProductId = `${categoryInitial}001`;
       }
 
@@ -149,10 +145,28 @@ const handler = async (request: NextRequest) => {
       const newProduct = new Product({
         ...products,
         productId: newProductId,
+        category: [products.category, "new-featured"],
         stock,
       });
 
       const savedProduct = await newProduct.save();
+
+      const newFeaturedProducts = await Product.find({
+        category: { $in: ["new-featured"] },
+      })
+        .sort({ createdAt: 1 })
+        .lean();
+
+      if (newFeaturedProducts.length > 10) {
+        const oldestProduct = newFeaturedProducts[0];
+        const updatedCategory = oldestProduct.category.filter(
+          (cat: string) => cat !== "new-featured"
+        );
+
+        await Product.findByIdAndUpdate(oldestProduct._id, {
+          category: updatedCategory,
+        });
+      }
 
       return NextResponse.json({
         status: true,

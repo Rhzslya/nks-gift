@@ -45,7 +45,7 @@ const NavbarViews = ({ serverSession }: { serverSession: any }) => {
 
   // Tombol Auth (Login/Logout)
   const renderAuthButton = () => {
-    if (status === "loading") return null; // Hindari render saat session masih loading
+    if (status === "loading") return null;
 
     return user ? (
       <UserDropDown

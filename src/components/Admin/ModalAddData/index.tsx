@@ -17,7 +17,7 @@ import { ProductCategories } from "@/utils/ProductCategories";
 interface Product {
   productImage: string;
   productName: string;
-  category: string;
+  category: [string];
   stock: {
     variant: string;
     quantity: string;
@@ -111,9 +111,10 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
       ...product,
       price: Number(rawPrice),
       stock,
-      categoryInitial: product.category.charAt(0).toUpperCase(), // Kirimkan huruf kategori saja
-      // Use raw price for actual data submission
+      categoryInitial: product.category.charAt(0).toUpperCase(),
     };
+
+    console.log(product);
 
     try {
       if (Object.keys(validationErrors).length === 0) {
@@ -122,8 +123,8 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
             ...prevErrors,
             productImage: "Image size must be less than 1MB",
           }));
-          setIsLoading(false); // Sembunyikan loading karena ada error
-          return; // Hentikan proses jika file terlalu besar
+          setIsLoading(false);
+          return;
         }
 
         const response = await fetch("/api/products", {

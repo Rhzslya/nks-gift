@@ -6,37 +6,16 @@ import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 interface ProductCategoryViewsProps {
-  category: string; // Tipe 'string' untuk prop category
+  category: string;
+  productsDataByCategories: any;
 }
 
 const ProductCategoryViews: React.FC<ProductCategoryViewsProps> = ({
   category,
+  productsDataByCategories,
 }) => {
   const path = usePathname();
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
   const productCategory = category.replace(/-/, " ");
-
-  useEffect(() => {
-    const fetchProductsByCategory = async () => {
-      if (productCategory) {
-        setLoading(true);
-        try {
-          const response = await fetch(
-            `/api/products?category=${productCategory}`
-          );
-          const data = await response.json();
-          setProducts(data?.data || []);
-        } catch (error) {
-          console.error("Error fetching products:", error);
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchProductsByCategory();
-  }, [productCategory]);
 
   const generateBreadcrumbs = () => {
     const segments = path.split("/").filter(Boolean);
@@ -73,9 +52,9 @@ const ProductCategoryViews: React.FC<ProductCategoryViewsProps> = ({
           This is the page for the product: {productCategory}
         </p>
         <div className="">
-          {products.length > 0 ? (
+          {productsDataByCategories.length > 0 ? (
             <ul>
-              {products.map((product: any) => (
+              {productsDataByCategories.map((product: any) => (
                 <li key={product._id}>{product.productName}</li>
               ))}
             </ul>

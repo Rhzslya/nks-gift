@@ -4,12 +4,12 @@ const stockSchema = new mongoose.Schema(
   {
     variant: {
       type: String,
-      required: true, // Each variant is required
+      required: true,
     },
     quantity: {
       type: Number,
-      required: true, // Each quantity for a variant is required
-      min: 0, // Ensure quantity is not negative
+      required: true,
+      min: 0,
     },
   },
   { _id: false }
@@ -18,7 +18,7 @@ const productSchema = new mongoose.Schema(
   {
     productName: {
       type: String,
-      required: true, // Typo: should be "required" instead of "require"
+      required: true,
     },
     productImage: {
       type: String,
@@ -26,15 +26,15 @@ const productSchema = new mongoose.Schema(
     },
     productId: {
       type: String,
-      required: true, // Use auto-increment number for product ID
+      required: true,
     },
     category: {
-      type: String,
-      required: true, // Typo: should be "required" instead of "require"
+      type: [String],
+      required: true,
     },
     price: {
       type: Number,
-      required: true, // To ensure price is provided
+      required: true,
     },
     stock: [stockSchema],
   },
