@@ -127,7 +127,7 @@ const SearchViews: React.FC<SearchViewsProps> = ({ path }) => {
               </h3>
               <div className="flex justify-between pb-2 border-b-[1px] border-gray-400">
                 <p className="text-gray-600 mb-1">
-                  {capitalizeFirst(product.category)}
+                  {capitalizeFirst(product.category[0])}
                 </p>
                 <p className="text-gray-800 font-semibold">
                   {formatPriceToIDR(product.price)}

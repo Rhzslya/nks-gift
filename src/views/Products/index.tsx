@@ -58,6 +58,7 @@ const ProductsViews = ({ productsData }: any) => {
   const breadcrumbs = generateBreadcrumbs();
 
   const sortedProducts = sortProducts(productsData, sortBy);
+
   return (
     <div className="max-w-[1400px] m-auto">
       <div className="flex justify-center px-6 bg-white">
@@ -171,7 +172,7 @@ const ProductsViews = ({ productsData }: any) => {
         {sortedProducts.length > 0 ? (
           sortedProducts.map((product: any) => (
             <Link
-              href={`products/${product.category}/${product.productId}`}
+              href={`products/${product.category[0]}/${product.productId}`}
               key={product._id}
               className="product-item flex flex-col border p-4 rounded-lg shadow-lg"
             >
@@ -191,7 +192,7 @@ const ProductsViews = ({ productsData }: any) => {
               </h3>
               <div className="flex justify-between pb-2 border-b-[1px] border-gray-400">
                 <p className="text-gray-600 mb-1">
-                  {capitalizeFirst(product.category)}
+                  {capitalizeFirst(product.category[0])}
                 </p>
                 <p className="text-gray-800 font-semibold">
                   {formatPriceToIDR(product.price)}

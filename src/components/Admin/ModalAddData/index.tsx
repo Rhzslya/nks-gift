@@ -114,8 +114,6 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
       categoryInitial: product.category.charAt(0).toUpperCase(),
     };
 
-    console.log(product);
-
     try {
       if (Object.keys(validationErrors).length === 0) {
         if (selectedImage && selectedImage.size >= 1048576) {
