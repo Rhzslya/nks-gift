@@ -22,7 +22,7 @@ interface ModalDeletePermanentlyUserProps {
   isDeletedPermanentlyProduct: Product;
   handleCloseModal: () => void;
   setProductsData: any;
-  userInSession: any; // Menjadikan properti ini opsional
+  userInSession: any;
   setModalDeletePermanentlyProduct: React.Dispatch<
     React.SetStateAction<string | null>
   >;

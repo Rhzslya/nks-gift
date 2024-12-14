@@ -72,8 +72,8 @@ const ProductsViews = ({ productsData }: any) => {
           isActiveLink={isActiveLink}
         />
       </div>
-      <div className="breadcrumbs w-full px-6">
-        <nav className="flex  py-2 text-sm text-gray-500 space-x-2">
+      <div className="breadcrumbs w-full">
+        <nav className="flex px-6 py-2 text-sm text-gray-500 space-x-2">
           <Link href="/" className="hover:underline">
             Home
           </Link>
@@ -91,7 +91,7 @@ const ProductsViews = ({ productsData }: any) => {
           ))}
         </nav>
       </div>
-      <div className="flex py-4 px-6  text-sm text-gray-500 border-b-[1px] border-gray-200 ">
+      <div className="flex py-2 px-6 text-sm text-gray-500 border-b-[1px] border-gray-200 ">
         <div className="flex items-center">
           <p>Sort By :</p>
           <div className="relative ml-2">
@@ -113,7 +113,7 @@ const ProductsViews = ({ productsData }: any) => {
         </div>
       </div>
 
-      <div className="flex justify-between pt-4 py-1 px-6 text-sm text-gray-500">
+      <div className="flex justify-between py-2 px-6 text-sm text-gray-500">
         <div className="">
           <p>({productsData.length}) Items Found</p>
         </div>
@@ -140,7 +140,7 @@ const ProductsViews = ({ productsData }: any) => {
                   {filteredProducts.slice(0, 5).map((product: any) => (
                     <li key={product._id} className="block hover:bg-gray-100">
                       <Link
-                        href={`products/${product.category}/${product.productId}`}
+                        href={`products/${product.category[0]}/${product.productId}`}
                         className="block p-2"
                       >
                         {product.productName}
@@ -168,15 +168,15 @@ const ProductsViews = ({ productsData }: any) => {
         </div>
       </div>
 
-      <div className="product-list grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-4 p-6">
+      <div className="product-list grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-4 p-4">
         {sortedProducts.length > 0 ? (
           sortedProducts.map((product: any) => (
             <Link
               href={`products/${product.category[0]}/${product.productId}`}
               key={product._id}
-              className="product-item flex flex-col border p-4 rounded-lg shadow-lg"
+              className="product-item flex flex-col border p-2 rounded-lg shadow-lg"
             >
-              <div className="relative w-full h-48 mb-4">
+              <div className="relative w-full h-[48] mb-4">
                 <Image
                   src={product.productImage}
                   alt={product.productName}
@@ -187,11 +187,11 @@ const ProductsViews = ({ productsData }: any) => {
                   priority
                 />
               </div>
-              <h3 className="text-xl font-bold mb-2 truncate">
+              <h3 className="text-base font-medium truncate">
                 {product.productName}
               </h3>
               <div className="flex justify-between pb-2 border-b-[1px] border-gray-400">
-                <p className="text-gray-600 mb-1">
+                <p className="text-gray-600 mb-1 text-sm">
                   {capitalizeFirst(product.category[0])}
                 </p>
                 <p className="text-gray-800 font-semibold">

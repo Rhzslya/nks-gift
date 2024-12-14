@@ -45,7 +45,7 @@ const NavbarViews = ({ serverSession }: { serverSession: any }) => {
 
   // Tombol Auth (Login/Logout)
   const renderAuthButton = () => {
-    if (status === "loading") return null;
+    // if (status === "loading") return <div className="">Loading</div>;
 
     return user ? (
       <UserDropDown

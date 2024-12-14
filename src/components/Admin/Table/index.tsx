@@ -58,7 +58,7 @@ const Table: React.FC<TableProps> = ({
       productName: capitalizeFirst(item.productName || ""),
       price: formatPriceToIDR(item.price),
       productId: item.productId,
-      category: capitalizeFirst(item.category[0] || ""),
+      category: capitalizeFirst(item.category?.[0] || ""),
       stock: item.stock,
       variant: item.stock?.variant,
       qty: item.stock?.qty,

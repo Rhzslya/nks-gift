@@ -54,7 +54,6 @@ const ProductDetailViews: React.FC<ProductDetailViewsProps> = ({ id }) => {
       }));
 
   const breadcrumbs = generateBreadcrumbs();
-  console.log(product);
   return (
     <div>
       <nav className="flex px-6 py-2 text-sm text-gray-500 space-x-2">

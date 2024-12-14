@@ -1,4 +1,4 @@
-import { ChangeEvent, Dispatch, SetStateAction } from "react";
+import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
 
 interface HandleChangeParams<T extends Record<string, any>> {
   e: ChangeEvent<HTMLInputElement>;
@@ -190,42 +190,50 @@ export const handleInputFileChange = <T extends Record<string, any>>({
   setErrors,
   setIsModified,
   setSelectedImage,
-  fieldName, // Field yang akan diupdate di dalam state
+  fieldName,
+  setImageSrc,
 }: {
   e: React.ChangeEvent<HTMLInputElement>;
   setData: React.Dispatch<React.SetStateAction<T>>;
   setErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
   setIsModified?: React.Dispatch<React.SetStateAction<boolean>>;
   setSelectedImage: React.Dispatch<React.SetStateAction<File | null>>;
-  fieldName: string; // Ditambahkan agar lebih fleksibel, misalnya untuk field 'productImage'
+  fieldName: string;
+  setImageSrc: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const file = e.target.files?.[0] || null;
   setSelectedImage(file);
 
   if (file) {
-    // Membuat preview URL dari file yang diunggah
-    const previewUrl = URL.createObjectURL(file);
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+      const imageUrl = reader.result?.toString() || "";
+      setImageSrc(imageUrl);
 
-    // Set data untuk field yang sesuai (misal: productImage atau lainnya)
+      setData((prevData) => ({
+        ...prevData,
+        [fieldName]: imageUrl,
+      }));
+
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [fieldName]: "",
+      }));
+    });
+
+    reader.readAsDataURL(file);
+  } else {
     setData((prevData) => ({
       ...prevData,
-      [fieldName]: previewUrl, // Menggunakan fieldName yang dinamis
+      [fieldName]: "",
     }));
 
-    // Reset error untuk field ini
-    setErrors((prevErrors) => ({
-      ...prevErrors,
-      [fieldName]: "", // Menggunakan fieldName yang dinamis
-    }));
-  } else {
-    // Jika tidak ada file yang dipilih atau file tidak valid
     setErrors((prevErrors) => ({
       ...prevErrors,
       [fieldName]: "Please select a valid image file",
     }));
   }
 
-  // Menandai bahwa data telah diubah (jika opsi setIsModified disediakan)
   if (setIsModified) {
     setIsModified(true);
   }

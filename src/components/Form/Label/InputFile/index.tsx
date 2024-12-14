@@ -30,7 +30,6 @@ const InputFile = forwardRef<HTMLInputElement, InputFileProps>(
     }: InputFileProps,
     ref
   ) => {
-    // Handle input change
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       if (handleChange) {
         handleChange(e);
@@ -121,7 +120,7 @@ const InputFile = forwardRef<HTMLInputElement, InputFileProps>(
               accept="image/png, image/jpeg, image/jpg"
               id={id}
               onChange={handleInputChange}
-              ref={ref} // Pass ref correctly to the input element
+              ref={ref}
             />
           </div>
         </label>

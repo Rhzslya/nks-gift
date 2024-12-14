@@ -167,7 +167,7 @@ const ProductCategoryViews: React.FC<ProductCategoryViewsProps> = ({
         {sortedProducts.length > 0 ? (
           sortedProducts.map((product: any) => (
             <Link
-              href={`products/${product.category[0]}/${product.productId}`}
+              href={`${product.category[0]}/${product.productId}`}
               key={product._id}
               className="product-item flex flex-col border p-4 rounded-lg shadow-lg"
             >
@@ -175,7 +175,7 @@ const ProductCategoryViews: React.FC<ProductCategoryViewsProps> = ({
                 <Image
                   src={product.productImage}
                   alt={product.productName}
-                  className="object-cover rounded-sm w-full h-full"
+                  className="object-cover rounded-lg w-full h-full"
                   quality={100}
                   width={300}
                   height={300}

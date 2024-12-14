@@ -214,7 +214,7 @@ const ModalViewDetailsProduct: React.FC<ModalViewDetailsProductProps> = ({
                 <div className="category text-sm mb-2">
                   <p>
                     <span className="text-gray-500">Category : </span>
-                    {capitalizeFirst(isViewDetailsProduct.category)}
+                    {capitalizeFirst(isViewDetailsProduct.category[0])}
                   </p>
                 </div>
                 <div className="stock text-sm mb-4">

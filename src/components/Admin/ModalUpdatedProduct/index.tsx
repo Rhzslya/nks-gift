@@ -47,6 +47,7 @@ const ModalUpdatedProduct = ({
   const [isModified, setIsModified] = useState(false);
   const [isLoading, setIsLoading] = useState("");
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const [imageSrc, setImageSrc] = useState("");
   const [updatedProduct, setUpdatedProduct] = useState<Product>({
     ...isUpdatedProduct,
     price: new Intl.NumberFormat("id-ID").format(
@@ -226,7 +227,8 @@ const ModalUpdatedProduct = ({
                   setData: setUpdatedProduct,
                   setErrors,
                   setSelectedImage,
-                  fieldName: "productImage", // Field yang di-update
+                  fieldName: "productImage",
+                  setImageSrc, // Field yang di-update
                 })
               }
               selectedImage={selectedImage}
@@ -270,7 +272,7 @@ const ModalUpdatedProduct = ({
               type="text"
               name="category"
               text="Category"
-              value={capitalizeFirst(updatedProduct.category)}
+              value={capitalizeFirst(updatedProduct.category[0])}
               disabled
               textStyle="text-xs font-medium"
             />
