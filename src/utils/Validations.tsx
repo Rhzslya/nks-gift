@@ -186,7 +186,7 @@ export const validationAddProduct = (product: Product) => {
   }
 
   // Validasi Category
-  if (!product.category[0].trim()) {
+  if (!product.category[0]) {
     errors.category = "Category is required";
   }
 

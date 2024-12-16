@@ -2,10 +2,12 @@ import React, { useRef, useState } from "react";
 import ReactCrop, { convertToPixelCrop, Crop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 import setCanvasPreview from "./setCanvasPreview";
+import Image from "next/image";
 
 const ASPECT_RATIO = 1;
 const MIN_DIMENSION = 150;
-const FIXED_CROP_SIZE = 200; // Ukuran tetap crop, misalnya 200px x 200px
+const FIXED_CROP_WIDTH_SIZE = 300;
+const FIXED_CROP_HEIGHT_SIZE = 400;
 
 const ImageCropper = ({
   imageSrc,
@@ -18,8 +20,8 @@ const ImageCropper = ({
 }) => {
   const [crop, setCrop] = useState<Crop | undefined>({
     unit: "px",
-    width: FIXED_CROP_SIZE,
-    height: FIXED_CROP_SIZE,
+    width: FIXED_CROP_WIDTH_SIZE,
+    height: FIXED_CROP_HEIGHT_SIZE,
     x: 0,
     y: 0,
   });
@@ -38,10 +40,10 @@ const ImageCropper = ({
     }
     const initialCrop: Crop = {
       unit: "px", // Tipe unit harus "px"
-      width: FIXED_CROP_SIZE,
-      height: FIXED_CROP_SIZE,
-      x: (width - FIXED_CROP_SIZE) / 2, // Memusatkan crop
-      y: (height - FIXED_CROP_SIZE) / 2, // Memusatkan crop
+      width: FIXED_CROP_WIDTH_SIZE,
+      height: FIXED_CROP_HEIGHT_SIZE,
+      x: (width - FIXED_CROP_WIDTH_SIZE) / 2, // Memusatkan crop
+      y: (height - FIXED_CROP_HEIGHT_SIZE) / 2, // Memusatkan crop
     };
     setCrop(initialCrop);
   };
@@ -49,11 +51,11 @@ const ImageCropper = ({
   const handleCropChange = (newCrop: Crop) => {
     if (newCrop.width && newCrop.height) {
       if (
-        newCrop.width !== FIXED_CROP_SIZE ||
-        newCrop.height !== FIXED_CROP_SIZE
+        newCrop.width !== FIXED_CROP_WIDTH_SIZE ||
+        newCrop.height !== FIXED_CROP_HEIGHT_SIZE
       ) {
-        newCrop.width = FIXED_CROP_SIZE;
-        newCrop.height = FIXED_CROP_SIZE;
+        newCrop.width = FIXED_CROP_WIDTH_SIZE;
+        newCrop.height = FIXED_CROP_HEIGHT_SIZE;
       }
     }
     setCrop(newCrop);
@@ -61,18 +63,27 @@ const ImageCropper = ({
 
   return (
     <>
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col items-center max-w-[600px] max-h-[400px] relative bg-sky-300">
         <ReactCrop
           crop={crop}
           onChange={handleCropChange}
           aspect={ASPECT_RATIO}
           keepSelection
         >
-          <img
+          {/* <img
             src={imageSrc}
             alt="Upload"
             onLoad={onImageLoad}
             ref={imageRef}
+          /> */}
+          <Image
+            src={imageSrc}
+            alt="Upload"
+            onLoad={onImageLoad}
+            ref={imageRef}
+            width={FIXED_CROP_WIDTH_SIZE}
+            height={FIXED_CROP_HEIGHT_SIZE}
+            className="w-full h-full  min-w-[300px] min-h-[400px] bg-cover"
           />
         </ReactCrop>
         <button
@@ -106,8 +117,9 @@ const ImageCropper = ({
           style={{
             border: "1px solid black",
             objectFit: "contain",
-            width: FIXED_CROP_SIZE,
-            height: FIXED_CROP_SIZE,
+            width: FIXED_CROP_WIDTH_SIZE,
+            height: FIXED_CROP_HEIGHT_SIZE,
+            display: "none",
           }}
         />
       )}
