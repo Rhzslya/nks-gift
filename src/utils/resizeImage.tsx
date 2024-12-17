@@ -11,25 +11,25 @@ const resizeImage = (
       const ctx = canvas.getContext("2d");
       if (!ctx) return reject("Canvas context not supported");
 
-      // Hitung rasio untuk resize
-      let width = img.width;
-      let height = img.height;
+      // Ukuran asli gambar
+      const originalWidth = img.width;
+      const originalHeight = img.height;
 
-      if (width > height) {
-        if (width > maxWidth) {
-          height = (height * maxWidth) / width;
-          width = maxWidth;
-        }
-      } else {
-        if (height > maxHeight) {
-          width = (width * maxHeight) / height;
-          height = maxHeight;
-        }
-      }
+      // Hitung scaling dinamis
+      const scale = Math.min(
+        maxWidth / originalWidth,
+        maxHeight / originalHeight,
+        1 // Scale tidak melebihi 1
+      );
 
-      canvas.width = width;
-      canvas.height = height;
-      ctx.drawImage(img, 0, 0, width, height);
+      // Tentukan ukuran akhir gambar setelah scaling
+      const finalWidth = Math.round(originalWidth * scale);
+      const finalHeight = Math.round(originalHeight * scale);
+
+      // Set canvas dan gambar
+      canvas.width = finalWidth;
+      canvas.height = finalHeight;
+      ctx.drawImage(img, 0, 0, finalWidth, finalHeight);
 
       resolve(canvas.toDataURL());
     };

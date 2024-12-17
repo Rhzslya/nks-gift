@@ -6,8 +6,8 @@ import Image from "next/image";
 
 const ASPECT_RATIO = 1;
 const MIN_DIMENSION = 150;
-const FIXED_CROP_WIDTH_SIZE = 200;
-const FIXED_CROP_HEIGHT_SIZE = 300;
+const FIXED_CROP_WIDTH_SIZE = 150;
+const FIXED_CROP_HEIGHT_SIZE = 200;
 
 const ImageCropper = ({
   imageSrc,

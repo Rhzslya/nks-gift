@@ -206,7 +206,7 @@ export const handleInputFileChange = <T extends Record<string, any>>({
   setSelectedImage(file);
 
   if (file) {
-    resizeImage(file, 600, 400)
+    resizeImage(file, 200, 250)
       .then((resizedDataUrl) => {
         setImageSrc(resizedDataUrl);
 
