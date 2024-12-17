@@ -1,26 +1,40 @@
-export const resizeImage = (
+const resizeImage = (
   file: File,
   maxWidth: number,
   maxHeight: number
-) => {
-  return new Promise<string>((resolve) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
+): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.src = URL.createObjectURL(file);
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return reject("Canvas context not supported");
 
-        canvas.width = maxWidth;
-        canvas.height = maxHeight;
+      // Hitung rasio untuk resize
+      let width = img.width;
+      let height = img.height;
 
-        ctx?.drawImage(img, 0, 0, maxWidth, maxHeight);
+      if (width > height) {
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width;
+          width = maxWidth;
+        }
+      } else {
+        if (height > maxHeight) {
+          width = (width * maxHeight) / height;
+          height = maxHeight;
+        }
+      }
 
-        const resizedDataUrl = canvas.toDataURL("image/jpeg");
-        resolve(resizedDataUrl);
-      };
-      img.src = e.target?.result as string;
+      canvas.width = width;
+      canvas.height = height;
+      ctx.drawImage(img, 0, 0, width, height);
+
+      resolve(canvas.toDataURL());
     };
-    reader.readAsDataURL(file);
+    img.onerror = reject;
   });
 };
+
+export default resizeImage;

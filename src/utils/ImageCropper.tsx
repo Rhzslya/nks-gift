@@ -6,8 +6,8 @@ import Image from "next/image";
 
 const ASPECT_RATIO = 1;
 const MIN_DIMENSION = 150;
-const FIXED_CROP_WIDTH_SIZE = 300;
-const FIXED_CROP_HEIGHT_SIZE = 400;
+const FIXED_CROP_WIDTH_SIZE = 200;
+const FIXED_CROP_HEIGHT_SIZE = 300;
 
 const ImageCropper = ({
   imageSrc,
@@ -63,19 +63,13 @@ const ImageCropper = ({
 
   return (
     <>
-      <div className="flex flex-col items-center max-w-[600px] max-h-[400px] relative bg-sky-300">
+      <div className="flex items-center justify-center w-[600px] h-[400px] bg-gray-500">
         <ReactCrop
           crop={crop}
           onChange={handleCropChange}
           aspect={ASPECT_RATIO}
           keepSelection
         >
-          {/* <img
-            src={imageSrc}
-            alt="Upload"
-            onLoad={onImageLoad}
-            ref={imageRef}
-          /> */}
           <Image
             src={imageSrc}
             alt="Upload"
@@ -83,33 +77,34 @@ const ImageCropper = ({
             ref={imageRef}
             width={FIXED_CROP_WIDTH_SIZE}
             height={FIXED_CROP_HEIGHT_SIZE}
-            className="w-full h-full  min-w-[300px] min-h-[400px] bg-cover"
+            className="w-full h-full bg-cover"
           />
         </ReactCrop>
-        <button
-          className="text-gray-500"
-          onClick={() => {
-            if (crop && imageRef.current && previewCanvasRef.current) {
-              setCanvasPreview(
-                imageRef.current,
-                previewCanvasRef.current,
-                convertToPixelCrop(
-                  crop,
-                  imageRef.current.width,
-                  imageRef.current.height
-                )
-              );
-
-              const dataUrl = previewCanvasRef.current.toDataURL();
-              setDataUrlImageCropper(dataUrl);
-            } else {
-              setError("Please select a crop area first.");
-            }
-          }}
-        >
-          Apply
-        </button>
       </div>
+
+      <button
+        className="text-gray-500"
+        onClick={() => {
+          if (crop && imageRef.current && previewCanvasRef.current) {
+            setCanvasPreview(
+              imageRef.current,
+              previewCanvasRef.current,
+              convertToPixelCrop(
+                crop,
+                imageRef.current.width,
+                imageRef.current.height
+              )
+            );
+
+            const dataUrl = previewCanvasRef.current.toDataURL();
+            setDataUrlImageCropper(dataUrl);
+          } else {
+            setError("Please select a crop area first.");
+          }
+        }}
+      >
+        Apply
+      </button>
       {crop && (
         <canvas
           ref={previewCanvasRef}

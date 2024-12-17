@@ -49,7 +49,7 @@ const InputFile = forwardRef<HTMLInputElement, InputFileProps>(
               height={100}
               alt={data || ""}
               quality={100}
-              className="h-24 w-24 object-cover rounded-sm"
+              className="w-full h-full bg-cover"
             />
           ) : (
             <Image
@@ -58,7 +58,7 @@ const InputFile = forwardRef<HTMLInputElement, InputFileProps>(
               height={100}
               alt={data || ""}
               quality={100}
-              className="h-24 w-24 object-cover rounded-sm"
+              className="h-[300px] w-[200px] object-cover rounded-sm"
             />
           )}
         </div>

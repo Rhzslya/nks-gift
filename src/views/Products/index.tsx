@@ -180,7 +180,7 @@ const ProductsViews = ({ productsData }: any) => {
                 <Image
                   src={product.productImage}
                   alt={product.productName}
-                  className="object-cover rounded-sm w-full h-full"
+                  className="object-cover rounded-sm max-w-[150px] h-full"
                   quality={100}
                   width={300}
                   height={300}

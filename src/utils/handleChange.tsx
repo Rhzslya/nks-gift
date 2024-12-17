@@ -1,4 +1,5 @@
 import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
+import resizeImage from "./resizeImage";
 
 interface HandleChangeParams<T extends Record<string, any>> {
   e: ChangeEvent<HTMLInputElement>;
@@ -205,23 +206,30 @@ export const handleInputFileChange = <T extends Record<string, any>>({
   setSelectedImage(file);
 
   if (file) {
-    const reader = new FileReader();
-    reader.addEventListener("load", () => {
-      const imageUrl = reader.result?.toString() || "";
-      setImageSrc(imageUrl);
+    resizeImage(file, 600, 400)
+      .then((resizedDataUrl) => {
+        setImageSrc(resizedDataUrl);
 
-      setData((prevData) => ({
-        ...prevData,
-        [fieldName]: imageUrl,
-      }));
+        setData((prevData) => ({
+          ...prevData,
+          [fieldName]: resizedDataUrl,
+        }));
 
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        [fieldName]: "",
-      }));
-    });
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          [fieldName]: "",
+        }));
 
-    reader.readAsDataURL(file);
+        if (setIsModified) {
+          setIsModified(true);
+        }
+      })
+      .catch(() => {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          [fieldName]: "Failed to process the image.",
+        }));
+      });
   } else {
     setData((prevData) => ({
       ...prevData,
@@ -232,9 +240,5 @@ export const handleInputFileChange = <T extends Record<string, any>>({
       ...prevErrors,
       [fieldName]: "Please select a valid image file",
     }));
-  }
-
-  if (setIsModified) {
-    setIsModified(true);
   }
 };

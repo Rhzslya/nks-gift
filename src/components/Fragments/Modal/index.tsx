@@ -48,7 +48,7 @@ const Modal = ({
     <AnimatePresence>
       <motion.div
         ref={overlay}
-        className="fixed inset-0 z-50 bg-black/60  flex justify-center items-center"
+        className="fixed  inset-0 z-50 bg-black/60  flex justify-center items-center"
         onClick={close}
         initial={{ opacity: 0 }}
         animate={{ opacity: isClosing ? 0 : 1 }} // Animate the overlay fade out

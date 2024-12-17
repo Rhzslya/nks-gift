@@ -203,7 +203,7 @@ export const validationAddProduct = (product: Product) => {
   });
 
   // Validasi Price
-  const cleanedPrice = product.price.toString().trim().replace(/\./g, ""); // Menghapus titik sebagai pemisah ribuan
+  const cleanedPrice = product.price.toString().trim().replace(/\./g, "");
 
   if (!cleanedPrice || isNaN(Number(cleanedPrice))) {
     errors.price = "Price is required and must be a number";
