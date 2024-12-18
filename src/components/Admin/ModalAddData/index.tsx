@@ -17,6 +17,7 @@ import { ProductCategories } from "@/utils/ProductCategories";
 import ImageCropper from "@/utils/ImageCropper";
 import { convertDataUrlToFile } from "@/utils/convertDataUrlToFile";
 import { motion, AnimatePresence } from "framer-motion";
+import MessageFromAPI from "@/components/Form/MessageFromAPI";
 interface Product {
   productImage: string;
   productName: string;
@@ -62,7 +63,7 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [imageSrc, setImageSrc] = useState("");
-  const [isCropped, setIsCropped] = useState<boolean>(false); // Untuk mendeteksi apakah gambar sudah dipotong
+  const [isCropped, setIsCropped] = useState<boolean>(false);
   const [dataUrlCropperImage, setDataUrlCropperImage] = useState("");
 
   const handleAddStockField = () => {
@@ -175,6 +176,9 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
     }
   }, [message]);
 
+  console.log(selectedImage);
+  console.log(dataUrlCropperImage);
+
   return (
     <>
       <AnimatePresence>
@@ -194,6 +198,7 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
               </div>
               <form onSubmit={handleSubmit}>
                 <div className="flex flex-col justify-center items-center gap-2 flex-grow mb-4">
+                  <MessageFromAPI message={message} />
                   <InputFile
                     id="product_image"
                     htmlfor="product_image"
@@ -209,6 +214,7 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
                         setSelectedImage,
                         fieldName: "productImage",
                         setImageSrc,
+                        setDataUrlCropperImage,
                       })
                     }
                     selectedImage={selectedImage}

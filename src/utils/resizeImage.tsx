@@ -11,29 +11,42 @@ const resizeImage = (
       const ctx = canvas.getContext("2d");
       if (!ctx) return reject("Canvas context not supported");
 
-      // Ukuran asli gambar
       const originalWidth = img.width;
       const originalHeight = img.height;
 
-      // Hitung scaling dinamis
       const scale = Math.min(
         maxWidth / originalWidth,
         maxHeight / originalHeight,
-        1 // Scale tidak melebihi 1
+        1
       );
 
-      // Tentukan ukuran akhir gambar setelah scaling
-      const finalWidth = Math.round(originalWidth * scale);
-      const finalHeight = Math.round(originalHeight * scale);
+      let finalWidth = Math.round(originalWidth * scale);
+      let finalHeight = Math.round(originalHeight * scale);
 
-      // Set canvas dan gambar
+      if (finalWidth < 150 || finalHeight < 200) {
+        const widthDiff = 150 - finalWidth > 0 ? 150 - finalWidth : 0;
+        const heightDiff = 200 - finalHeight > 0 ? 200 - finalHeight : 0;
+
+        if (widthDiff > 0) {
+          const proportion = widthDiff / finalWidth;
+          finalHeight += Math.round(finalHeight * proportion);
+          finalWidth = 150;
+        }
+
+        if (heightDiff > 0) {
+          const proportion = heightDiff / finalHeight;
+          finalWidth += Math.round(finalWidth * proportion);
+          finalHeight = 200;
+        }
+      }
+
       canvas.width = finalWidth;
       canvas.height = finalHeight;
       ctx.drawImage(img, 0, 0, finalWidth, finalHeight);
 
       resolve(canvas.toDataURL());
     };
-    img.onerror = reject;
+    img.onerror = (err) => reject(`Failed to load image. Error: ${err}`);
   });
 };
 

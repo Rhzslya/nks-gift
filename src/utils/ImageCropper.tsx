@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ReactCrop, { convertToPixelCrop, Crop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 import setCanvasPreview from "./setCanvasPreview";
@@ -25,7 +25,6 @@ const ImageCropper = ({
     x: 0,
     y: 0,
   });
-  const [error, setError] = useState<string>("");
 
   // Berikan tipe yang sesuai untuk imageRef dan previewCanvasRef
   const imageRef = useRef<HTMLImageElement | null>(null);
@@ -34,7 +33,6 @@ const ImageCropper = ({
   const onImageLoad = (e: any) => {
     const { width, height, naturalWidth, naturalHeight } = e.currentTarget;
     if (naturalWidth < MIN_DIMENSION || naturalHeight < MIN_DIMENSION) {
-      setError("Image Must be at least 150 x 150 pixels.");
       setImageSrc("");
       return;
     }
@@ -42,22 +40,33 @@ const ImageCropper = ({
       unit: "px", // Tipe unit harus "px"
       width: FIXED_CROP_WIDTH_SIZE,
       height: FIXED_CROP_HEIGHT_SIZE,
-      x: (width - FIXED_CROP_WIDTH_SIZE) / 2, // Memusatkan crop
-      y: (height - FIXED_CROP_HEIGHT_SIZE) / 2, // Memusatkan crop
+      x: (width - FIXED_CROP_WIDTH_SIZE) / 2,
+      y: (height - FIXED_CROP_HEIGHT_SIZE) / 2,
     };
     setCrop(initialCrop);
   };
 
   const handleCropChange = (newCrop: Crop) => {
-    if (newCrop.width && newCrop.height) {
-      if (
-        newCrop.width !== FIXED_CROP_WIDTH_SIZE ||
-        newCrop.height !== FIXED_CROP_HEIGHT_SIZE
-      ) {
-        newCrop.width = FIXED_CROP_WIDTH_SIZE;
-        newCrop.height = FIXED_CROP_HEIGHT_SIZE;
+    newCrop.width = FIXED_CROP_WIDTH_SIZE;
+    newCrop.height = FIXED_CROP_HEIGHT_SIZE;
+
+    if (imageRef.current) {
+      const { naturalWidth, naturalHeight } = imageRef.current;
+
+      if (newCrop.x + newCrop.width > naturalWidth) {
+        newCrop.x = naturalWidth - newCrop.width;
+      }
+      if (newCrop.y + newCrop.height > naturalHeight) {
+        newCrop.y = naturalHeight - newCrop.height;
+      }
+      if (newCrop.x < 0) {
+        newCrop.x = 0;
+      }
+      if (newCrop.y < 0) {
+        newCrop.y = 0;
       }
     }
+
     setCrop(newCrop);
   };
 
@@ -98,13 +107,12 @@ const ImageCropper = ({
 
             const dataUrl = previewCanvasRef.current.toDataURL();
             setDataUrlImageCropper(dataUrl);
-          } else {
-            setError("Please select a crop area first.");
           }
         }}
       >
         Apply
       </button>
+
       {crop && (
         <canvas
           ref={previewCanvasRef}

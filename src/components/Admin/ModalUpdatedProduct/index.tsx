@@ -228,7 +228,7 @@ const ModalUpdatedProduct = ({
                   setErrors,
                   setSelectedImage,
                   fieldName: "productImage",
-                  setImageSrc, // Field yang di-update
+                  setImageSrc,
                 })
               }
               selectedImage={selectedImage}

@@ -193,6 +193,7 @@ export const handleInputFileChange = <T extends Record<string, any>>({
   setSelectedImage,
   fieldName,
   setImageSrc,
+  setDataUrlCropperImage,
 }: {
   e: React.ChangeEvent<HTMLInputElement>;
   setData: React.Dispatch<React.SetStateAction<T>>;
@@ -201,10 +202,11 @@ export const handleInputFileChange = <T extends Record<string, any>>({
   setSelectedImage: React.Dispatch<React.SetStateAction<File | null>>;
   fieldName: string;
   setImageSrc: React.Dispatch<React.SetStateAction<string>>;
+  setDataUrlCropperImage?: any;
 }) => {
   const file = e.target.files?.[0] || null;
   setSelectedImage(file);
-
+  setDataUrlCropperImage("");
   if (file) {
     resizeImage(file, 200, 250)
       .then((resizedDataUrl) => {
