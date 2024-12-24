@@ -107,7 +107,7 @@ const SearchViews: React.FC<SearchViewsProps> = ({ path }) => {
         {products.length > 0 ? (
           products.map((product) => (
             <Link
-              href={`${product.category[0]}/${product.productId}`}
+              href={`${product.category}/${product.productId}`}
               key={product._id}
               className="product-item flex flex-col border p-4 rounded-lg shadow-lg"
             >

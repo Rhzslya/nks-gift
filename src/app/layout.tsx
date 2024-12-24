@@ -3,7 +3,6 @@ import { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Fragments/Navbar";
-import { disableNavAndFooter } from "@/utils/Hide";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 // import Footer from "@/components/Footer/Footer";

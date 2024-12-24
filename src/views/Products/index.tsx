@@ -13,7 +13,7 @@ import { productPageSortOptions } from "@/utils/SortOptions";
 
 const ProductsViews = ({ productsData }: any) => {
   const path = usePathname();
-  const router = useRouter(); // Inisialisasi router
+  const router = useRouter();
   const [sortBy, setSortBy] = useState("sold");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -168,7 +168,7 @@ const ProductsViews = ({ productsData }: any) => {
         </div>
       </div>
 
-      <div className="product-list grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-4 p-4">
+      <div className="product-list grid grid-cols-1 sm:grid-cols-2 md:grid-cols-[repeat(auto-fit,_minmax(auto,_150px))] gap-4 p-4">
         {sortedProducts.length > 0 ? (
           sortedProducts.map((product: any) => (
             <Link
@@ -176,14 +176,14 @@ const ProductsViews = ({ productsData }: any) => {
               key={product._id}
               className="product-item flex flex-col border p-2 rounded-lg shadow-lg"
             >
-              <div className="relative w-full h-[48] mb-4">
+              <div className="relative w-full mb-4">
                 <Image
                   src={product.productImage}
                   alt={product.productName}
-                  className="object-cover rounded-sm max-w-full h-full"
+                  className="object-cover rounded-sm "
                   quality={100}
-                  width={200}
-                  height={250}
+                  width={150}
+                  height={200}
                   priority
                 />
               </div>

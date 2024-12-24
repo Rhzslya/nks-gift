@@ -169,16 +169,15 @@ const ProductCategoryViews: React.FC<ProductCategoryViewsProps> = ({
             <Link
               href={`${product.category[0]}/${product.productId}`}
               key={product._id}
-              className="product-item flex flex-col border p-4 rounded-lg shadow-lg"
+              className="product-item  flex flex-col border p-4 rounded-lg shadow-lg"
             >
-              <div className="relative w-full h-48 mb-4">
+              <div className="relative w-full h-full">
                 <Image
                   src={product.productImage}
                   alt={product.productName}
                   className="object-cover rounded-lg w-full h-full"
                   quality={100}
-                  width={300}
-                  height={300}
+                  layout="fill"
                   priority
                 />
               </div>

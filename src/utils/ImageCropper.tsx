@@ -13,10 +13,12 @@ const ImageCropper = ({
   imageSrc,
   setImageSrc,
   setDataUrlImageCropper,
+  setSelectedImage,
 }: {
   imageSrc: string;
   setImageSrc: (value: string) => void;
   setDataUrlImageCropper: (value: string) => void;
+  setSelectedImage: (value: File | null) => void;
 }) => {
   const [crop, setCrop] = useState<Crop | undefined>({
     unit: "px",
@@ -70,8 +72,18 @@ const ImageCropper = ({
     setCrop(newCrop);
   };
 
+  const handleCancel = () => {
+    if (imageSrc != "") {
+      setImageSrc("");
+      setSelectedImage(null);
+    }
+  };
+
   return (
     <>
+      <div className="title text-gray-500 p-2">
+        <h1 className="font-semibold">Crop Image</h1>
+      </div>
       <div className="flex items-center justify-center w-[600px] h-[400px] bg-gray-500">
         <ReactCrop
           crop={crop}
@@ -90,28 +102,32 @@ const ImageCropper = ({
           />
         </ReactCrop>
       </div>
+      <div className="button-container flex p-2 items-center">
+        <button onClick={handleCancel} className="text-gray-500">
+          Cancel
+        </button>
+        <button
+          className="text-gray-white text-sm ml-auto bg-sky-300 py-1 px-2 rounded-sm"
+          onClick={() => {
+            if (crop && imageRef.current && previewCanvasRef.current) {
+              setCanvasPreview(
+                imageRef.current,
+                previewCanvasRef.current,
+                convertToPixelCrop(
+                  crop,
+                  imageRef.current.width,
+                  imageRef.current.height
+                )
+              );
 
-      <button
-        className="text-gray-500"
-        onClick={() => {
-          if (crop && imageRef.current && previewCanvasRef.current) {
-            setCanvasPreview(
-              imageRef.current,
-              previewCanvasRef.current,
-              convertToPixelCrop(
-                crop,
-                imageRef.current.width,
-                imageRef.current.height
-              )
-            );
-
-            const dataUrl = previewCanvasRef.current.toDataURL();
-            setDataUrlImageCropper(dataUrl);
-          }
-        }}
-      >
-        Apply
-      </button>
+              const dataUrl = previewCanvasRef.current.toDataURL();
+              setDataUrlImageCropper(dataUrl);
+            }
+          }}
+        >
+          Apply
+        </button>
+      </div>
 
       {crop && (
         <canvas

@@ -41,7 +41,7 @@ const InputFile = forwardRef<HTMLInputElement, InputFileProps>(
         <div>
           <h3 className="text-sm font-medium text-gray-600">{title}</h3>
         </div>
-        <div className="flex items-center bg-gray-100 p-2 rounded-sm">
+        <div className="flex items-center bg-gray-100 p-2 rounded-sm h-[200px] w-[150px] ">
           {data ? (
             <Image
               src={data}
@@ -53,12 +53,12 @@ const InputFile = forwardRef<HTMLInputElement, InputFileProps>(
             />
           ) : (
             <Image
-              src={"/default.jpg"}
+              src={"/product-dummy.png"}
               width={100}
               height={100}
               alt={data || ""}
               quality={100}
-              className="h-[250px] w-[200px] object-cover rounded-sm"
+              className="object-cover rounded-sm w-full h-full"
             />
           )}
         </div>

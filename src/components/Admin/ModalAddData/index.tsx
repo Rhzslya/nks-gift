@@ -188,6 +188,7 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
               imageSrc={imageSrc}
               setImageSrc={setImageSrc}
               setDataUrlImageCropper={setDataUrlCropperImage}
+              setSelectedImage={setSelectedImage}
             />
           </Modal>
         ) : (
