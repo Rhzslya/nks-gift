@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { ActionMenu } from "../../ActionMenu";
@@ -52,49 +52,70 @@ const TableRow: React.FC<TableRowProps> = ({
     orange: "bg-orange-200",
   };
 
-  // Function to render stock variants and quantity
-  // Function to render stock variants and quantity
-  const renderStock = (item: any) => (
-    <React.Fragment key={item._id}>
-      <td className="px-4 py-2 text-center text-xs font-medium tracking-wider">
-        {Array.isArray(item.stock) && item.stock.length > 0 ? (
-          item.stock.map(
-            (
-              stockItem: { variant: string; quantity: string },
-              index: number
-            ) => (
-              <div
-                key={`${item._id}-${stockItem.variant}-${index}`}
-                className="px-2 py-1"
-              >
-                {stockItem.variant || "-"}
-              </div>
-            )
-          )
-        ) : (
-          <div className="text-center">No stock data available</div>
-        )}
-      </td>
-      <td className="px-4 py-2 text-center text-xs font-medium tracking-wider">
-        {Array.isArray(item.stock) && item.stock.length > 0 ? (
-          item.stock.map(
-            (
-              stockItem: { variant: string; quantity: string },
-              index: number
-            ) => (
-              <div key={`${item._id}-quantity-${index}`} className="px-2 py-1">
-                {stockItem.quantity || "-"}
-              </div>
-            )
-          )
-        ) : (
-          <div className="text-center">No stock data available</div>
-        )}
-      </td>
-    </React.Fragment>
-  );
+  const [selectedVariants, setSelectedVariants] = useState<{
+    [key: string]: string;
+  }>({});
 
-  // Function to render table cells based on the header key
+  useEffect(() => {
+    const defaultVariants: { [key: string]: string } = {};
+    paginatedItems.forEach((item) => {
+      if (Array.isArray(item.stock) && item.stock.length > 0) {
+        defaultVariants[item._id] = item.stock[0].variant;
+      }
+    });
+    setSelectedVariants(defaultVariants);
+  }, [paginatedItems]);
+
+  const handleVariantChange = (itemId: string, variant: string) => {
+    setSelectedVariants((prev) => ({ ...prev, [itemId]: variant }));
+  };
+
+  const renderStock = (item: any) => {
+    const selectedVariant = selectedVariants[item._id];
+    const stockItem =
+      Array.isArray(item.stock) && selectedVariant
+        ? item.stock.find((s: any) => s.variant === selectedVariant)
+        : null;
+
+    return (
+      <React.Fragment key={item._id}>
+        <td className="px-4 py-2 text-center  text-xs font-medium tracking-wider">
+          {Array.isArray(item.stock) && item.stock.length > 0 ? (
+            item.stock.length === 1 ? (
+              <div className="px-2 py-1">{item.stock[0].variant || "-"}</div>
+            ) : (
+              <select
+                className="border rounded px-2 py-1 cursor-pointer border-none outline-none"
+                value={selectedVariant || ""}
+                onChange={(e) => handleVariantChange(item._id, e.target.value)}
+              >
+                {item.stock.map(
+                  (stockItem: { variant: string }, index: number) => (
+                    <option
+                      key={`${item._id}-${index}`}
+                      value={stockItem.variant}
+                    >
+                      {stockItem.variant}
+                    </option>
+                  )
+                )}
+              </select>
+            )
+          ) : (
+            <div className="text-center">-</div>
+          )}
+        </td>
+        <td className="px-4 py-2 text-center text-xs font-medium tracking-wider">
+          {stockItem ? (
+            <div className="px-2 py-1">{stockItem.quantity || "-"}</div>
+          ) : (
+            <div className="text-center">-</div>
+          )}
+        </td>
+      </React.Fragment>
+    );
+  };
+
   const renderCellContent = (item: any, headerKey: string) => {
     if (headerKey === "stock") {
       return renderStock(item);

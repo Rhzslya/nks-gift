@@ -41,7 +41,7 @@ const InputFile = forwardRef<HTMLInputElement, InputFileProps>(
         <div>
           <h3 className="text-sm font-medium text-gray-600">{title}</h3>
         </div>
-        <div className="flex items-center bg-gray-100 p-2 rounded-sm h-[200px] w-[150px] ">
+        <div className="flex items-center bg-gray-100 p-2 rounded-sm h-[200px] w-[200px] ">
           {data ? (
             <Image
               src={data}
@@ -101,7 +101,7 @@ const InputFile = forwardRef<HTMLInputElement, InputFileProps>(
                   </small>
                   <small className="">
                     For best results, use a clear image with a minimum
-                    resolution of 300x300 pixels.
+                    resolution of 200x200 pixels.
                   </small>
                 </div>
               </>

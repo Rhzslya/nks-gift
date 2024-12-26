@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import ReactCrop, { convertToPixelCrop, Crop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 import setCanvasPreview from "./setCanvasPreview";
@@ -6,7 +6,7 @@ import Image from "next/image";
 
 const ASPECT_RATIO = 1;
 const MIN_DIMENSION = 150;
-const FIXED_CROP_WIDTH_SIZE = 150;
+const FIXED_CROP_WIDTH_SIZE = 200;
 const FIXED_CROP_HEIGHT_SIZE = 200;
 
 const ImageCropper = ({
@@ -39,7 +39,7 @@ const ImageCropper = ({
       return;
     }
     const initialCrop: Crop = {
-      unit: "px", // Tipe unit harus "px"
+      unit: "px",
       width: FIXED_CROP_WIDTH_SIZE,
       height: FIXED_CROP_HEIGHT_SIZE,
       x: (width - FIXED_CROP_WIDTH_SIZE) / 2,
@@ -84,7 +84,7 @@ const ImageCropper = ({
       <div className="title text-gray-500 p-2">
         <h1 className="font-semibold">Crop Image</h1>
       </div>
-      <div className="flex items-center justify-center w-[600px] h-[400px] bg-gray-500">
+      <div className="flex items-center justify-center w-[600px] h-[400px]  bg-gray-300">
         <ReactCrop
           crop={crop}
           onChange={handleCropChange}

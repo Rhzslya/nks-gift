@@ -282,7 +282,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
     (product) =>
       product.productName.toLowerCase().startsWith(searchQuery.toLowerCase()) ||
       product.productId.toLowerCase().startsWith(searchQuery.toLowerCase()) ||
-      product.category.toLowerCase().startsWith(searchQuery.toLowerCase())
+      product.category[0].toLowerCase().startsWith(searchQuery.toLowerCase())
   );
 
   const paginatedUsers = filteredProducts.slice(

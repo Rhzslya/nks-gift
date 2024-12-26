@@ -176,9 +176,6 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
     }
   }, [message]);
 
-  console.log(selectedImage);
-  console.log(dataUrlCropperImage);
-
   return (
     <>
       <AnimatePresence>

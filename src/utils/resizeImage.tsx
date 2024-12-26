@@ -23,14 +23,14 @@ const resizeImage = (
       let finalWidth = Math.round(originalWidth * scale);
       let finalHeight = Math.round(originalHeight * scale);
 
-      if (finalWidth < 150 || finalHeight < 200) {
-        const widthDiff = 150 - finalWidth > 0 ? 150 - finalWidth : 0;
+      if (finalWidth < 200 || finalHeight < 200) {
+        const widthDiff = 200 - finalWidth > 0 ? 200 - finalWidth : 0;
         const heightDiff = 200 - finalHeight > 0 ? 200 - finalHeight : 0;
 
         if (widthDiff > 0) {
           const proportion = widthDiff / finalWidth;
           finalHeight += Math.round(finalHeight * proportion);
-          finalWidth = 150;
+          finalWidth = 200;
         }
 
         if (heightDiff > 0) {
