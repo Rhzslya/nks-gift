@@ -52,7 +52,6 @@ const Table: React.FC<TableProps> = ({
     orange: "bg-orange-200",
   };
 
-  // Function to map the header key to the appropriate data field
   const getItemField = (item: any, key: string) => {
     const fieldMap: { [key: string]: any } = {
       productName: capitalizeFirst(item.productName || ""),
@@ -65,7 +64,7 @@ const Table: React.FC<TableProps> = ({
       username: capitalizeFirst(item.username || ""),
       email: item.email,
       userId: item.userId,
-      type: item.type ? capitalizeFirst(item.type.join(", ")) : "", // Check if item.type is defined and is an array
+      type: item.type ? capitalizeFirst(item.type.join(", ")) : "",
       accessLevel: capitalizeFirst(item.role || ""),
       verifiedStatus: (
         <span className={item.isVerified ? "text-green-500" : "text-red-500"}>
@@ -79,7 +78,7 @@ const Table: React.FC<TableProps> = ({
               month: "2-digit",
               day: "2-digit",
             })
-            .replace(/\//g, "-") // Mengganti '/' dengan '-'
+            .replace(/\//g, "-")
         : "",
       deletedAt: item.deletedAt
         ? new Date(item.deletedAt)
@@ -88,10 +87,10 @@ const Table: React.FC<TableProps> = ({
               month: "2-digit",
               day: "2-digit",
             })
-            .replace(/\//g, "-") // Mengganti '/' dengan '-'
+            .replace(/\//g, "-")
         : "",
     };
-    return fieldMap[key] || null; // Return null if no mapping exists
+    return fieldMap[key] || null;
   };
 
   const hasStockHeader = tableHeaders.some((header) => header.key === "stock");

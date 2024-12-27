@@ -31,7 +31,7 @@ interface ProductErrors {
   productName?: string;
   price?: string;
   stock?: { variant?: string; quantity?: string }[];
-  [key: string]: any; // Optional: Jika kamu ingin memperluas secara dinamis
+  [key: string]: any;
 }
 
 const ModalUpdatedProduct = ({
@@ -41,7 +41,7 @@ const ModalUpdatedProduct = ({
   setProductsData,
 }: any) => {
   const [message, setMessage] = useState("");
-  const [rawPrice, setRawPrice] = useState(isUpdatedProduct.price); // Initialize raw price from product price
+  const [rawPrice, setRawPrice] = useState(isUpdatedProduct.price);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isModified, setIsModified] = useState(false);
@@ -56,7 +56,6 @@ const ModalUpdatedProduct = ({
   });
   const [errors, setErrors] = useState<ProductErrors>({});
 
-  // Cek apakah ada perubahan pada updatedProduct
   useEffect(() => {
     const isChanged =
       JSON.stringify(updatedProduct) !==
@@ -71,7 +70,6 @@ const ModalUpdatedProduct = ({
   }, [updatedProduct, isUpdatedProduct]);
 
   const handleAddStockField = () => {
-    // Cek apakah semua stock item sudah memiliki nilai untuk variant dan quantity
     const allFieldsFilled = updatedProduct.stock.every(
       (stockItem) => stockItem.variant !== "" && stockItem.quantity !== ""
     );
@@ -113,8 +111,8 @@ const ModalUpdatedProduct = ({
     }
   }, [message]);
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // Mencegah refresh halaman
-    setIsLoading("submit-edit-product"); // Menampilkan loading saat proses berjalan
+    e.preventDefault();
+    setIsLoading("submit-edit-product");
 
     const updatedStock = updatedProduct.stock.map((stockItem) => ({
       ...stockItem,
@@ -122,23 +120,21 @@ const ModalUpdatedProduct = ({
     }));
     const validationErrors = validationAddProduct({
       ...updatedProduct,
-      stock: updatedStock, // Pass stock with string quantities for validation
+      stock: updatedStock,
     });
     setErrors(validationErrors);
     try {
       if (Object.keys(validationErrors).length === 0) {
-        let productImage = updatedProduct.productImage; // Inisialisasi gambar produk
+        let productImage = updatedProduct.productImage;
 
-        // Jika ada gambar baru yang dipilih, upload dan dapatkan URL baru
         if (selectedImage) {
-          // Pengecekan ukuran file, jika lebih dari 1MB
           if (selectedImage.size >= 1048576) {
             setErrors((prevErrors) => ({
               ...prevErrors,
               productImage: "Image size must be less than 1MB",
             }));
-            setIsLoading(""); // Sembunyikan loading karena ada error
-            return; // Hentikan proses jika file terlalu besar
+            setIsLoading("");
+            return;
           }
 
           const newImageURL = await uploadProductImage(
@@ -155,11 +151,10 @@ const ModalUpdatedProduct = ({
         const stock = updatedProduct.stock.map(
           (item: { variant: string; quantity: string }) => ({
             variant: item.variant,
-            quantity: parseInt(item.quantity), // Parsing kuantitas di frontend
+            quantity: parseInt(item.quantity),
           })
         );
 
-        // Kirim permintaan untuk mengupdate produk
         const response = await fetch(`/api/products`, {
           headers: {
             "Content-Type": "application/json",
@@ -171,15 +166,14 @@ const ModalUpdatedProduct = ({
             data: {
               ...updatedProduct,
               productImage,
-              stock, // Gambar produk (baru atau lama)
-              price: Number(rawPrice), // Harga produk yang diubah menjadi angka
+              stock,
+              price: Number(rawPrice),
             },
           }),
         });
 
         const data = await response.json();
 
-        // Jika berhasil, update data produk di tampilan
         if (response.ok) {
           setMessage(data.message);
           setProductsData((prevData: Product[]) =>
@@ -198,12 +192,13 @@ const ModalUpdatedProduct = ({
         }
       }
     } catch (error) {
-      console.error(error); // Tangani error jika ada
+      console.error(error);
     } finally {
-      setIsLoading(""); // Sembunyikan loading setelah proses selesai
+      setIsLoading("");
     }
   };
 
+  console.log(updatedProduct.stock);
   return (
     <Modal onClose={handleCloseModal}>
       <div className="w-[500px]  overflow-y-auto max-h-[550px] text-black">

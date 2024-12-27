@@ -57,13 +57,23 @@ const TableRow: React.FC<TableRowProps> = ({
   }>({});
 
   useEffect(() => {
-    const defaultVariants: { [key: string]: string } = {};
-    paginatedItems.forEach((item) => {
-      if (Array.isArray(item.stock) && item.stock.length > 0) {
-        defaultVariants[item._id] = item.stock[0].variant;
-      }
+    setSelectedVariants((prev) => {
+      const updatedVariants = { ...prev };
+      paginatedItems.forEach((item) => {
+        if (Array.isArray(item.stock) && item.stock.length > 0) {
+          if (
+            !item.stock.find(
+              (s: any) => s.variant === updatedVariants[item._id]
+            )
+          ) {
+            updatedVariants[item._id] = item.stock[0].variant;
+          }
+        } else {
+          delete updatedVariants[item._id];
+        }
+      });
+      return updatedVariants;
     });
-    setSelectedVariants(defaultVariants);
   }, [paginatedItems]);
 
   const handleVariantChange = (itemId: string, variant: string) => {
@@ -75,7 +85,7 @@ const TableRow: React.FC<TableRowProps> = ({
     const stockItem =
       Array.isArray(item.stock) && selectedVariant
         ? item.stock.find((s: any) => s.variant === selectedVariant)
-        : null;
+        : item.stock[0];
 
     return (
       <React.Fragment key={item._id}>
@@ -109,7 +119,7 @@ const TableRow: React.FC<TableRowProps> = ({
           {stockItem ? (
             <div className="px-2 py-1">{stockItem.quantity || "-"}</div>
           ) : (
-            <div className="text-center">-</div>
+            <div className="text-center">{stockItem?.quantity[0]}</div>
           )}
         </td>
       </React.Fragment>

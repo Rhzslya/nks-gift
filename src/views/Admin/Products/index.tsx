@@ -76,11 +76,6 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   const isViewDetailsProduct = productsData?.find(
     (product) => product._id === modalViewDetailsProduct
   );
-  // const isArchivedProduct = productsData?.find(
-  //   (product) => product._id === modalDeletePermanentlyProduct
-  // );
-
-  // Gunakan isUpdatedProduct dan isArchivedProduct di tempat lain dalam kode Anda
 
   const [clickedButtonId, setClickedButtonId] = useState<string | null>(null);
   const menuSettingRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
@@ -91,8 +86,8 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   const filterButtonRef = useRef<HTMLButtonElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const dropdownButtonRef = useRef<HTMLDivElement | null>(null);
-  const [addData, setAddData] = useState(true);
   const [modalShowAddData, setShowModalAddData] = useState(false);
+
   // Always Update Data
   useEffect(() => {
     setProductsData(products);
@@ -237,13 +232,6 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
     setCurrentPage(1);
   };
 
-  // const roleOrder: RoleOrder = {
-  //   user: 3,
-  //   manager: 2,
-  //   admin: 1,
-  //   super_admin: 0,
-  // };
-
   const sortedProducts = Array.isArray(productsData)
     ? [...productsData].sort((a, b) => {
         if (sortBy === "productName") {
@@ -269,9 +257,9 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
             typeof b.price === "string" ? parseFloat(b.price) : b.price;
 
           if (sortOrder === "asc") {
-            return priceA - priceB; // Mengurutkan berdasarkan price secara ascending
+            return priceA - priceB;
           } else if (sortOrder === "desc") {
-            return priceB - priceA; // Mengurutkan berdasarkan price secara descending
+            return priceB - priceA;
           }
         }
         return 0;
