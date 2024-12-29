@@ -5,13 +5,16 @@ import MessageFromAPI from "@/components/Form/MessageFromAPI";
 import Modal from "@/components/Fragments/Modal";
 import { uploadProductImage } from "@/lib/firebase/services";
 import { capitalizeFirst } from "@/utils/Capitalize";
+import { convertDataUrlToFile } from "@/utils/convertDataUrlToFile";
 import {
   handleChange,
   handleInputFileChange,
   handlePriceChange,
   handleStockChange,
 } from "@/utils/handleChange";
+import ImageCropper from "@/utils/ImageCropper";
 import { validationAddProduct } from "@/utils/Validations";
+import { AnimatePresence } from "framer-motion";
 import React, { useEffect, useRef, useState } from "react";
 
 interface Product {
@@ -48,6 +51,8 @@ const ModalUpdatedProduct = ({
   const [isLoading, setIsLoading] = useState("");
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [imageSrc, setImageSrc] = useState("");
+  const [dataUrlCropperImage, setDataUrlCropperImage] = useState("");
+
   const [updatedProduct, setUpdatedProduct] = useState<Product>({
     ...isUpdatedProduct,
     price: new Intl.NumberFormat("id-ID").format(
@@ -125,21 +130,17 @@ const ModalUpdatedProduct = ({
     setErrors(validationErrors);
     try {
       if (Object.keys(validationErrors).length === 0) {
-        let productImage = updatedProduct.productImage;
+        let productImage = dataUrlCropperImage;
 
-        if (selectedImage) {
-          if (selectedImage.size >= 1048576) {
-            setErrors((prevErrors) => ({
-              ...prevErrors,
-              productImage: "Image size must be less than 1MB",
-            }));
-            setIsLoading("");
-            return;
-          }
+        if (dataUrlCropperImage) {
+          const imageToUpload = convertDataUrlToFile(
+            dataUrlCropperImage,
+            "cropped-image.jpg"
+          );
 
           const newImageURL = await uploadProductImage(
             updatedProduct._id,
-            selectedImage,
+            imageToUpload,
             setUploadProgress
           );
           if (newImageURL && typeof newImageURL === "string") {
@@ -147,7 +148,6 @@ const ModalUpdatedProduct = ({
           }
         }
 
-        // Parsing stock sebelum dikirim ke backend
         const stock = updatedProduct.stock.map(
           (item: { variant: string; quantity: string }) => ({
             variant: item.variant,
@@ -198,179 +198,196 @@ const ModalUpdatedProduct = ({
     }
   };
 
-  console.log(updatedProduct.stock);
   return (
-    <Modal onClose={handleCloseModal}>
-      <div className="w-[500px]  overflow-y-auto max-h-[550px] text-black">
-        <div className="text-xl font-bold text-center mb-4">
-          <h3>Edit Product</h3>
-        </div>
-        <form onSubmit={handleSubmit}>
-          <MessageFromAPI message={message} />
-
-          <div className="flex flex-col justify-center items-center gap-2 flex-grow mb-4">
-            <InputFile
-              id="product_image"
-              htmlfor="product_image"
-              title="Product Image"
-              text="Click to Upload Product Image"
-              data={updatedProduct.productImage}
-              error={errors.productImage}
-              handleChange={(e) =>
-                handleInputFileChange({
-                  e,
-                  setData: setUpdatedProduct,
-                  setErrors,
-                  setSelectedImage,
-                  fieldName: "productImage",
-                  setImageSrc,
-                })
-              }
-              selectedImage={selectedImage}
-              handleClickLabel={handleClickLabel}
-              ref={fileInputRef}
-            />
-          </div>
-          <div className="flex flex-col mb-4">
-            <LabelAndInput
-              id="productName"
-              type="text"
-              name="productName"
-              text="Product Name"
-              value={updatedProduct.productName}
-              // disabled
-              handleChange={(e) =>
-                handleChange({
-                  e,
-                  setData: setUpdatedProduct,
-                  setErrors,
-                })
-              }
-              textStyle="text-xs font-medium"
-              error={errors.productName}
-            />
-          </div>
-          <div className="flex flex-col mb-4">
-            <LabelAndInput
-              id="productId"
-              type="text"
-              name="productId"
-              text="Product ID"
-              value={updatedProduct.productId}
-              disabled
-              textStyle="text-xs font-medium"
-            />
-          </div>
-          <div className="flex flex-col mb-4">
-            <LabelAndInput
-              id="category"
-              type="text"
-              name="category"
-              text="Category"
-              value={capitalizeFirst(updatedProduct.category[0])}
-              disabled
-              textStyle="text-xs font-medium"
-            />
-          </div>
-          <div className="flex flex-col text-md">
-            <h2 className="text-base font-medium">Stock</h2>
-            {updatedProduct.stock.map((stockItem, index) => (
-              <div key={index} className="relative flex gap-2 mb-4">
-                <div className="w-full flex flex-col text-md p-">
-                  <LabelAndInput
-                    id={`variant-${index}`}
-                    type="text"
-                    name={`stock[${index}].variant`}
-                    text="variant"
-                    value={stockItem.variant}
-                    textStyle="text-xs font-medium"
-                    handleChange={(e) =>
-                      handleStockChange({
-                        index,
-                        field: "variant",
-                        value: e.target.value,
-                        setData: setUpdatedProduct,
-                        setErrors: setErrors,
-                      })
-                    }
-                    padding="p-[6px]"
-                    placeholder="Variant"
-                    error={errors?.[`stock[${index}].variant`]}
-                  />
-                </div>
-                <div className="w-full flex flex-col text-md">
-                  <LabelAndInput
-                    id={`quantity-${index}`}
-                    type="number"
-                    name={`stock[${index}].quantity`}
-                    text="quantity"
-                    value={stockItem.quantity}
-                    textStyle="text-xs font-medium"
-                    handleChange={(e) =>
-                      handleStockChange({
-                        index,
-                        field: "quantity",
-                        value: e.target.value,
-                        setData: setUpdatedProduct,
-                        setErrors: setErrors,
-                      })
-                    }
-                    padding="p-[6px]"
-                    placeholder="Quantity"
-                    error={errors?.[`stock[${index}].quantity`]}
-                  />
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleDeleteStock(index)}
-                  className="mt-auto text-[20px] text-red-500 hover:text-red-400 duration-300"
-                >
-                  <i className="bx bxs-trash"></i>
-                </button>
-              </div>
-            ))}
-            <div className="fle items-center ml-auto">
-              <button
-                type="button"
-                className="w-fit flex justify-center items-center"
-                onClick={handleAddStockField}
-              >
-                <i className="bx bxs-plus-circle text-gray-500 text-[20px]"></i>
-              </button>
+    <AnimatePresence>
+      {imageSrc && !dataUrlCropperImage ? (
+        <Modal key="image-cropper" onClose={handleCloseModal}>
+          <ImageCropper
+            imageSrc={imageSrc}
+            setImageSrc={setImageSrc}
+            setDataUrlImageCropper={setDataUrlCropperImage}
+            setSelectedImage={setSelectedImage}
+          />
+        </Modal>
+      ) : (
+        <Modal key="form" onClose={handleCloseModal}>
+          <div className="w-[500px]  overflow-y-auto max-h-[550px] text-black">
+            <div className="text-xl font-bold text-center mb-4">
+              <h3>Edit Product</h3>
             </div>
+            <form onSubmit={handleSubmit}>
+              <div className="flex flex-col justify-center items-center gap-2 flex-grow mb-4">
+                <MessageFromAPI message={message} />
+                <InputFile
+                  id="product_image"
+                  htmlfor="product_image"
+                  title="Product Image"
+                  text="Click to Upload Product Image"
+                  data={
+                    dataUrlCropperImage
+                      ? dataUrlCropperImage
+                      : updatedProduct.productImage
+                  }
+                  error={errors.productImage}
+                  handleChange={(e) =>
+                    handleInputFileChange({
+                      e,
+                      setData: setUpdatedProduct,
+                      setErrors,
+                      setSelectedImage,
+                      fieldName: "productImage",
+                      setImageSrc,
+                      setDataUrlCropperImage,
+                    })
+                  }
+                  selectedImage={selectedImage}
+                  handleClickLabel={handleClickLabel}
+                  ref={fileInputRef}
+                />
+              </div>
+              <div className="flex flex-col mb-4">
+                <LabelAndInput
+                  id="productName"
+                  type="text"
+                  name="productName"
+                  text="Product Name"
+                  value={updatedProduct.productName}
+                  handleChange={(e) =>
+                    handleChange({
+                      e,
+                      setData: setUpdatedProduct,
+                      setErrors,
+                    })
+                  }
+                  textStyle="text-xs font-medium"
+                  error={errors.productName}
+                />
+              </div>
+              <div className="flex flex-col mb-4">
+                <LabelAndInput
+                  id="productId"
+                  type="text"
+                  name="productId"
+                  text="Product ID"
+                  value={updatedProduct.productId}
+                  disabled
+                  textStyle="text-xs font-medium"
+                />
+              </div>
+              <div className="flex flex-col mb-4">
+                <LabelAndInput
+                  id="category"
+                  type="text"
+                  name="category"
+                  text="Category"
+                  value={capitalizeFirst(updatedProduct.category[0])}
+                  disabled
+                  textStyle="text-xs font-medium"
+                />
+              </div>
+              <div className="flex flex-col text-md">
+                <h2 className="text-base font-medium">Stock</h2>
+                {updatedProduct.stock.map((stockItem, index) => (
+                  <div key={index} className="relative flex gap-2 mb-4">
+                    <div className="w-full flex flex-col text-md p-">
+                      <LabelAndInput
+                        id={`variant-${index}`}
+                        type="text"
+                        name={`stock[${index}].variant`}
+                        text="variant"
+                        value={stockItem.variant}
+                        textStyle="text-xs font-medium"
+                        handleChange={(e) =>
+                          handleStockChange({
+                            index,
+                            field: "variant",
+                            value: e.target.value,
+                            setData: setUpdatedProduct,
+                            setErrors: setErrors,
+                          })
+                        }
+                        padding="p-[6px]"
+                        placeholder="Variant"
+                        error={errors?.[`stock[${index}].variant`]}
+                      />
+                    </div>
+                    <div className="w-full flex flex-col text-md">
+                      <LabelAndInput
+                        id={`quantity-${index}`}
+                        type="number"
+                        name={`stock[${index}].quantity`}
+                        text="quantity"
+                        value={stockItem.quantity}
+                        textStyle="text-xs font-medium"
+                        handleChange={(e) =>
+                          handleStockChange({
+                            index,
+                            field: "quantity",
+                            value: e.target.value,
+                            setData: setUpdatedProduct,
+                            setErrors: setErrors,
+                          })
+                        }
+                        padding="p-[6px]"
+                        placeholder="Quantity"
+                        error={errors?.[`stock[${index}].quantity`]}
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteStock(index)}
+                      className="mt-auto text-[20px] text-red-500 hover:text-red-400 duration-300"
+                    >
+                      <i className="bx bxs-trash"></i>
+                    </button>
+                  </div>
+                ))}
+                <div className="fle items-center ml-auto">
+                  <button
+                    type="button"
+                    className="w-fit flex justify-center items-center"
+                    onClick={handleAddStockField}
+                  >
+                    <i className="bx bxs-plus-circle text-gray-500 text-[20px]"></i>
+                  </button>
+                </div>
+              </div>
+              <div className="flex flex-col mb-4">
+                <LabelAndInput
+                  id="price"
+                  type="text"
+                  name="price"
+                  text="price"
+                  value={updatedProduct.price}
+                  textStyle="text-sm font-medium"
+                  handleChange={(e) =>
+                    handlePriceChange({
+                      e,
+                      setData: setUpdatedProduct,
+                      setErrors,
+                      setRawPrice,
+                    })
+                  }
+                  padding="p-2"
+                  placeholder="Price"
+                  error={errors.price}
+                />
+              </div>
+              <div className="flex flex-col mb-4">
+                <SubmitButton
+                  type="submit"
+                  disabled={!isModified}
+                  text="Save"
+                  isLoading={
+                    isLoading === "submit-edit-product" ? isLoading : ""
+                  }
+                />
+              </div>
+            </form>
           </div>
-          <div className="flex flex-col mb-4">
-            <LabelAndInput
-              id="price"
-              type="text"
-              name="price"
-              text="price"
-              value={updatedProduct.price}
-              textStyle="text-sm font-medium"
-              handleChange={(e) =>
-                handlePriceChange({
-                  e,
-                  setData: setUpdatedProduct,
-                  setErrors,
-                  setRawPrice,
-                })
-              }
-              padding="p-2"
-              placeholder="Price"
-              error={errors.price}
-            />
-          </div>
-          <div className="flex flex-col mb-4">
-            <SubmitButton
-              type="submit"
-              disabled={!isModified}
-              text="Save"
-              isLoading={isLoading === "submit-edit-product" ? isLoading : ""}
-            />
-          </div>
-        </form>
-      </div>
-    </Modal>
+        </Modal>
+      )}
+    </AnimatePresence>
   );
 };
 

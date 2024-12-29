@@ -129,7 +129,6 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
           if (response.ok) {
             const newProductId = data.data._id;
 
-            // Upload image yang sudah dipotong
             const newImageURL = await uploadProductImage(
               newProductId,
               imageToUpload,

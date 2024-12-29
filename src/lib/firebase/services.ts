@@ -66,17 +66,14 @@ export async function uploadProductImage(
   if (!file) return false;
 
   if (file.size >= 1048576) {
-    // File lebih dari 1MB
-    console.log(file);
     return false;
   }
 
   const newName = `product.${file.name.split(".").pop()}`;
   const productFolderRef = ref(storage, `images/products/${productId}/`);
 
-  // List all files in the product's folder and delete the old product image
   const files = await listAll(productFolderRef);
-  console.log(files);
+  console.log(file);
   for (const item of files.items) {
     await deleteObject(item);
   }
