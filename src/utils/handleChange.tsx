@@ -173,7 +173,7 @@ export const handleStockChange = <T extends Record<string, any>>({
 
     return {
       ...prevData,
-      stock: newStock, // Assign the deeply cloned stock array
+      stock: newStock,
     };
   });
 
@@ -208,8 +208,8 @@ export const handleInputFileChange = <T extends Record<string, any>>({
   setSelectedImage(file);
   setDataUrlCropperImage("");
   if (file) {
-    resizeImage(file, 200, 200)
-      .then((resizedDataUrl) => {
+    resizeImage(file, 400, 400)
+      .then((resizedDataUrl: any) => {
         setImageSrc(resizedDataUrl);
 
         setData((prevData) => ({

@@ -43,3 +43,9 @@ input[type="number"] {
     text-wrap: balance;
   }
 }
+
+.crop-container {
+  max-width: 100%;
+  max-height: 400px;
+  overflow: auto;
+}

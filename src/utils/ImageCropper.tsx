@@ -6,8 +6,8 @@ import Image from "next/image";
 
 const ASPECT_RATIO = 1;
 const MIN_DIMENSION = 150;
-const FIXED_CROP_WIDTH_SIZE = 200;
-const FIXED_CROP_HEIGHT_SIZE = 200;
+const FIXED_CROP_WIDTH_SIZE = 400;
+const FIXED_CROP_HEIGHT_SIZE = 400;
 
 const ImageCropper = ({
   imageSrc,
@@ -28,7 +28,6 @@ const ImageCropper = ({
     y: 0,
   });
 
-  // Berikan tipe yang sesuai untuk imageRef dan previewCanvasRef
   const imageRef = useRef<HTMLImageElement | null>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -84,21 +83,23 @@ const ImageCropper = ({
       <div className="title text-gray-500 p-2">
         <h1 className="font-semibold">Crop Image</h1>
       </div>
-      <div className="flex items-center justify-center w-[600px] h-[400px]  bg-gray-300">
+      <div className="flex justify-center w-full h-full p-6 bg-gray-300">
         <ReactCrop
           crop={crop}
           onChange={handleCropChange}
           aspect={ASPECT_RATIO}
           keepSelection
+          locked
+          className="w-fit h-[450px] overflow-scroll"
         >
           <Image
             src={imageSrc}
             alt="Upload"
             onLoad={onImageLoad}
             ref={imageRef}
-            width={FIXED_CROP_WIDTH_SIZE}
-            height={FIXED_CROP_HEIGHT_SIZE}
-            className="w-full h-full bg-cover"
+            width={imageRef.current?.naturalWidth || FIXED_CROP_WIDTH_SIZE}
+            height={imageRef.current?.naturalHeight || FIXED_CROP_HEIGHT_SIZE}
+            className="w-full h-full bg-cover "
           />
         </ReactCrop>
       </div>
