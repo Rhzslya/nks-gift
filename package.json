@@ -30,6 +30,7 @@
     "nodemailer": "^6.9.14",
     "react": "^18",
     "react-dom": "^18",
+    "react-easy-crop": "^5.2.0",
     "react-icons": "^5.2.1",
     "react-image-crop": "^11.0.7",
     "react-loading": "^2.0.3",

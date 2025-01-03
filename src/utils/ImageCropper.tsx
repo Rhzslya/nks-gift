@@ -78,30 +78,47 @@ const ImageCropper = ({
     }
   };
 
+  const handleDragStart = () => {
+    console.log("Drag started!");
+  };
+
   return (
     <>
       <div className="title text-gray-500 p-2">
         <h1 className="font-semibold">Crop Image</h1>
       </div>
-      <div className="flex justify-center w-full h-full p-6 bg-gray-300">
+      <div
+        className="relative w-[400px] h-[400px] bg-gray-300 overflow-scroll"
+        style={{
+          display: "block",
+          whiteSpace: "nowrap", // Pastikan horizontal scrolling aktif
+        }}
+      >
         <ReactCrop
           crop={crop}
           onChange={handleCropChange}
           aspect={ASPECT_RATIO}
           keepSelection
           locked
-          className="w-fit h-[450px] overflow-scroll"
+          onDragStart={handleDragStart} // Tambahkan callback di sini
         >
-          <Image
-            src={imageSrc}
-            alt="Upload"
-            onLoad={onImageLoad}
-            ref={imageRef}
-            width={imageRef.current?.naturalWidth || FIXED_CROP_WIDTH_SIZE}
-            height={imageRef.current?.naturalHeight || FIXED_CROP_HEIGHT_SIZE}
-            className="w-full h-full bg-cover "
-          />
+          <div style={{ position: "relative" }}>
+            <Image
+              src={imageSrc}
+              alt="Upload"
+              onLoad={onImageLoad}
+              ref={imageRef}
+              width={imageRef.current?.naturalWidth || FIXED_CROP_WIDTH_SIZE}
+              height={imageRef.current?.naturalHeight || FIXED_CROP_HEIGHT_SIZE}
+              style={{
+                display: "inline-block",
+                maxWidth: "unset",
+                maxHeight: "unset",
+              }}
+            />
+          </div>
         </ReactCrop>
+        ;
       </div>
       <div className="button-container flex p-2 items-center">
         <button onClick={handleCancel} className="text-gray-500">

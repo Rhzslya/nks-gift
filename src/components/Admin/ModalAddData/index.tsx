@@ -18,6 +18,7 @@ import ImageCropper from "@/utils/ImageCropper";
 import { convertDataUrlToFile } from "@/utils/convertDataUrlToFile";
 import { motion, AnimatePresence } from "framer-motion";
 import MessageFromAPI from "@/components/Form/MessageFromAPI";
+import CropEasy from "@/utils/CropEasy";
 interface Product {
   productImage: string;
   productName: string;
@@ -180,7 +181,7 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
       <AnimatePresence>
         {imageSrc && !dataUrlCropperImage ? (
           <Modal key="image-cropper" onClose={handleCloseModal}>
-            <ImageCropper
+            <CropEasy
               imageSrc={imageSrc}
               setImageSrc={setImageSrc}
               setDataUrlImageCropper={setDataUrlCropperImage}
