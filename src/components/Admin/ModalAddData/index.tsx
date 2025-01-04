@@ -180,14 +180,12 @@ const ModalAddData: React.FC<ModalUpdatedUserProps> = ({
     <>
       <AnimatePresence>
         {imageSrc && !dataUrlCropperImage ? (
-          <Modal key="image-cropper" onClose={handleCloseModal}>
-            <CropEasy
-              imageSrc={imageSrc}
-              setImageSrc={setImageSrc}
-              setDataUrlImageCropper={setDataUrlCropperImage}
-              setSelectedImage={setSelectedImage}
-            />
-          </Modal>
+          <CropEasy
+            imageSrc={imageSrc}
+            setImageSrc={setImageSrc}
+            setDataUrlImageCropper={setDataUrlCropperImage}
+            setSelectedImage={setSelectedImage}
+          />
         ) : (
           <Modal key="form" onClose={handleCloseModal}>
             <div className="w-[500px] overflow-y-auto max-h-[550px] text-black">

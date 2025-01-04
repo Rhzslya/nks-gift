@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Cropper, { Area } from "react-easy-crop";
 import getCroppedImg from "./CropImage";
 
@@ -15,12 +15,14 @@ const CropEasy: React.FC<CropEasyProps> = ({
   setDataUrlImageCropper,
   setSelectedImage,
 }) => {
-  const [crop, setCrop] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [crop, setCrop] = useState<{ x: number; y: number }>({
+    x: 0,
+    y: 0,
+  });
   const [zoom, setZoom] = useState<number>(1);
   const [rotation, setRotation] = useState<number>(0);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
 
-  const cropSize = { width: 350, height: 350 };
   const onCropComplete = (croppedArea: Area, croppedAreaPixels: Area) => {
     setCroppedAreaPixels(croppedAreaPixels);
   };
@@ -33,6 +35,7 @@ const CropEasy: React.FC<CropEasyProps> = ({
           croppedAreaPixels,
           rotation
         );
+
         setDataUrlImageCropper(croppedImage as string);
         setImageSrc("");
         setSelectedImage(null);
@@ -49,7 +52,13 @@ const CropEasy: React.FC<CropEasyProps> = ({
 
   return (
     <div className="App">
-      <div style={{ width: "100%", height: 400, position: "relative" }}>
+      <div
+        style={{
+          width: "100%",
+          height: "500px",
+          position: "relative",
+        }}
+      >
         <Cropper
           image={imageSrc}
           crop={crop}
@@ -59,19 +68,18 @@ const CropEasy: React.FC<CropEasyProps> = ({
           onZoomChange={setZoom}
           onRotationChange={setRotation}
           onCropComplete={onCropComplete}
-          objectFit="contain"
-          onMediaLoaded={({ naturalHeight, naturalWidth }) => {
-            setCrop({ y: naturalHeight, x: naturalWidth });
-          }}
+          cropShape="rect"
+          aspect={1}
         />
       </div>
+
       <div style={{ marginTop: "20px", display: "flex", gap: "20px" }}>
         <label>
           Zoom:
           <input
             type="range"
             min={1}
-            max={3}
+            max={5}
             step={0.1}
             value={zoom}
             onChange={(e) => setZoom(Number(e.target.value))}
@@ -82,7 +90,7 @@ const CropEasy: React.FC<CropEasyProps> = ({
           <input
             type="range"
             min={0}
-            max={360}
+            max={180}
             step={1}
             value={rotation}
             onChange={(e) => setRotation(Number(e.target.value))}

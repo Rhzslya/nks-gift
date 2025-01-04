@@ -5,7 +5,7 @@ import setCanvasPreview from "./setCanvasPreview";
 import Image from "next/image";
 
 const ASPECT_RATIO = 1;
-const MIN_DIMENSION = 150;
+const MIN_DIMENSION = 200;
 const FIXED_CROP_WIDTH_SIZE = 400;
 const FIXED_CROP_HEIGHT_SIZE = 400;
 
@@ -78,48 +78,31 @@ const ImageCropper = ({
     }
   };
 
-  const handleDragStart = () => {
-    console.log("Drag started!");
-  };
-
   return (
-    <>
+    <div className="w-[500px] overflow-y-auto max-h-[550px] text-black">
       <div className="title text-gray-500 p-2">
         <h1 className="font-semibold">Crop Image</h1>
       </div>
-      <div
-        className="relative w-[400px] h-[400px] bg-gray-300 overflow-scroll"
-        style={{
-          display: "block",
-          whiteSpace: "nowrap", // Pastikan horizontal scrolling aktif
-        }}
-      >
+      <div className="relative flex justify-center items-center">
         <ReactCrop
           crop={crop}
           onChange={handleCropChange}
           aspect={ASPECT_RATIO}
           keepSelection
-          locked
-          onDragStart={handleDragStart} // Tambahkan callback di sini
+          minHeight={400}
         >
-          <div style={{ position: "relative" }}>
-            <Image
-              src={imageSrc}
-              alt="Upload"
-              onLoad={onImageLoad}
-              ref={imageRef}
-              width={imageRef.current?.naturalWidth || FIXED_CROP_WIDTH_SIZE}
-              height={imageRef.current?.naturalHeight || FIXED_CROP_HEIGHT_SIZE}
-              style={{
-                display: "inline-block",
-                maxWidth: "unset",
-                maxHeight: "unset",
-              }}
-            />
-          </div>
+          <Image
+            src={imageSrc}
+            alt="Upload"
+            onLoad={onImageLoad}
+            ref={imageRef}
+            width={FIXED_CROP_WIDTH_SIZE}
+            height={FIXED_CROP_HEIGHT_SIZE}
+            className="object-contain"
+          />
         </ReactCrop>
-        ;
       </div>
+
       <div className="button-container flex p-2 items-center">
         <button onClick={handleCancel} className="text-gray-500">
           Cancel
@@ -160,7 +143,7 @@ const ImageCropper = ({
           }}
         />
       )}
-    </>
+    </div>
   );
 };
 

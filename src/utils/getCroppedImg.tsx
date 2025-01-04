@@ -19,9 +19,6 @@ const getCroppedImg = (
       canvas.width = croppedAreaPixels.width;
       canvas.height = croppedAreaPixels.height;
 
-      console.log(canvas.width);
-      console.log(canvas.height);
-
       // Apply rotation to the context
       ctx.save();
       ctx.translate(croppedAreaPixels.width / 2, croppedAreaPixels.height / 2);
@@ -43,6 +40,8 @@ const getCroppedImg = (
         croppedAreaPixels.width,
         croppedAreaPixels.height
       );
+
+      console.log(ctx);
 
       // Restore the canvas state after drawing
       ctx.restore();

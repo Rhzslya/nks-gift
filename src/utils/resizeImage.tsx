@@ -44,8 +44,6 @@ const resizeImage = (
       canvas.height = finalHeight;
 
       // Pastikan rendered size sama dengan intrinsic size
-      canvas.style.width = `${finalWidth}px`;
-      canvas.style.height = `${finalHeight}px`;
 
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
