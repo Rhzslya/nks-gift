@@ -23,20 +23,20 @@ const resizeImage = (
       let finalWidth = Math.round(originalWidth * scale);
       let finalHeight = Math.round(originalHeight * scale);
 
-      if (finalWidth < 400 || finalHeight < 400) {
-        const widthDiff = 400 - finalWidth > 0 ? 400 - finalWidth : 0;
-        const heightDiff = 400 - finalHeight > 0 ? 400 - finalHeight : 0;
+      if (finalWidth < 300 || finalHeight < 300) {
+        const widthDiff = 300 - finalWidth > 0 ? 300 - finalWidth : 0;
+        const heightDiff = 300 - finalHeight > 0 ? 300 - finalHeight : 0;
 
         if (widthDiff > 0) {
           const proportion = widthDiff / finalWidth;
           finalHeight += Math.round(finalHeight * proportion);
-          finalWidth = 400;
+          finalWidth = 300;
         }
 
         if (heightDiff > 0) {
           const proportion = heightDiff / finalHeight;
           finalWidth += Math.round(finalWidth * proportion);
-          finalHeight = 400;
+          finalHeight = 300;
         }
       }
 

@@ -38,13 +38,13 @@ const UtilityBar: React.FC<UtilityBarProps> = ({
   modalAddData,
 }) => {
   return (
-    <div className="relative py-2 flex items-center">
+    <div className="py-2 flex items-center">
       <SearchQuery
         searchQuery={searchQuery}
         onSearchChange={onSearchChange}
         searchPlaceholder={searchPlaceholder}
       />
-      <div className="relative pl-10">
+      <div className="pl-10">
         <button onClick={onToggleFilter} ref={filterToggleButtonRef}>
           <i
             className={`bx bx-filter text-[28px] text-gray-500 cursor-pointer rounded-md hover:bg-gray-200 duration-300 ${

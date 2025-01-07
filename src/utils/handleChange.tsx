@@ -208,7 +208,7 @@ export const handleInputFileChange = <T extends Record<string, any>>({
   setSelectedImage(file);
   setDataUrlCropperImage("");
   if (file) {
-    resizeImage(file, 400, 400)
+    resizeImage(file, 300, 300)
       .then((resizedDataUrl: any) => {
         setImageSrc(resizedDataUrl);
 

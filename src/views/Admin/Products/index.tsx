@@ -303,7 +303,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
   }, [message]);
 
   return (
-    <div className="w-full relative">
+    <div className="w-full">
       <Header
         dropdownButtonRef={dropdownButtonRef}
         userInSession={

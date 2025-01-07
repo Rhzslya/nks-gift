@@ -8,7 +8,7 @@ import {
   useEffect,
 } from "react";
 
-const Modal = ({
+const ModalCropper = ({
   children,
   onClose,
   escClosable = true,
@@ -48,10 +48,10 @@ const Modal = ({
     <AnimatePresence>
       <motion.div
         ref={overlay}
-        className="fixed inset-0 z-50 bg-black/60 flex justify-center items-center"
+        className="absolute inset-0 z-50 bg-black/60 place-content-center"
         onClick={close}
         initial={{ opacity: 0 }}
-        animate={{ opacity: isClosing ? 0 : 1 }} // Animate the overlay fade out
+        animate={{ opacity: isClosing ? 0 : 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
       >
@@ -60,7 +60,7 @@ const Modal = ({
           animate={{ opacity: isClosing ? 0 : 1, scale: isClosing ? 0 : 1 }}
           exit={{ opacity: 0, scale: 0.8 }}
           transition={{ duration: 0.3 }}
-          className="bg-white rounded-lg shadow-lg p-6"
+          className="relative rounded-lg shadow-lg p-6 bg-white max-w-[50%] m-auto "
         >
           {children}
         </motion.div>
@@ -69,4 +69,4 @@ const Modal = ({
   );
 };
 
-export default Modal;
+export default ModalCropper;

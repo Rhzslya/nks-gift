@@ -69,11 +69,11 @@ const CropEasy: React.FC<CropEasyProps> = ({
           onRotationChange={setRotation}
           onCropComplete={onCropComplete}
           cropShape="rect"
-          aspect={1}
+          aspect={4 / 4}
         />
       </div>
 
-      <div style={{ marginTop: "20px", display: "flex", gap: "20px" }}>
+      <div style={{ margin: "auto", display: "flex", gap: "20px" }}>
         <label>
           Zoom:
           <input
