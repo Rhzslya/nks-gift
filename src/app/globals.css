@@ -62,3 +62,37 @@ input[type="number"] {
   width: 100%;
   min-height: 400px;
 }
+
+.slider {
+  -webkit-appearance: none; /* Hapus gaya default browser */
+  width: 70%; /* Sesuaikan lebar */
+  height: 8px; /* Tinggi track */
+  background: #ddd; /* Warna track */
+  border-radius: 5px; /* Membulatkan track */
+  outline: none; /* Hapus outline */
+  opacity: 0.9; /* Transparansi */
+  transition: opacity 0.2s;
+}
+
+.slider:hover {
+  opacity: 1; /* Transparansi saat hover */
+}
+
+/* Gaya thumb (tombol yang bisa digeser) */
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px; /* Lebar thumb */
+  height: 15px; /* Tinggi thumb */
+  border-radius: 50%; /* Membulatkan thumb */
+  background: #6b7280; /* Warna thumb */
+  cursor: pointer; /* Ubah kursor saat hover */
+}
+
+.slider::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #6b7280;
+  cursor: pointer;
+}

@@ -60,7 +60,7 @@ const ModalCropper = ({
           animate={{ opacity: isClosing ? 0 : 1, scale: isClosing ? 0 : 1 }}
           exit={{ opacity: 0, scale: 0.8 }}
           transition={{ duration: 0.3 }}
-          className="relative rounded-lg shadow-lg p-6 bg-white max-w-[50%] m-auto "
+          className="relative rounded-lg shadow-lg p-6 bg-white max-w-[40%] m-auto "
         >
           {children}
         </motion.div>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Cropper, { Area } from "react-easy-crop";
 import getCroppedImg from "./CropImage";
+import ConfirmButton from "@/components/Button/ConfirmButton";
 
 interface CropEasyProps {
   imageSrc: string;
@@ -52,13 +53,10 @@ const CropEasy: React.FC<CropEasyProps> = ({
 
   return (
     <div className="App">
-      <div
-        style={{
-          width: "100%",
-          height: "500px",
-          position: "relative",
-        }}
-      >
+      <div className="title text-gray-500 font-semibold mb-4">
+        <h3>Crop Image</h3>
+      </div>
+      <div className="cropper relative w-full h-[500px]">
         <Cropper
           image={imageSrc}
           crop={crop}
@@ -72,44 +70,23 @@ const CropEasy: React.FC<CropEasyProps> = ({
           aspect={4 / 4}
         />
       </div>
-
-      <div style={{ margin: "auto", display: "flex", gap: "20px" }}>
-        <label>
-          Zoom:
-          <input
-            type="range"
-            min={1}
-            max={5}
-            step={0.1}
-            value={zoom}
-            onChange={(e) => setZoom(Number(e.target.value))}
-          />
-        </label>
-        <label>
-          Rotation:
-          <input
-            type="range"
-            min={0}
-            max={180}
-            step={1}
-            value={rotation}
-            onChange={(e) => setRotation(Number(e.target.value))}
-          />
-        </label>
+      <div className=" py-4 text-gray-500 mx-4 flex items-center justify-center gap-4">
+        <i className="bx bxs-image-alt text-2xl"></i>
+        <input
+          type="range"
+          min={1}
+          max={5}
+          step={0.1}
+          value={zoom}
+          onChange={(e) => setZoom(Number(e.target.value))}
+          className="slider w-[70%]  h-2 bg-gray-500  rounded-lg appearance-none cursor-pointer"
+        />
+        <i className="bx bxs-image-alt text-4xl"></i>
       </div>
-      <div style={{ marginTop: "20px", display: "flex", gap: "10px" }}>
-        <button
-          onClick={handleApply}
-          style={{ padding: "10px", backgroundColor: "green", color: "white" }}
-        >
-          Apply
-        </button>
-        <button
-          onClick={handleCancel}
-          style={{ padding: "10px", backgroundColor: "red", color: "white" }}
-        >
-          Cancel
-        </button>
+      <div className="flex justify-between mx-4">
+        <ConfirmButton text="Cancel" variant="cancel" onClick={handleCancel} />
+
+        <ConfirmButton text="Apply" variant="default" onClick={handleApply} />
       </div>
     </div>
   );
