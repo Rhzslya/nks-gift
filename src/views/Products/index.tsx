@@ -168,7 +168,7 @@ const ProductsViews = ({ productsData }: any) => {
         </div>
       </div>
 
-      <div className="product-list grid grid-cols-1 sm:grid-cols-2 md:grid-cols-[repeat(auto-fit,_minmax(auto,_150px))] gap-4 p-4">
+      <div className="product-list grid grid-cols-[repeat(auto-fit,_minmax(auto,_150px))] gap-4 p-4">
         {sortedProducts.length > 0 ? (
           sortedProducts.map((product: any) => (
             <Link
@@ -190,8 +190,8 @@ const ProductsViews = ({ productsData }: any) => {
               <h3 className="text-base font-medium truncate">
                 {product.productName}
               </h3>
-              <div className="flex justify-between pb-2 border-b-[1px] border-gray-400">
-                <p className="text-gray-600 mb-1 text-sm">
+              <div className="flex justify-between pb-2 border-b-[1px] border-gray-400 text-xs">
+                <p className="text-gray-600 mb-1">
                   {capitalizeFirst(product.category[0])}
                 </p>
                 <p className="text-gray-800 font-semibold">

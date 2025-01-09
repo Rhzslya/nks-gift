@@ -19,7 +19,7 @@ const PaginationToolbar: React.FC<PaginationToolbarProps> = ({
   currentPage,
   totalPages,
   setCurrentPage,
-  rowsPerPageOptions = [5, 10, 15], // Tetapkan default opsi jika tidak ada prop yang diberikan
+  rowsPerPageOptions = [5, 10, 15],
 }) => {
   return (
     <div className="py-2 px-2 flex justify-between items-center">

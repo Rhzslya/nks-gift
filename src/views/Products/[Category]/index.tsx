@@ -6,7 +6,7 @@ import { productPageSortOptions } from "@/utils/SortOptions";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 
 interface ProductCategoryViewsProps {
   category: string;
@@ -20,14 +20,14 @@ const ProductCategoryViews: React.FC<ProductCategoryViewsProps> = ({
   const path = usePathname();
   const router = useRouter(); // Inisialisasi router
   const productCategory = category.replace(/-/, " ");
-  const [sortBy, setSortBy] = useState("sold");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [activeSortOption, setActiveSortOption] = useState("sold");
+  const [searchKeyword, setSearchKeyword] = useState("");
 
-  const sortProducts = (products: any[], sortBy: string) => {
+  const getSortedProducts = (products: any[], sortOption: string) => {
     return [...products].sort((a, b) => {
-      if (sortBy === "sold") {
+      if (sortOption === "sold") {
         return b.sold - a.sold;
-      } else if (sortBy === "price") {
+      } else if (sortOption === "price") {
         const priceA =
           typeof a.price === "string" ? parseFloat(a.price) : a.price;
         const priceB =
@@ -38,19 +38,19 @@ const ProductCategoryViews: React.FC<ProductCategoryViewsProps> = ({
     });
   };
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
+  const onSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchKeyword(e.target.value);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const onSearchKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      // Arahkan pengguna ke halaman pencarian dengan query
-      router.push(`products/search?q=${searchQuery}`);
+      router.push(`/products/search?q=${searchKeyword}`);
     }
   };
 
-  const filteredProducts = productsDataByCategories.filter((product: any) =>
-    product.productName.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredProductsByKeyword = productsDataByCategories.filter(
+    (product: any) =>
+      product.productName.toLowerCase().includes(searchKeyword.toLowerCase())
   );
 
   const generateBreadcrumbs = () => {
@@ -63,7 +63,10 @@ const ProductCategoryViews: React.FC<ProductCategoryViewsProps> = ({
   };
   const breadcrumbs = generateBreadcrumbs();
 
-  const sortedProducts = sortProducts(productsDataByCategories, sortBy);
+  const sortedAndFilteredProducts = getSortedProducts(
+    filteredProductsByKeyword,
+    activeSortOption
+  );
 
   return (
     <div className="max-w-[1400px] m-auto">
@@ -91,8 +94,8 @@ const ProductCategoryViews: React.FC<ProductCategoryViewsProps> = ({
           <p>Sort By :</p>
           <div className="relative ml-2">
             <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
+              value={activeSortOption}
+              onChange={(e) => setActiveSortOption(e.target.value)}
               className="appearance-none outline-none cursor-pointer bg-transparent border-none text-sm font-medium text-sky-300 pr-8 py-1"
             >
               {productPageSortOptions.map((option) => (
@@ -120,22 +123,24 @@ const ProductCategoryViews: React.FC<ProductCategoryViewsProps> = ({
             type="text"
             placeholder="Search Product"
             className="w-full px-2 py-1 border rounded-full text-sm pl-12 focus:border-sky-300 focus:outline-none"
-            value={searchQuery}
-            onChange={handleSearchChange}
-            onKeyDown={handleKeyDown}
+            value={searchKeyword}
+            onChange={onSearchInputChange}
+            onKeyDown={onSearchKeyPress}
           />
-          {searchQuery && (
+          {searchKeyword && (
             <div className="absolute w-full top-6 py-2 z-10">
-              {filteredProducts.length > 0 ? (
+              {filteredProductsByKeyword.length > 0 ? (
                 <ul
                   className={`bg-white border shadow-lg divide-y ${
-                    filteredProducts.length <= 5 ? "rounded-lg" : "rounded-t-lg"
+                    filteredProductsByKeyword.length <= 5
+                      ? "rounded-lg"
+                      : "rounded-t-lg"
                   }`}
                 >
-                  {filteredProducts.slice(0, 5).map((product: any) => (
+                  {filteredProductsByKeyword.slice(0, 5).map((product: any) => (
                     <li key={product._id} className="block hover:bg-gray-100">
                       <Link
-                        href={`products/${product.category}/${product.productId}`}
+                        href={`/products/${product.category[0]}/${product.productId}`}
                         className="block p-2"
                       >
                         {product.productName}
@@ -148,10 +153,10 @@ const ProductCategoryViews: React.FC<ProductCategoryViewsProps> = ({
                   No products found.
                 </p>
               )}
-              {filteredProducts.length > 5 && (
+              {filteredProductsByKeyword.length > 5 && (
                 <button
                   onClick={() =>
-                    router.push(`/products/search?q=${searchQuery}`)
+                    router.push(`/products/search?q=${searchKeyword}`)
                   }
                   className="block w-full text-center py-2 bg-white border-b border-x hover:bg-gray-200 rounded-b-lg"
                 >
@@ -163,28 +168,29 @@ const ProductCategoryViews: React.FC<ProductCategoryViewsProps> = ({
         </div>
       </div>
 
-      <div className="product-list grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-4 p-6">
-        {sortedProducts.length > 0 ? (
-          sortedProducts.map((product: any) => (
+      <div className="product-list grid grid-cols-[repeat(auto-fit,_minmax(auto,_150px))] gap-4 p-4">
+        {sortedAndFilteredProducts.length > 0 ? (
+          sortedAndFilteredProducts.map((product: any) => (
             <Link
               href={`${product.category[0]}/${product.productId}`}
               key={product._id}
-              className="product-item  flex flex-col border p-4 rounded-lg shadow-lg"
+              className="product-item flex flex-col border p-2 rounded-lg shadow-lg"
             >
-              <div className="relative w-full h-full">
+              <div className="relative w-full mb-4">
                 <Image
                   src={product.productImage}
                   alt={product.productName}
-                  className="object-cover rounded-lg w-full h-full"
+                  className="object-cover rounded-sm "
                   quality={100}
-                  layout="fill"
+                  width={150}
+                  height={200}
                   priority
                 />
               </div>
-              <h3 className="text-xl font-bold mb-2 truncate">
+              <h3 className="text-base font-medium truncate">
                 {product.productName}
               </h3>
-              <div className="flex justify-between pb-2 border-b-[1px] border-gray-400">
+              <div className="flex justify-between pb-2 border-b-[1px] border-gray-400 text-xs">
                 <p className="text-gray-600 mb-1">
                   {capitalizeFirst(product.category[0])}
                 </p>

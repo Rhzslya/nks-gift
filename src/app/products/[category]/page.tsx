@@ -33,7 +33,6 @@ const ProductCategoryPage: React.FC<ProductPageProps> = ({ params }) => {
     }
   }, [category]);
 
-  console.log(productsDataByCategories);
   return (
     <ProductCategoryViews
       category={category}

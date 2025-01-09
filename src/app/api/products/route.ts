@@ -32,7 +32,6 @@ const handler = async (request: NextRequest) => {
   if (request.method === "GET") {
     try {
       connect();
-      // Fetch all products excluding certain fields
       const allowedRoles = ["manager", "admin", "super_admin"];
       const searchQuery = request.nextUrl.searchParams.get("q") || "";
       const category = request.nextUrl.searchParams.get("category") || "";
@@ -46,12 +45,12 @@ const handler = async (request: NextRequest) => {
         });
       } else if (category) {
         query.category = category;
-        products = await Product.find(query);
+        products = await Product.find(query).sort({ createdAt: -1 });
       } else if (id) {
         query.productId = id;
-        products = await Product.find(query);
+        products = await Product.find(query).sort({ createdAt: -1 });
       } else {
-        products = await Product.find();
+        products = await Product.find().sort({ createdAt: -1 });
       }
 
       const path = request.nextUrl.searchParams.get("path") || "/";
@@ -122,7 +121,7 @@ const handler = async (request: NextRequest) => {
       }
 
       const lastProduct = await Product.findOne({ category: products.category })
-        .sort({ productId: -1 }) // Mengurutkan secara descending berdasarkan productId
+        .sort({ productId: 1 }) // Mengurutkan secara descending berdasarkan productId
         .limit(1);
 
       let newProductId;
@@ -154,7 +153,7 @@ const handler = async (request: NextRequest) => {
       const newFeaturedProducts = await Product.find({
         category: { $in: ["new-featured"] },
       })
-        .sort({ createdAt: 1 })
+        .sort({ createdAt: -1 })
         .lean();
 
       if (newFeaturedProducts.length > 10) {

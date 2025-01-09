@@ -152,12 +152,12 @@ const ModalViewDetailsProduct: React.FC<ModalViewDetailsProductProps> = ({
         </div>
         <div className="flex gap-8">
           <div className="m-auto">
-            <div className="h-[400px] w-[400px]  flex items-center justify-center border-2 border-gray-300 p-2 rounded-md">
+            <div className="h-[350px] w-[350px]  flex items-center justify-center border-2 border-gray-300 p-2 rounded-md">
               {isViewDetailsProduct ? (
                 <Image
                   src={isViewDetailsProduct.productImage}
-                  width={400} // Width tetap
-                  height={400} // Height tetap
+                  width={350} // Width tetap
+                  height={350} // Height tetap
                   alt={isViewDetailsProduct.productName || ""}
                   quality={100}
                   className="object-contain w-full h-full"
@@ -166,8 +166,7 @@ const ModalViewDetailsProduct: React.FC<ModalViewDetailsProductProps> = ({
               ) : (
                 <Image
                   src="/default.jpg"
-                  width={400} // Width tetap
-                  height={400} // Height tetap
+                  width={350}
                   alt="Default Image"
                   quality={100}
                   className="object-cover rounded-sm w-full h-full"

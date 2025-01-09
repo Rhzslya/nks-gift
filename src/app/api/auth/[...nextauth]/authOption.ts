@@ -127,5 +127,6 @@ export const authOptions: NextAuthOptions = {
     signIn: "/sign-in",
     error: "/auth/error",
   },
+
   debug: true,
 };

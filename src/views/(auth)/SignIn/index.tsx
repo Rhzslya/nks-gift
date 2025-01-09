@@ -1,9 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { signIn, useSession, getSession } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { validationLogin } from "@/utils/Validations";
 import MessageFromAPI from "@/components/Form/MessageFromAPI";
@@ -116,7 +114,7 @@ const SignInViews = () => {
             <div className="mb-6  ">
               <button
                 type="button"
-                onClick={() => signIn("google")}
+                onClick={() => signIn("google", { callbackUrl: callbackUrl })}
                 className="w-full bg-sky-400 text-white px-2 py-[6px] text-sm rounded hover:bg-sky-300 duration-300"
               >
                 Sign In With Google
