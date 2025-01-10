@@ -25,7 +25,7 @@ interface Products {
     quantity: string;
   }[];
   productId: string;
-  createdAt: string;
+  createdAt: string | Date;
 }
 
 interface UsersManagementViewsProps {
@@ -273,10 +273,12 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
       product.category[0].toLowerCase().startsWith(searchQuery.toLowerCase())
   );
 
-  const paginatedUsers = filteredProducts.slice(
-    (currentPage - 1) * usersPerPage,
-    currentPage * usersPerPage
-  );
+  const paginatedItems = filteredProducts
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    )
+    .slice((currentPage - 1) * usersPerPage, currentPage * usersPerPage);
 
   const isActive = (
     order: "asc" | "desc",
@@ -349,7 +351,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
           <Table
             tableHeaders={productsTableHeaders}
             isLoading={isLoading}
-            paginatedItems={paginatedUsers}
+            paginatedItems={paginatedItems}
             userInSession={userInSession}
             clickedButtonId={clickedButtonId}
             settingButtonRefs={settingButtonRefs}

@@ -121,7 +121,7 @@ const handler = async (request: NextRequest) => {
       }
 
       const lastProduct = await Product.findOne({ category: products.category })
-        .sort({ productId: 1 }) // Mengurutkan secara descending berdasarkan productId
+        .sort({ productId: -1 })
         .limit(1);
 
       let newProductId;
@@ -133,6 +133,9 @@ const handler = async (request: NextRequest) => {
       } else {
         newProductId = `${categoryInitial}001`;
       }
+
+      console.log(lastProduct);
+      console.log(newProductId);
 
       const stock = products.stock.map(
         (item: { variant: string; quantity: string }) => ({

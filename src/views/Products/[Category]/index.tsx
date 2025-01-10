@@ -7,6 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState, useMemo } from "react";
+import Skeleton from "react-loading-skeleton";
 
 interface ProductCategoryViewsProps {
   category: string;
@@ -223,7 +224,7 @@ const ProductCategoryViews: React.FC<ProductCategoryViewsProps> = ({
             </Link>
           ))
         ) : (
-          <p>No products available</p>
+          <Skeleton />
         )}
       </div>
     </div>

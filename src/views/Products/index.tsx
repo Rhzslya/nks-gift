@@ -10,8 +10,11 @@ import { capitalizeFirst } from "@/utils/Capitalize";
 import { formatPriceToIDR } from "@/utils/FormatPrice";
 import Link from "next/link";
 import { productPageSortOptions } from "@/utils/SortOptions";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
+import CardSkeleton from "@/utils/Skeleton";
 
-const ProductsViews = ({ productsData }: any) => {
+const ProductsViews = ({ productsData, isLoading }: any) => {
   const path = usePathname();
   const router = useRouter();
   const [sortBy, setSortBy] = useState("sold");
@@ -169,7 +172,9 @@ const ProductsViews = ({ productsData }: any) => {
       </div>
 
       <div className="product-list grid grid-cols-[repeat(auto-fit,_minmax(auto,_150px))] gap-4 p-4">
-        {sortedProducts.length > 0 ? (
+        {isLoading ? (
+          <CardSkeleton cards={16} />
+        ) : (
           sortedProducts.map((product: any) => (
             <Link
               href={`products/${product.category[0]}/${product.productId}`}
@@ -222,8 +227,6 @@ const ProductsViews = ({ productsData }: any) => {
               </div>
             </Link>
           ))
-        ) : (
-          <p>No products available</p>
         )}
       </div>
     </div>

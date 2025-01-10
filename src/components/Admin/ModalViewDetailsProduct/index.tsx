@@ -18,7 +18,7 @@ interface Product {
     quantity: string;
   }[];
   productId: string;
-  createdAt: string;
+  createdAt: string | Date;
 }
 
 interface ModalViewDetailsProductProps {
