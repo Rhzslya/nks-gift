@@ -5,22 +5,36 @@ import Head from "next/head";
 import React, { useEffect, useState } from "react";
 
 const Products = () => {
-  const [productsData, setProductsData] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [productsData, setProductsData] = useState<any[]>([]);
+  const [dataPerPage, setDataPerPage] = useState(5);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const getAllProducts = async () => {
+  // Fungsi untuk mengambil produk dari API atau cache
+  const fetchProducts = async (page: number) => {
+    const cachedData = localStorage.getItem(`products_page_${page}`);
+
+    if (cachedData) {
+      const parsedData = JSON.parse(cachedData);
+      setProductsData(parsedData.data);
+      setTotalPages(parsedData.totalPages);
+      setIsLoading(false);
+    } else {
       setIsLoading(true);
       try {
-        const response = await fetch(`api/products`, {
-          next: { revalidate: 1 },
-          mode: "cors",
-          headers: {
-            "Cache-Control": "no-cache",
-            "Content-Type": "application/json",
-          },
-          method: "GET",
-        });
+        const response = await fetch(
+          `/api/products?page=${page}&limit=${dataPerPage}`,
+          {
+            next: { revalidate: 1 },
+            mode: "cors",
+            headers: {
+              "Cache-Control": "no-cache",
+              "Content-Type": "application/json",
+            },
+            method: "GET",
+          }
+        );
 
         if (!response.ok) {
           throw new Error(
@@ -30,21 +44,46 @@ const Products = () => {
 
         const data = await response.json();
         setProductsData(data.data);
+        setTotalPages(data.totalPages);
+
+        localStorage.setItem(
+          `products_page_${page}`,
+          JSON.stringify({
+            data: data.data,
+            totalPages: data.totalPages,
+          })
+        );
       } catch (error) {
         console.error("Failed to fetch products:", error);
       } finally {
         setIsLoading(false);
       }
-    };
-    getAllProducts();
-  }, []);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts(currentPage);
+  }, [currentPage, dataPerPage]);
+
+  const handleDataPerPage = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setDataPerPage(parseInt(e.target.value, 10));
+    setCurrentPage(1);
+  };
 
   return (
     <>
       <Head>
         <title>Products</title>
       </Head>
-      <ProductsViews productsData={productsData} isLoading={isLoading} />
+      <ProductsViews
+        productsData={productsData}
+        isLoading={isLoading}
+        handleDataPerPage={handleDataPerPage}
+        dataPerPage={dataPerPage}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        setCurrentPage={setCurrentPage}
+      />
     </>
   );
 };

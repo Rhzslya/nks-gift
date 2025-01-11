@@ -36,43 +36,60 @@ const handler = async (request: NextRequest) => {
       const searchQuery = request.nextUrl.searchParams.get("q") || "";
       const category = request.nextUrl.searchParams.get("category") || "";
       const id = request.nextUrl.searchParams.get("id") || "";
+      const limit = parseInt(
+        request.nextUrl.searchParams.get("limit") || "5",
+        10
+      );
+      const page = parseInt(
+        request.nextUrl.searchParams.get("page") || "1",
+        10
+      );
 
-      let products;
-      const query: any = {};
-      if (searchQuery) {
-        products = await Product.find({
-          productName: { $regex: `${searchQuery}`, $options: "i" },
-        });
-      } else if (category) {
-        query.category = category;
-        products = await Product.find(query).sort({ createdAt: -1 });
-      } else if (id) {
-        query.productId = id;
-        products = await Product.find(query).sort({ createdAt: -1 });
-      } else {
-        products = await Product.find().sort({ createdAt: -1 });
+      if (
+        isNaN(limit) ||
+        limit <= 0 ||
+        limit > 100 ||
+        isNaN(page) ||
+        page <= 0
+      ) {
+        return NextResponse.json(
+          {
+            status: false,
+            statusCode: 400,
+            message: "Invalid query parameters",
+          },
+          { status: 400 }
+        );
       }
 
-      const path = request.nextUrl.searchParams.get("path") || "/";
-      revalidatePath(path);
-      const response = NextResponse.json({
+      const query: any = {};
+      if (searchQuery) {
+        query.productName = { $regex: `${searchQuery}`, $options: "i" };
+      }
+      if (category) {
+        query.category = category;
+      }
+      if (id) {
+        query.productId = id;
+      }
+
+      const skip = (page - 1) * limit;
+      const products = await Product.find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
+
+      const totalProducts = await Product.countDocuments(query);
+      return NextResponse.json({
         status: true,
         statusCode: 200,
         data: products,
+        total: totalProducts,
+        currentPage: page,
+        totalPages: Math.ceil(totalProducts / limit),
       });
-
-      response.headers.set("Cache-Control", "no-store, max-age=0");
-
-      return response;
     } catch (error) {
       console.error("Error:", error);
-      // Mengembalikan respons berdasarkan jenis kesalahan
-      if (error instanceof jwt.JsonWebTokenError) {
-        return NextResponse.json(
-          { status: false, statusCode: 403, message: "Access Denied" },
-          { status: 403 }
-        );
-      }
       return NextResponse.json(
         { status: false, statusCode: 500, message: "Internal Server Error" },
         { status: 500 }
@@ -134,9 +151,6 @@ const handler = async (request: NextRequest) => {
         newProductId = `${categoryInitial}001`;
       }
 
-      console.log(lastProduct);
-      console.log(newProductId);
-
       const stock = products.stock.map(
         (item: { variant: string; quantity: string }) => ({
           variant: item.variant,
@@ -160,14 +174,19 @@ const handler = async (request: NextRequest) => {
         .lean();
 
       if (newFeaturedProducts.length > 10) {
-        const oldestProduct = newFeaturedProducts[0];
-        const updatedCategory = oldestProduct.category.filter(
-          (cat: string) => cat !== "new-featured"
-        );
+        const oldestProduct = await Product.findOne({
+          category: { $in: ["new-featured"] },
+        }).sort({ createdAt: 1 });
 
-        await Product.findByIdAndUpdate(oldestProduct._id, {
-          category: updatedCategory,
-        });
+        if (oldestProduct) {
+          const updatedCategory = oldestProduct.category.filter(
+            (cat: string) => cat !== "new-featured"
+          );
+
+          await Product.findByIdAndUpdate(oldestProduct._id, {
+            category: updatedCategory,
+          });
+        }
       }
 
       return NextResponse.json({
@@ -179,7 +198,6 @@ const handler = async (request: NextRequest) => {
       });
     } catch (error) {
       console.error("Error:", error);
-      // Mengembalikan respons berdasarkan jenis kesalahan
       if (error instanceof jwt.JsonWebTokenError) {
         return NextResponse.json(
           { status: false, statusCode: 403, message: "Access Denied" },

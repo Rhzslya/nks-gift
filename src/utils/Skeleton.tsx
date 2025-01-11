@@ -5,7 +5,7 @@ const CardSkeleton = ({ cards }: any) => {
   return Array(cards)
     .fill(0)
     .map((item, i) => (
-      <div className="card-skeleton p-[2px]" key={i}>
+      <div className="card-skeleton p-[0px]" key={i}>
         <Skeleton className="h-[140px] mb-2" />
         <Skeleton className="h-[24px]" />
         <div className="grid grid-cols-2 gap-2">

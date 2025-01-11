@@ -13,8 +13,17 @@ import { productPageSortOptions } from "@/utils/SortOptions";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import CardSkeleton from "@/utils/Skeleton";
+import PaginationToolbar from "@/components/Admin/PaginationToolbar";
 
-const ProductsViews = ({ productsData, isLoading }: any) => {
+const ProductsViews = ({
+  productsData,
+  isLoading,
+  handleDataPerPage,
+  dataPerPage,
+  currentPage,
+  totalPages,
+  setCurrentPage,
+}: any) => {
   const path = usePathname();
   const router = useRouter();
   const [sortBy, setSortBy] = useState("sold");
@@ -45,7 +54,6 @@ const ProductsViews = ({ productsData, isLoading }: any) => {
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      // Arahkan pengguna ke halaman pencarian dengan query
       router.push(`products/search?q=${searchQuery}`);
     }
   };
@@ -229,6 +237,15 @@ const ProductsViews = ({ productsData, isLoading }: any) => {
           ))
         )}
       </div>
+      <PaginationToolbar
+        usersPerPage={dataPerPage}
+        handleUsersPerPage={handleDataPerPage}
+        items={productsData}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        setCurrentPage={setCurrentPage}
+        rowsPerPageOptions={[5]}
+      />
     </div>
   );
 };
