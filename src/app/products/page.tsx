@@ -6,7 +6,7 @@ import React, { useEffect, useState } from "react";
 
 const Products = () => {
   const [productsData, setProductsData] = useState<any[]>([]);
-  const [dataPerPage, setDataPerPage] = useState(5);
+  const [dataPerPage, setDataPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
@@ -15,50 +15,51 @@ const Products = () => {
   const fetchProducts = async (page: number) => {
     const cachedData = localStorage.getItem(`products_page_${page}`);
 
-    if (cachedData) {
-      const parsedData = JSON.parse(cachedData);
-      setProductsData(parsedData.data);
-      setTotalPages(parsedData.totalPages);
-      setIsLoading(false);
-    } else {
-      setIsLoading(true);
-      try {
-        const response = await fetch(
-          `/api/products?page=${page}&limit=${dataPerPage}`,
-          {
-            next: { revalidate: 1 },
-            mode: "cors",
-            headers: {
-              "Cache-Control": "no-cache",
-              "Content-Type": "application/json",
-            },
-            method: "GET",
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(
-            `Failed to fetch products. HTTP status: ${response.status}`
-          );
+    // if (cachedData) {
+    //   const parsedData = JSON.parse(cachedData);
+    //   setProductsData(parsedData.data);
+    //   setTotalPages(parsedData.totalPages);
+    //   setIsLoading(false);
+    // } else {
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `/api/products?page=${page}&limit=${dataPerPage}`,
+        {
+          next: { revalidate: 1 },
+          mode: "cors",
+          headers: {
+            "Cache-Control": "no-cache",
+            "Content-Type": "application/json",
+          },
+          method: "GET",
         }
+      );
 
-        const data = await response.json();
-        setProductsData(data.data);
-        setTotalPages(data.totalPages);
-
-        localStorage.setItem(
-          `products_page_${page}`,
-          JSON.stringify({
-            data: data.data,
-            totalPages: data.totalPages,
-          })
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch products. HTTP status: ${response.status}`
         );
-      } catch (error) {
-        console.error("Failed to fetch products:", error);
-      } finally {
-        setIsLoading(false);
       }
+
+      const data = await response.json();
+      setProductsData(data.data);
+      setTotalPages(data.totalPages);
+      console.log(data);
+
+      localStorage.setItem(
+        `products_page_${page}`,
+        JSON.stringify({
+          data: data.data,
+          totalPages: data.totalPages,
+        })
+      );
+    } catch (error) {
+      console.error("Failed to fetch products:", error);
+    } finally {
+      setIsLoading(false);
     }
+    // }
   };
 
   useEffect(() => {

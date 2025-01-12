@@ -37,13 +37,15 @@ const handler = async (request: NextRequest) => {
       const category = request.nextUrl.searchParams.get("category") || "";
       const id = request.nextUrl.searchParams.get("id") || "";
       const limit = parseInt(
-        request.nextUrl.searchParams.get("limit") || "5",
+        request.nextUrl.searchParams.get("limit") || "10",
         10
       );
       const page = parseInt(
         request.nextUrl.searchParams.get("page") || "1",
         10
       );
+
+      console.log(limit);
 
       if (
         isNaN(limit) ||

@@ -179,7 +179,7 @@ const ProductsViews = ({
         </div>
       </div>
 
-      <div className="product-list grid grid-cols-[repeat(auto-fit,_minmax(auto,_150px))] gap-4 p-4">
+      <div className="product-list grid grid-cols-[repeat(auto-fit,_minmax(auto,_180px))] gap-4 p-4">
         {isLoading ? (
           <CardSkeleton cards={16} />
         ) : (
@@ -189,13 +189,13 @@ const ProductsViews = ({
               key={product._id}
               className="product-item flex flex-col border p-2 rounded-lg shadow-lg"
             >
-              <div className="relative w-full mb-4">
+              <div className="relative w-full mb-4 flex justify-center">
                 <Image
                   src={product.productImage}
                   alt={product.productName}
                   className="object-cover rounded-sm "
                   quality={100}
-                  width={150}
+                  width={160}
                   height={200}
                   priority
                 />
@@ -244,7 +244,7 @@ const ProductsViews = ({
         currentPage={currentPage}
         totalPages={totalPages}
         setCurrentPage={setCurrentPage}
-        rowsPerPageOptions={[5]}
+        rowsPerPageOptions={[5, 10]}
       />
     </div>
   );
