@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ProductCategories } from "@/utils/ProductCategories";
 import { NavigationMenuProduct } from "@/components/NavLink";
 import { usePathname, useRouter } from "next/navigation"; // Import useRouter
@@ -31,6 +31,8 @@ const ProductsViews = ({
   const path = usePathname();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+  const dropdownSortingRef = useRef<HTMLDivElement | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   const filteredProducts = productsData.filter((product: any) =>
     product.productName.toLowerCase().includes(searchQuery.toLowerCase())
@@ -46,6 +48,27 @@ const ProductsViews = ({
     }
   };
 
+  const handleClickSortingOutside = (e: MouseEvent) => {
+    if (
+      dropdownSortingRef.current &&
+      !dropdownSortingRef.current.contains(event?.target as Node)
+    ) {
+      setIsOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickSortingOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickSortingOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickSortingOutside);
+    };
+  }, [isOpen]);
+
   const generateBreadcrumbs = () => {
     const segments = path.split("/").filter(Boolean);
     return segments.map((segment, index) => {
@@ -55,6 +78,18 @@ const ProductsViews = ({
     });
   };
   const breadcrumbs = generateBreadcrumbs();
+
+  const getSortLabel = (field: string, order: string): string => {
+    const options: Record<string, string> = {
+      price_desc: "Highest Price",
+      price_asc: "Lowest Price",
+      createdAt_desc: "Newest Products",
+      createdAt_asc: "Oldest Products",
+      productName_asc: "A-Z (Product Name)",
+      productName_desc: "Z-A (Product Name)",
+    };
+    return options[`${field}_${order}`] || "Sort By";
+  };
 
   return (
     <div className="max-w-[1400px] m-auto">
@@ -89,15 +124,16 @@ const ProductsViews = ({
         </nav>
       </div>
       <div className="flex py-2 px-6 text-sm text-gray-500 border-b-[1px] border-gray-200 ">
-        <div className="flex items-center">
+        {/* <div className="flex items-center">
           <p>Sort By :</p>
           <div className="relative ml-2">
             <select
-              value={`${sortField}_${sortOrder}`} // Gabungkan field dan order
+              value={`${sortField}_${sortOrder}`}
               onChange={(e) => {
                 const [field, order] = e.target.value.split("_");
-                handleSortChange(field, order); // Ubah sesuai opsi
+                handleSortChange(field, order);
               }}
+              className="cursor-pointer bg-transparent border-[1px] border-gray-200 outline-none p-2 rounded-md appearance-none"
             >
               <option value="price_desc">Highest Price</option>
               <option value="price_asc">Lowest Price</option>
@@ -106,8 +142,59 @@ const ProductsViews = ({
               <option value="productName_asc">A-Z (Product Name)</option>
               <option value="productName_desc">Z-A (Product Name)</option>
             </select>
-
             <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none"></span>
+          </div>
+        </div> */}
+        <div className="flex items-center" ref={dropdownSortingRef}>
+          <p className="text-xs font-semibold">Sort By:</p>
+          <div className="relative ml-2">
+            <button
+              className="flex items-center justify-between border-[1px] border-gray-200 p-2 rounded-md bg-transparent w-48"
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              {getSortLabel(sortField, sortOrder)}
+              <i
+                className={`text-[20px] transform transition-transform duration-300 ${
+                  isOpen ? "rotate-180" : "rotate-0"
+                } bx bx-chevron-down`}
+              ></i>
+            </button>
+
+            <div
+              className={`absolute z-10 mt-2 w-full bg-white border border-gray-200 rounded-md shadow-md transition-all duration-300 ease-in-out transform ${
+                isOpen
+                  ? "opacity-100 scale-100 visible"
+                  : "opacity-0 scale-95 invisible"
+              }`}
+            >
+              {[
+                { label: "Highest Price", field: "price", order: "desc" },
+                { label: "Lowest Price", field: "price", order: "asc" },
+                { label: "Newest Products", field: "createdAt", order: "desc" },
+                { label: "Oldest Products", field: "createdAt", order: "asc" },
+                {
+                  label: "A-Z (Product Name)",
+                  field: "productName",
+                  order: "asc",
+                },
+                {
+                  label: "Z-A (Product Name)",
+                  field: "productName",
+                  order: "desc",
+                },
+              ].map(({ label, field, order }) => (
+                <button
+                  key={`${field}_${order}`}
+                  onClick={() => {
+                    handleSortChange(field, order);
+                    setIsOpen(false);
+                  }}
+                  className="block w-full px-4 py-2 text-left hover:bg-gray-100"
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
