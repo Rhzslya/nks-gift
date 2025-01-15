@@ -6,10 +6,13 @@ import React, { useEffect, useState } from "react";
 
 const Products = () => {
   const [productsData, setProductsData] = useState<any[]>([]);
-  const [dataPerPage, setDataPerPage] = useState(10);
+  const [dataPerPage, setDataPerPage] = useState(14);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
+  const [totalProducts, setTotalProducts] = useState(null);
+  const [sortField, setSortField] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState("desc");
 
   // Fungsi untuk mengambil produk dari API atau cache
   const fetchProducts = async (page: number) => {
@@ -24,7 +27,7 @@ const Products = () => {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `/api/products?page=${page}&limit=${dataPerPage}`,
+        `/api/products?page=${page}&limit=${dataPerPage}&sort=${sortField}&order=${sortOrder}`,
         {
           next: { revalidate: 1 },
           mode: "cors",
@@ -45,7 +48,7 @@ const Products = () => {
       const data = await response.json();
       setProductsData(data.data);
       setTotalPages(data.totalPages);
-      console.log(data);
+      setTotalProducts(data.total);
 
       localStorage.setItem(
         `products_page_${page}`,
@@ -64,10 +67,16 @@ const Products = () => {
 
   useEffect(() => {
     fetchProducts(currentPage);
-  }, [currentPage, dataPerPage]);
+  }, [currentPage, dataPerPage, sortField, sortOrder]);
 
   const handleDataPerPage = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setDataPerPage(parseInt(e.target.value, 10));
+    setCurrentPage(1);
+  };
+
+  const handleSortChange = (field: string, order: string) => {
+    setSortField(field);
+    setSortOrder(order);
     setCurrentPage(1);
   };
 
@@ -78,12 +87,16 @@ const Products = () => {
       </Head>
       <ProductsViews
         productsData={productsData}
+        totalProducts={totalProducts}
         isLoading={isLoading}
         handleDataPerPage={handleDataPerPage}
         dataPerPage={dataPerPage}
         currentPage={currentPage}
         totalPages={totalPages}
         setCurrentPage={setCurrentPage}
+        handleSortChange={handleSortChange}
+        sortField={sortField}
+        sortOrder={sortOrder}
       />
     </>
   );

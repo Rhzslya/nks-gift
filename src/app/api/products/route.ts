@@ -35,6 +35,9 @@ const handler = async (request: NextRequest) => {
       const allowedRoles = ["manager", "admin", "super_admin"];
       const searchQuery = request.nextUrl.searchParams.get("q") || "";
       const category = request.nextUrl.searchParams.get("category") || "";
+      const sortField = request.nextUrl.searchParams.get("sort") || "createdAt";
+      const sortOrder =
+        request.nextUrl.searchParams.get("order") === "asc" ? 1 : -1;
       const id = request.nextUrl.searchParams.get("id") || "";
       const limit = parseInt(
         request.nextUrl.searchParams.get("limit") || "10",
@@ -44,8 +47,6 @@ const handler = async (request: NextRequest) => {
         request.nextUrl.searchParams.get("page") || "1",
         10
       );
-
-      console.log(limit);
 
       if (
         isNaN(limit) ||
@@ -75,9 +76,17 @@ const handler = async (request: NextRequest) => {
         query.productId = id;
       }
 
+      const allowedSortFields = ["productName", "price", "createdAt"];
+      if (!allowedSortFields.includes(sortField)) {
+        return NextResponse.json(
+          { status: false, statusCode: 400, message: "Invalid sort field" },
+          { status: 400 }
+        );
+      }
+
       const skip = (page - 1) * limit;
       const products = await Product.find(query)
-        .sort({ createdAt: -1 })
+        .sort({ [sortField]: sortOrder })
         .skip(skip)
         .limit(limit);
 

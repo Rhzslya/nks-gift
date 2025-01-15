@@ -17,32 +17,20 @@ import PaginationToolbar from "@/components/Admin/PaginationToolbar";
 
 const ProductsViews = ({
   productsData,
+  totalProducts,
   isLoading,
   handleDataPerPage,
   dataPerPage,
   currentPage,
   totalPages,
   setCurrentPage,
+  handleSortChange,
+  sortField,
+  sortOrder,
 }: any) => {
   const path = usePathname();
   const router = useRouter();
-  const [sortBy, setSortBy] = useState("sold");
   const [searchQuery, setSearchQuery] = useState("");
-
-  const sortProducts = (products: any[], sortBy: string) => {
-    return [...products].sort((a, b) => {
-      if (sortBy === "sold") {
-        return b.sold - a.sold;
-      } else if (sortBy === "price") {
-        const priceA =
-          typeof a.price === "string" ? parseFloat(a.price) : a.price;
-        const priceB =
-          typeof b.price === "string" ? parseFloat(b.price) : b.price;
-        return priceB - priceA;
-      }
-      return 0;
-    });
-  };
 
   const filteredProducts = productsData.filter((product: any) =>
     product.productName.toLowerCase().includes(searchQuery.toLowerCase())
@@ -67,8 +55,6 @@ const ProductsViews = ({
     });
   };
   const breadcrumbs = generateBreadcrumbs();
-
-  const sortedProducts = sortProducts(productsData, sortBy);
 
   return (
     <div className="max-w-[1400px] m-auto">
@@ -107,26 +93,28 @@ const ProductsViews = ({
           <p>Sort By :</p>
           <div className="relative ml-2">
             <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="appearance-none outline-none cursor-pointer bg-transparent border-none text-sm font-medium text-sky-300 pr-8 py-1"
+              value={`${sortField}_${sortOrder}`} // Gabungkan field dan order
+              onChange={(e) => {
+                const [field, order] = e.target.value.split("_");
+                handleSortChange(field, order); // Ubah sesuai opsi
+              }}
             >
-              {productPageSortOptions.map((option) => (
-                <option key={option.label} value={option.field}>
-                  {option.label}
-                </option>
-              ))}
+              <option value="price_desc">Highest Price</option>
+              <option value="price_asc">Lowest Price</option>
+              <option value="createdAt_desc">Newest Products</option>
+              <option value="createdAt_asc">Oldest Products</option>
+              <option value="productName_asc">A-Z (Product Name)</option>
+              <option value="productName_desc">Z-A (Product Name)</option>
             </select>
-            <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-              <i className="bx bx-chevron-down text-[20px]"></i>
-            </span>
+
+            <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none"></span>
           </div>
         </div>
       </div>
 
       <div className="flex justify-between py-2 px-6 text-sm text-gray-500">
         <div className="">
-          <p>({productsData.length}) Items Found</p>
+          <p>({totalProducts}) Items Found</p>
         </div>
         <div className="relative w-full max-w-xs flex">
           <span className="absolute inset-y-0 left-0 top-0 flex items-center pl-3 pr-2 border-r-[1px] border-gray-300">
@@ -183,7 +171,7 @@ const ProductsViews = ({
         {isLoading ? (
           <CardSkeleton cards={16} />
         ) : (
-          sortedProducts.map((product: any) => (
+          productsData.map((product: any) => (
             <Link
               href={`products/${product.category[0]}/${product.productId}`}
               key={product._id}
@@ -240,11 +228,11 @@ const ProductsViews = ({
       <PaginationToolbar
         usersPerPage={dataPerPage}
         handleUsersPerPage={handleDataPerPage}
-        items={productsData}
+        items={totalProducts}
         currentPage={currentPage}
         totalPages={totalPages}
         setCurrentPage={setCurrentPage}
-        rowsPerPageOptions={[5, 10]}
+        rowsPerPageOptions={[dataPerPage]}
       />
     </div>
   );

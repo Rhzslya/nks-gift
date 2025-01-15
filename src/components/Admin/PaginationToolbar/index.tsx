@@ -5,11 +5,11 @@ import MyPagination from "@/utils/Pagination";
 interface PaginationToolbarProps {
   usersPerPage: number;
   handleUsersPerPage: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  items: any[]; // Anda dapat mengganti any dengan tipe data yang lebih spesifik jika ada
+  items: number;
   currentPage: number;
   totalPages: number;
   setCurrentPage: (page: number) => void;
-  rowsPerPageOptions?: number[]; // Tambahkan prop untuk opsi jumlah baris per halaman
+  rowsPerPageOptions?: number[];
 }
 
 const PaginationToolbar: React.FC<PaginationToolbarProps> = ({
@@ -22,10 +22,10 @@ const PaginationToolbar: React.FC<PaginationToolbarProps> = ({
   rowsPerPageOptions = [5, 10, 15],
 }) => {
   return (
-    <div className="py-2 px-2 flex justify-between items-center">
+    <div className="relative py-2 px-2 flex justify-between items-center">
       <div className="pr-10 text-xs text-gray-500">
         <p>
-          Rows per page
+          Items per page
           <select
             value={usersPerPage}
             onChange={(e) => {
@@ -39,7 +39,7 @@ const PaginationToolbar: React.FC<PaginationToolbarProps> = ({
               </option>
             ))}
           </select>{" "}
-          of {items?.length} items
+          of {items} items
         </p>
       </div>
       <MyPagination

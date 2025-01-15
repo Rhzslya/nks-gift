@@ -365,7 +365,7 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
           <PaginationToolbar
             usersPerPage={usersPerPage}
             handleUsersPerPage={handleUsersPerPage}
-            items={products}
+            items={products.length}
             currentPage={currentPage}
             totalPages={totalPages}
             setCurrentPage={setCurrentPage}

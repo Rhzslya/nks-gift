@@ -313,7 +313,7 @@ const ArchivedUsersViews: React.FC<ArchivedUsersViewsProps> = ({
           <PaginationToolbar
             usersPerPage={usersPerPage}
             handleUsersPerPage={handleUsersPerPage}
-            items={users}
+            items={users.length}
             currentPage={currentPage}
             totalPages={totalPages}
             setCurrentPage={setCurrentPage}
