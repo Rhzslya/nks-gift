@@ -26,17 +26,24 @@ interface SearchViewsProps {
 
 const SearchViews: React.FC<SearchViewsProps> = ({ path }) => {
   const searchParams = useSearchParams(); // Get search params from URL
-  const query = searchParams.get("q"); // Get the value from the 'q' query parameter
+  const searchQuery = searchParams.get("q"); // Get the value from the 'q' searchQuery parameter
   const [products, setProducts] = useState<Product[]>([]); // State for products
   const [loading, setLoading] = useState<boolean>(true); // State for loading status
 
   useEffect(() => {
-    if (query) {
-      // Fetch products that match the query
+    if (searchQuery) {
+      // Fetch products that match the searchQuery
       const fetchProducts = async () => {
         setLoading(true);
         try {
-          const response = await fetch(`/api/products?q=${query}`);
+          const response = await fetch(`/api/products?q=${searchQuery}`, {
+            mode: "cors",
+            headers: {
+              "Cache-Control": "no-cache",
+              "Content-Type": "application/json",
+            },
+            method: "GET",
+          });
           const data = await response.json();
           if (data.status) {
             setProducts(data.data);
@@ -50,7 +57,7 @@ const SearchViews: React.FC<SearchViewsProps> = ({ path }) => {
 
       fetchProducts();
     }
-  }, [query]);
+  }, []);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -66,7 +73,6 @@ const SearchViews: React.FC<SearchViewsProps> = ({ path }) => {
   };
 
   const breadcrumbs = generateBreadcrumbs();
-  console.log(breadcrumbs);
 
   return (
     <div className="max-w-[1400px] m-auto">
@@ -101,7 +107,7 @@ const SearchViews: React.FC<SearchViewsProps> = ({ path }) => {
         </nav>
       </div>
       <div className="px-6 text-gray-500 text-sm">
-        <h1>{`Search Results for "${query}"`}</h1>
+        <h1>{`Search Results for "${searchQuery}"`}</h1>
       </div>
       <div className="product-list grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 p-6">
         {products.length > 0 ? (

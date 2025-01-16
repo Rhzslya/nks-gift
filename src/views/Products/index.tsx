@@ -27,26 +27,15 @@ const ProductsViews = ({
   handleSortChange,
   sortField,
   sortOrder,
+  searchQuery,
+  filteredProducts,
+  onSearchInputChange,
+  handleKeyDown,
+  handleMoreResult,
 }: any) => {
   const path = usePathname();
-  const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState("");
   const dropdownSortingRef = useRef<HTMLDivElement | null>(null);
   const [isOpen, setIsOpen] = useState(false);
-
-  const filteredProducts = productsData.filter((product: any) =>
-    product.productName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      router.push(`products/search?q=${searchQuery}`);
-    }
-  };
 
   const handleClickSortingOutside = (e: MouseEvent) => {
     if (
@@ -212,7 +201,7 @@ const ProductsViews = ({
             placeholder="Search Product"
             className="w-full px-2 py-1 border rounded-full text-sm pl-12 focus:border-sky-300 focus:outline-none"
             value={searchQuery}
-            onChange={handleSearchChange}
+            onChange={onSearchInputChange}
             onKeyDown={handleKeyDown}
           />
           {searchQuery && (
@@ -239,11 +228,10 @@ const ProductsViews = ({
                   No products found.
                 </p>
               )}
+
               {filteredProducts.length > 5 && (
                 <button
-                  onClick={() =>
-                    router.push(`/products/search?q=${searchQuery}`)
-                  }
+                  onClick={handleMoreResult}
                   className="block w-full text-center py-2 bg-white border-b border-x hover:bg-gray-200 rounded-b-lg"
                 >
                   View More Results

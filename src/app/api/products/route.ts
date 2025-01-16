@@ -16,7 +16,7 @@ const handler = async (request: NextRequest) => {
   const referer = request.headers.get("referer");
   const origin =
     request.headers.get("origin") ||
-    (referer ? referer.split("/").slice(0, 3).join("/") : ""); // Ambil skema dan host
+    (referer ? referer.split("/").slice(0, 3).join("/") : "");
 
   if (!allowedOrigins.includes(origin)) {
     return NextResponse.json(
