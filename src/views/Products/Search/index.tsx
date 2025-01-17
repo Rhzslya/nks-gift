@@ -10,54 +10,9 @@ import Image from "next/image";
 import { capitalizeFirst } from "@/utils/Capitalize";
 import { formatPriceToIDR } from "@/utils/FormatPrice";
 
-// Define a type for Product
-interface Product {
-  _id: string;
-  productId: string;
-  productName: string;
-  productImage: string;
-  category: string;
-  price: number;
-}
-
-interface SearchViewsProps {
-  path: string;
-}
-
-const SearchViews: React.FC<SearchViewsProps> = ({ path }) => {
+const SearchViews = ({ path, products, loading }: any) => {
   const searchParams = useSearchParams(); // Get search params from URL
   const searchQuery = searchParams.get("q"); // Get the value from the 'q' searchQuery parameter
-  const [products, setProducts] = useState<Product[]>([]); // State for products
-  const [loading, setLoading] = useState<boolean>(true); // State for loading status
-
-  useEffect(() => {
-    if (searchQuery) {
-      // Fetch products that match the searchQuery
-      const fetchProducts = async () => {
-        setLoading(true);
-        try {
-          const response = await fetch(`/api/products?q=${searchQuery}`, {
-            mode: "cors",
-            headers: {
-              "Cache-Control": "no-cache",
-              "Content-Type": "application/json",
-            },
-            method: "GET",
-          });
-          const data = await response.json();
-          if (data.status) {
-            setProducts(data.data);
-          }
-        } catch (error) {
-          console.error("Error fetching products:", error);
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      fetchProducts();
-    }
-  }, []);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -65,13 +20,12 @@ const SearchViews: React.FC<SearchViewsProps> = ({ path }) => {
 
   const generateBreadcrumbs = () => {
     const segments = path.split("/").filter(Boolean);
-    return segments.map((segment, index) => {
+    return segments.map((segment: any, index: any) => {
       const href = "/" + segments.slice(0, index + 1).join("/");
-      const label = capitalizeFirst(segment);
+      const label = capitalizeFirst(segment.replace(/-/, " "));
       return { href, label };
     });
   };
-
   const breadcrumbs = generateBreadcrumbs();
 
   return (
@@ -92,7 +46,7 @@ const SearchViews: React.FC<SearchViewsProps> = ({ path }) => {
           <Link href="/" className="hover:underline">
             Home
           </Link>
-          {breadcrumbs.map((breadcrumb, index) => (
+          {breadcrumbs.map((breadcrumb: any, index: any) => (
             <React.Fragment key={index}>
               <span>&gt;</span>
               {breadcrumb.href === path ? (
@@ -111,7 +65,7 @@ const SearchViews: React.FC<SearchViewsProps> = ({ path }) => {
       </div>
       <div className="product-list grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 p-6">
         {products.length > 0 ? (
-          products.map((product) => (
+          products.map((product: any) => (
             <Link
               href={`${product.category}/${product.productId}`}
               key={product._id}

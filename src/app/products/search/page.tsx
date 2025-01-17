@@ -9,16 +9,30 @@ import Link from "next/link";
 import Image from "next/image";
 import { capitalizeFirst } from "@/utils/Capitalize";
 import { formatPriceToIDR } from "@/utils/FormatPrice";
+
+// Define a type for Product
+interface Product {
+  _id: string;
+  productId: string;
+  productName: string;
+  productImage: string;
+  category: string;
+  price: number;
+}
+
 import SearchViews from "@/views/Products/Search";
 const Search = () => {
   const searchParams = useSearchParams(); // Mengambil search params dari URL
   const query = searchParams.get("q"); // Mengambil nilai dari query parameter 'q'
   const path = usePathname();
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+
+  console.log(path);
 
   useEffect(() => {
     if (query) {
+      console.log(query);
       // Panggil API untuk mendapatkan produk yang cocok dengan query
       const fetchProducts = async () => {
         setLoading(true);
@@ -39,11 +53,7 @@ const Search = () => {
     }
   }, [query]);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  return <SearchViews path={path} />;
+  return <SearchViews path={path} products={products} loading={loading} />;
 };
 
 export default Search;

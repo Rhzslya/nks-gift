@@ -8,13 +8,11 @@ export async function GET(request: Request) {
   console.log("Search Query:", searchQuery);
 
   try {
-    console.log("Connecting to MongoDB...");
     await connect();
-    console.log("Connected to MongoDB");
 
     const products = await Product.find(
       { productName: { $regex: searchQuery, $options: "i" } },
-      { productName: 1, _id: 0 }
+      { productName: 1, category: 1, productId: 1, _id: 0 }
     );
 
     return NextResponse.json({
