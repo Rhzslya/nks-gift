@@ -208,6 +208,7 @@ const ProductsViews = ({
             <div className="absolute w-full top-6 py-2 z-10">
               {filteredProducts.length > 0 ? (
                 <ul
+                  key={filteredProducts.productId}
                   className={`bg-white border shadow-lg divide-y ${
                     filteredProducts.length <= 5 ? "rounded-lg" : "rounded-t-lg"
                   }`}
@@ -244,7 +245,7 @@ const ProductsViews = ({
 
       <div className="product-list grid grid-cols-[repeat(auto-fit,_minmax(auto,_180px))] gap-4 p-4">
         {isLoading ? (
-          <CardSkeleton cards={16} />
+          <CardSkeleton cards={14} />
         ) : (
           productsData.map((product: any) => (
             <Link
@@ -256,16 +257,21 @@ const ProductsViews = ({
                 <Image
                   src={product.productImage}
                   alt={product.productName}
-                  className="object-cover rounded-sm "
+                  className="object-cover rounded-sm w-[160px]"
                   quality={100}
                   width={160}
-                  height={200}
+                  height={0}
                   priority
                 />
               </div>
-              <h3 className="text-base font-medium truncate">
-                {product.productName}
-              </h3>
+              <div className="title-container relative group">
+                <h3 className="text-base font-medium truncate">
+                  {product.productName}
+                </h3>
+                <div className="absolute left-0 top-full mt-1 w-max max-w-xs bg-gray-800 text-white text-sm rounded px-2 py-1 shadow-md opacity-0 transition-opacity duration-200 delay-500 group-hover:opacity-100 ">
+                  {product.productName}
+                </div>
+              </div>
               <div className="flex justify-between pb-2 border-b-[1px] border-gray-400 text-xs">
                 <p className="text-gray-600 mb-1">
                   {capitalizeFirst(product.category[0])}
