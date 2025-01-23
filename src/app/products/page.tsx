@@ -144,7 +144,7 @@ const Products = () => {
   };
 
   return (
-    <>
+    <main className="relative">
       <Head>
         <title>Products</title>
       </Head>
@@ -167,7 +167,7 @@ const Products = () => {
         handleKeyDown={handleKeyDown}
         handleMoreResult={handleMoreResult}
       />
-    </>
+    </main>
   );
 };
 

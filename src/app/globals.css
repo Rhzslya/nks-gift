@@ -96,3 +96,7 @@ input[type="number"] {
   background: #6b7280;
   cursor: pointer;
 }
+
+.main-w-header {
+  height: calc(100vh - 57px);
+}

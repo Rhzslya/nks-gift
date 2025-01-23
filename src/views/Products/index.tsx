@@ -81,7 +81,7 @@ const ProductsViews = ({
   };
 
   return (
-    <div className="max-w-[1400px] m-auto">
+    <div className="max-w-[1400px] m-auto flex flex-col main-w-header">
       <div className="flex justify-center px-6 bg-white">
         <NavigationMenuProduct
           items={[
@@ -306,15 +306,17 @@ const ProductsViews = ({
           ))
         )}
       </div>
-      <PaginationToolbar
-        usersPerPage={dataPerPage}
-        handleUsersPerPage={handleDataPerPage}
-        items={totalProducts}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        setCurrentPage={setCurrentPage}
-        rowsPerPageOptions={[dataPerPage]}
-      />
+      <div className="mt-auto pb-4">
+        <PaginationToolbar
+          usersPerPage={dataPerPage}
+          handleUsersPerPage={handleDataPerPage}
+          items={totalProducts}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          setCurrentPage={setCurrentPage}
+          rowsPerPageOptions={[dataPerPage]}
+        />
+      </div>
     </div>
   );
 };
