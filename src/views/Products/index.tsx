@@ -306,7 +306,7 @@ const ProductsViews = ({
           ))
         )}
       </div>
-      <div className="mt-auto pb-4">
+      <div className="pagination mt-auto pb-4">
         <PaginationToolbar
           usersPerPage={dataPerPage}
           handleUsersPerPage={handleDataPerPage}
