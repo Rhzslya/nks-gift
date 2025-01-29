@@ -181,7 +181,7 @@ const ProductCategoryViews: React.FC<ProductCategoryViewsProps> = ({
                 <Image
                   src={product.productImage}
                   alt={product.productName}
-                  className="object-cover rounded-sm "
+                  className="object-cover rounded-sm"
                   quality={100}
                   width={150}
                   height={200}

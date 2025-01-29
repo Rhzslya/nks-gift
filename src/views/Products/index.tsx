@@ -190,7 +190,7 @@ const ProductsViews = ({
 
       <div className="flex justify-between py-2 px-6 text-sm text-gray-500">
         <div className="">
-          <p>({totalProducts}) Items Found</p>
+          <p>({totalProducts || productsData.length}) Items Found</p>
         </div>
         <div className="relative w-full max-w-xs flex">
           <span className="absolute inset-y-0 left-0 top-0 flex items-center pl-3 pr-2 border-r-[1px] border-gray-300">

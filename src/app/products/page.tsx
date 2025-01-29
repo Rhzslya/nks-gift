@@ -25,6 +25,7 @@ const Products = () => {
     //   const parsedData = JSON.parse(cachedData);
     //   setProductsData(parsedData.data);
     //   setTotalPages(parsedData.totalPages);
+    //   setTotalProducts(parsedData.totalProducts);
     //   setIsLoading(false);
     // } else {
     setIsLoading(true);
@@ -52,12 +53,12 @@ const Products = () => {
       setProductsData(data.data);
       setTotalPages(data.totalPages);
       setTotalProducts(data.total);
-
       localStorage.setItem(
         `products_page_${page}`,
         JSON.stringify({
           data: data.data,
           totalPages: data.totalPages,
+          totalProducts: data.total,
         })
       );
     } catch (error) {
