@@ -70,8 +70,8 @@ const ProductCategoryViews: React.FC<ProductCategoryViewsProps> = ({
   );
 
   return (
-    <div className="max-w-[1400px] m-auto">
-      <div className="breadcrumbs w-full px-6">
+    <div className="max-w-[1400px] m-auto flex flex-col main-w-header">
+      <div className="breadcrumbs w-full">
         <nav className="flex py-2 text-sm text-gray-500 space-x-2">
           <Link href="/" className="hover:underline">
             Home
