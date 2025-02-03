@@ -1,28 +1,64 @@
 "use client";
 
+import PaginationToolbar from "@/components/Admin/PaginationToolbar";
 import { capitalizeFirst } from "@/utils/Capitalize";
 import { formatPriceToIDR } from "@/utils/FormatPrice";
+import CardSkeleton from "@/utils/Skeleton";
 import { productPageSortOptions } from "@/utils/SortOptions";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import Skeleton from "react-loading-skeleton";
 
 interface ProductCategoryViewsProps {
   category: string;
-  productsDataByCategories: any;
+  productsDataByCategories: any[];
+  totalProducts: number | null;
+  isLoading: boolean;
+  handleDataPerPage: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  dataPerPage: number;
+  currentPage: number;
+  totalPages: number;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+  handleSortChange: (field: string, order: string) => void;
+  sortField: string;
+  sortOrder: string;
+  searchQuery: string;
+  handleSearchChange: (query: string) => void;
+  filteredProducts: any[];
+  onSearchInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  handleMoreResult: () => void;
 }
 
 const ProductCategoryViews: React.FC<ProductCategoryViewsProps> = ({
   category,
   productsDataByCategories,
+  totalProducts,
+  isLoading,
+  handleDataPerPage,
+  dataPerPage,
+  currentPage,
+  totalPages,
+  setCurrentPage,
+  handleSortChange,
+  sortField,
+  sortOrder,
+  searchQuery,
+  handleSearchChange,
+  filteredProducts,
+  onSearchInputChange,
+  handleKeyDown,
+  handleMoreResult,
 }) => {
   const path = usePathname();
   const router = useRouter(); // Inisialisasi router
   const productCategory = category.replace(/-/, " ");
   const [activeSortOption, setActiveSortOption] = useState("sold");
   const [searchKeyword, setSearchKeyword] = useState("");
+  const dropdownSortingRef = useRef<HTMLDivElement | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   const getSortedProducts = (products: any[], sortOption: string) => {
     return [...products].sort((a, b) => {
@@ -37,10 +73,6 @@ const ProductCategoryViews: React.FC<ProductCategoryViewsProps> = ({
       }
       return 0;
     });
-  };
-
-  const onSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchKeyword(e.target.value);
   };
 
   const onSearchKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -64,15 +96,22 @@ const ProductCategoryViews: React.FC<ProductCategoryViewsProps> = ({
   };
   const breadcrumbs = generateBreadcrumbs();
 
-  const sortedAndFilteredProducts = getSortedProducts(
-    filteredProductsByKeyword,
-    activeSortOption
-  );
+  const getSortLabel = (field: string, order: string): string => {
+    const options: Record<string, string> = {
+      price_desc: "Highest Price",
+      price_asc: "Lowest Price",
+      createdAt_desc: "Newest Products",
+      createdAt_asc: "Oldest Products",
+      productName_asc: "A-Z (Product Name)",
+      productName_desc: "Z-A (Product Name)",
+    };
+    return options[`${field}_${order}`] || "Sort By";
+  };
 
   return (
     <div className="max-w-[1400px] m-auto flex flex-col main-w-header">
       <div className="breadcrumbs w-full">
-        <nav className="flex py-2 text-sm text-gray-500 space-x-2">
+        <nav className="flex px-6 py-2 text-sm text-gray-500 space-x-2">
           <Link href="/" className="hover:underline">
             Home
           </Link>
@@ -91,23 +130,56 @@ const ProductCategoryViews: React.FC<ProductCategoryViewsProps> = ({
         </nav>
       </div>
       <div className="flex py-4 px-6  text-sm text-gray-500 border-b-[1px] border-gray-200 ">
-        <div className="flex items-center">
-          <p>Sort By :</p>
+        <div className="flex items-center" ref={dropdownSortingRef}>
+          <p className="text-xs font-semibold">Sort By:</p>
           <div className="relative ml-2">
-            <select
-              value={activeSortOption}
-              onChange={(e) => setActiveSortOption(e.target.value)}
-              className="appearance-none outline-none cursor-pointer bg-transparent border-none text-sm font-medium text-sky-300 pr-8 py-1"
+            <button
+              className="flex items-center justify-between border-[1px] border-gray-200 p-2 rounded-md bg-transparent w-48"
+              onClick={() => setIsOpen(!isOpen)}
             >
-              {productPageSortOptions.map((option) => (
-                <option key={option.label} value={option.field}>
-                  {option.label}
-                </option>
+              {getSortLabel(sortField, sortOrder)}
+              <i
+                className={`text-[20px] transform transition-transform duration-300 ${
+                  isOpen ? "rotate-180" : "rotate-0"
+                } bx bx-chevron-down`}
+              ></i>
+            </button>
+
+            <div
+              className={`absolute z-10 mt-2 w-full bg-white border border-gray-200 rounded-md shadow-md transition-all duration-300 ease-in-out transform ${
+                isOpen
+                  ? "opacity-100 scale-100 visible"
+                  : "opacity-0 scale-95 invisible"
+              }`}
+            >
+              {[
+                { label: "Highest Price", field: "price", order: "desc" },
+                { label: "Lowest Price", field: "price", order: "asc" },
+                { label: "Newest Products", field: "createdAt", order: "desc" },
+                { label: "Oldest Products", field: "createdAt", order: "asc" },
+                {
+                  label: "A-Z (Product Name)",
+                  field: "productName",
+                  order: "asc",
+                },
+                {
+                  label: "Z-A (Product Name)",
+                  field: "productName",
+                  order: "desc",
+                },
+              ].map(({ label, field, order }) => (
+                <button
+                  key={`${field}_${order}`}
+                  onClick={() => {
+                    handleSortChange(field, order);
+                    setIsOpen(false);
+                  }}
+                  className="block w-full px-4 py-2 text-left hover:bg-gray-100"
+                >
+                  {label}
+                </button>
               ))}
-            </select>
-            <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-              <i className="bx bx-chevron-down text-[20px]"></i>
-            </span>
+            </div>
           </div>
         </div>
       </div>
@@ -169,28 +241,35 @@ const ProductCategoryViews: React.FC<ProductCategoryViewsProps> = ({
         </div>
       </div>
 
-      <div className="product-list grid grid-cols-[repeat(auto-fit,_minmax(auto,_150px))] gap-4 p-4">
-        {sortedAndFilteredProducts.length > 0 ? (
-          sortedAndFilteredProducts.map((product: any) => (
+      <div className="product-list grid grid-cols-[repeat(auto-fit,_minmax(auto,_180px))] gap-4 p-4">
+        {isLoading ? (
+          <CardSkeleton cards={14} />
+        ) : (
+          productsDataByCategories.map((product: any) => (
             <Link
-              href={`${product.category[0]}/${product.productId}`}
+              href={`/products/${product.category[0]}/${product.productId}`}
               key={product._id}
               className="product-item flex flex-col border p-2 rounded-lg shadow-lg"
             >
-              <div className="relative w-full mb-4">
+              <div className="relative w-full mb-4 flex justify-center">
                 <Image
                   src={product.productImage}
                   alt={product.productName}
-                  className="object-cover rounded-sm"
+                  className="object-cover rounded-sm w-[160px]"
                   quality={100}
-                  width={150}
-                  height={200}
+                  width={160}
+                  height={0}
                   priority
                 />
               </div>
-              <h3 className="text-base font-medium truncate">
-                {product.productName}
-              </h3>
+              <div className="title-container relative group">
+                <h3 className="text-base font-medium truncate">
+                  {product.productName}
+                </h3>
+                <div className="absolute left-0 top-full mt-1 w-max max-w-xs bg-gray-800 text-white text-sm rounded px-2 py-1 shadow-md opacity-0 transition-opacity duration-200 delay-500 group-hover:opacity-100 ">
+                  {product.productName}
+                </div>
+              </div>
               <div className="flex justify-between pb-2 border-b-[1px] border-gray-400 text-xs">
                 <p className="text-gray-600 mb-1">
                   {capitalizeFirst(product.category[0])}
@@ -223,9 +302,18 @@ const ProductCategoryViews: React.FC<ProductCategoryViewsProps> = ({
               </div>
             </Link>
           ))
-        ) : (
-          <Skeleton />
         )}
+      </div>
+      <div className="pagination mt-auto pb-4">
+        <PaginationToolbar
+          usersPerPage={dataPerPage}
+          handleUsersPerPage={handleDataPerPage}
+          items={totalProducts}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          setCurrentPage={setCurrentPage}
+          rowsPerPageOptions={[dataPerPage]}
+        />
       </div>
     </div>
   );

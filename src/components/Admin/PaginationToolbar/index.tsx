@@ -5,7 +5,7 @@ import MyPagination from "@/utils/Pagination";
 interface PaginationToolbarProps {
   usersPerPage: number;
   handleUsersPerPage: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  items: number;
+  items: number | null;
   currentPage: number;
   totalPages: number;
   setCurrentPage: (page: number) => void;
