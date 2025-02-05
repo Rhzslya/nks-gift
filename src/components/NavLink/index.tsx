@@ -34,23 +34,45 @@ export const NavLink: React.FC<NavLinkProps> = ({
           />
         </Link>
       </div>
-      <div className="flex items-center justify-center gap-4">
-        {sectionsNav?.map((item, index) => {
-          const linkPath = `/${item}`;
-          const isActive = isActiveLink(path, linkPath);
+      <div className="flex items-center justify-center gap-6">
+        <div className="hidden lg:flex gap-6">
+          {sectionsNav?.map((item, index) => {
+            const linkPath = `/${item}`;
+            const isActive = isActiveLink(path, linkPath);
 
-          return (
-            <Link
-              href={linkPath}
-              key={index}
-              className={`link ${
-                isActive ? "text-sky-500" : ""
-              } hover:text-sky-300 duration-300 text-[15px] font-medium`}
-            >
-              {capitalizeFirst(item)}
-            </Link>
-          );
-        })}
+            return (
+              <Link
+                href={linkPath}
+                key={index}
+                className={`link ${
+                  isActive ? "text-sky-500" : ""
+                } hover:text-sky-300 duration-300 text-[15px] font-medium`}
+              >
+                {capitalizeFirst(item)}
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* Mobile Wrapper */}
+        <div className="lg:hidden flex flex-col">
+          {sectionsNav?.map((item, index) => {
+            const linkPath = `/${item}`;
+            const isActive = isActiveLink(path, linkPath);
+
+            return (
+              <Link
+                href={linkPath}
+                key={index}
+                className={`link ${
+                  isActive ? "text-sky-500" : ""
+                } hover:text-sky-300 duration-300 text-[15px] font-medium`}
+              >
+                {capitalizeFirst(item)}
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
@@ -67,7 +89,6 @@ export const NavigationMenuProduct: React.FC<NavigationMenuProps> = ({
       {items
         .filter((option) => option.value !== "")
         .map((option) => {
-          // Tambahkan basePath jika path tidak memulai dengan basePath
           const linkPath = path.startsWith(basePath)
             ? `${basePath}/${option.value}`
             : `/${basePath}/${option.value}`;

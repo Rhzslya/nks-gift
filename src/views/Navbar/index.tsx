@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { sectionsNav, sectionsNavAdmin } from "@/utils/Sections";
 import { isActiveLink } from "@/utils/ActiveLink";
@@ -15,11 +15,30 @@ const NavbarViews = ({ serverSession }: { serverSession: any }) => {
   const { data: session, status } = useSession();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const dropDownAccountRef = useRef<HTMLDivElement | null>(null);
 
-  // Mengambil user dari session sisi klien atau server
+  const handleClickAccountOutside = (e: MouseEvent) => {
+    if (
+      dropDownAccountRef.current &&
+      !dropDownAccountRef.current.contains(e?.target as Node)
+    ) {
+      setIsDropdownOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isDropdownOpen) {
+      document.addEventListener("mousedown", handleClickAccountOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickAccountOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickAccountOutside);
+    };
+  }, [isDropdownOpen]);
+
   const user = session?.user || serverSession?.user;
-
-  // Tentukan navigasi berdasarkan role
   const getNavSections = () => {
     if (
       user?.role === "admin" ||
@@ -31,22 +50,17 @@ const NavbarViews = ({ serverSession }: { serverSession: any }) => {
     return sectionsNav;
   };
 
-  // Reset state dropdown ketika path berubah
   useEffect(() => {
     setIsDropdownOpen(false);
   }, [path]);
 
-  // Fungsi logout dengan reset session
   const handleSignOut = async () => {
     setIsLoading(true);
     await signOut({ redirect: false });
     setIsLoading(false);
   };
 
-  // Tombol Auth (Login/Logout)
   const renderAuthButton = () => {
-    // if (status === "loading") return <div className="">Loading</div>;
-
     return user ? (
       <UserDropDown
         user={user}
@@ -69,13 +83,16 @@ const NavbarViews = ({ serverSession }: { serverSession: any }) => {
     <>
       {!disableNavAndFooter.includes(path.split("/")[1]) && (
         <header className="flex justify-center border-b-[1px] border-gray-300 px-6 bg-white">
-          <nav className="w-[1400px] flex items-center justify-between text-base text-neutral-700 font-semi-bold h-14">
+          <nav className="w-[1400px] flex items-center justify-between text-base text-gray-400 font-semi-bold h-14">
             <NavLink
               sectionsNav={getNavSections()}
               isActiveLink={isActiveLink}
               path={path}
             />
-            <div className="flex gap-2 justify-center items-center ml-auto">
+            <div
+              className="relative flex gap-2 justify-center items-center ml-auto"
+              ref={dropDownAccountRef}
+            >
               {renderAuthButton()}
             </div>
           </nav>

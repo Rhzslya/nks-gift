@@ -306,13 +306,9 @@ const ProductCategoryViews: React.FC<ProductCategoryViewsProps> = ({
       </div>
       <div className="pagination mt-auto pb-4">
         <PaginationToolbar
-          usersPerPage={dataPerPage}
-          handleUsersPerPage={handleDataPerPage}
-          items={totalProducts}
           currentPage={currentPage}
           totalPages={totalPages}
           setCurrentPage={setCurrentPage}
-          rowsPerPageOptions={[dataPerPage]}
         />
       </div>
     </div>

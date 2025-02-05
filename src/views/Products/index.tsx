@@ -81,7 +81,7 @@ const ProductsViews = ({
   };
 
   return (
-    <div className="max-w-[1400px] m-auto flex flex-col main-w-header">
+    <div className="max-w-[1400px] m-auto flex flex-col main-w-header ">
       <div className="flex justify-center px-6 bg-white">
         <NavigationMenuProduct
           items={[
@@ -188,7 +188,7 @@ const ProductsViews = ({
         </div>
       </div>
 
-      <div className="flex justify-between py-2 px-6 text-sm text-gray-500">
+      <div className="flex justify-between items-center py-2 px-6 text-sm text-gray-500">
         <div className="">
           <p>({totalProducts || productsData.length}) Items Found</p>
         </div>
@@ -243,7 +243,7 @@ const ProductsViews = ({
         </div>
       </div>
 
-      <div className="product-list grid grid-cols-[repeat(auto-fit,_minmax(auto,_180px))] gap-4 p-4">
+      <div className="product-list place-content-center grid grid-cols-[repeat(auto-fit,_minmax(auto,_180px))] gap-4 p-4">
         {isLoading ? (
           <CardSkeleton cards={14} />
         ) : (
@@ -306,15 +306,11 @@ const ProductsViews = ({
           ))
         )}
       </div>
-      <div className="pagination mt-auto pb-4">
+      <div className="pagination mt-auto ml-auto pb-4">
         <PaginationToolbar
-          usersPerPage={dataPerPage}
-          handleUsersPerPage={handleDataPerPage}
-          items={totalProducts}
           currentPage={currentPage}
           totalPages={totalPages}
           setCurrentPage={setCurrentPage}
-          rowsPerPageOptions={[dataPerPage]}
         />
       </div>
     </div>

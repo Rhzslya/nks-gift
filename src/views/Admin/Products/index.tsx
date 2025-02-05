@@ -363,13 +363,9 @@ const UsersManagementViews: React.FC<UsersManagementViewsProps> = ({
             handleModalViewDetails={handleModalViewDetails}
           />
           <PaginationToolbar
-            usersPerPage={usersPerPage}
-            handleUsersPerPage={handleUsersPerPage}
-            items={products.length}
             currentPage={currentPage}
             totalPages={totalPages}
             setCurrentPage={setCurrentPage}
-            rowsPerPageOptions={[5]}
           />
         </div>
       </div>

@@ -22,7 +22,7 @@ export default function MyPagination({
 
   const visiblePages = pageNumbers.slice(startPage - 1, endPage);
   return (
-    <div className="">
+    <div className="pagination">
       <ul className="flex justify-center items-center gap-1">
         <li>
           <button

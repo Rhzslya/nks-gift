@@ -311,9 +311,6 @@ const ArchivedUsersViews: React.FC<ArchivedUsersViewsProps> = ({
             variant="orange"
           />
           <PaginationToolbar
-            usersPerPage={usersPerPage}
-            handleUsersPerPage={handleUsersPerPage}
-            items={users.length}
             currentPage={currentPage}
             totalPages={totalPages}
             setCurrentPage={setCurrentPage}
