@@ -6,6 +6,7 @@ type NavLinkProps = {
   sectionsNav: string[];
   isActiveLink: (path: string, linkPath: string) => boolean;
   path: string;
+  isBurgerOpen: boolean;
 };
 
 type NavigationMenuProps = {
@@ -19,6 +20,7 @@ export const NavLink: React.FC<NavLinkProps> = ({
   sectionsNav,
   isActiveLink,
   path,
+  isBurgerOpen,
 }) => {
   return (
     <div className="flex">
@@ -39,7 +41,6 @@ export const NavLink: React.FC<NavLinkProps> = ({
           {sectionsNav?.map((item, index) => {
             const linkPath = `/${item}`;
             const isActive = isActiveLink(path, linkPath);
-
             return (
               <Link
                 href={linkPath}
@@ -55,23 +56,28 @@ export const NavLink: React.FC<NavLinkProps> = ({
         </div>
 
         {/* Mobile Wrapper */}
-        <div className="lg:hidden flex flex-col">
-          {sectionsNav?.map((item, index) => {
-            const linkPath = `/${item}`;
-            const isActive = isActiveLink(path, linkPath);
-
-            return (
-              <Link
-                href={linkPath}
-                key={index}
-                className={`link ${
-                  isActive ? "text-sky-500" : ""
-                } hover:text-sky-300 duration-300 text-[15px] font-medium`}
-              >
-                {capitalizeFirst(item)}
-              </Link>
-            );
-          })}
+        <div
+          className={`lg:hidden absolute top-0 mt-[57px] left-0 bg-white w-full h-screen z-50 ${
+            isBurgerOpen ? "left-0" : "left-full"
+          }`}
+        >
+          <div className="mt-auto flex flex-col gap-4 p-4">
+            {sectionsNav?.map((item, index) => {
+              const linkPath = `/${item}`;
+              const isActive = isActiveLink(path, linkPath);
+              return (
+                <Link
+                  href={linkPath}
+                  key={index}
+                  className={`link ${
+                    isActive ? "text-sky-500" : ""
+                  } hover:text-sky-300 duration-300 text-[15px] font-medium`}
+                >
+                  {capitalizeFirst(item)}
+                </Link>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
@@ -85,7 +91,9 @@ export const NavigationMenuProduct: React.FC<NavigationMenuProps> = ({
   isActiveLink,
 }) => {
   return (
-    <nav className="w-full flex items-center justify-center text-base text-neutral-700 font-semi-bold h-14">
+    <nav
+      className={`w-full flex items-center justify-center text-base text-neutral-700 font-semi-bold h-14`}
+    >
       {items
         .filter((option) => option.value !== "")
         .map((option) => {

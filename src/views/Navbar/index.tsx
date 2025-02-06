@@ -16,6 +16,7 @@ const NavbarViews = ({ serverSession }: { serverSession: any }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const dropDownAccountRef = useRef<HTMLDivElement | null>(null);
+  const [isBurgerOpen, setIsBurgerOpen] = useState(false);
 
   const handleClickAccountOutside = (e: MouseEvent) => {
     if (
@@ -60,6 +61,10 @@ const NavbarViews = ({ serverSession }: { serverSession: any }) => {
     setIsLoading(false);
   };
 
+  const handleBurgerClick = () => {
+    setIsBurgerOpen((prev) => !prev);
+  };
+
   const renderAuthButton = () => {
     return user ? (
       <UserDropDown
@@ -88,12 +93,39 @@ const NavbarViews = ({ serverSession }: { serverSession: any }) => {
               sectionsNav={getNavSections()}
               isActiveLink={isActiveLink}
               path={path}
+              isBurgerOpen={isBurgerOpen}
             />
             <div
               className="relative flex gap-2 justify-center items-center ml-auto"
               ref={dropDownAccountRef}
             >
               {renderAuthButton()}
+            </div>
+            <div className="lg:hidden hamburger-button ml-2">
+              <button
+                className="flex flex-col gap-1 justify-center items-center"
+                onClick={handleBurgerClick}
+              >
+                <div
+                  className={`w-[28px] h-[4px] bg-black rounded-sm transition-transform ${
+                    isBurgerOpen
+                      ? "rotate-45 translate-y-[7px] w-[24px] h-[3px]"
+                      : ""
+                  }`}
+                ></div>
+                <div
+                  className={`w-[30px] h-[2px] bg-black rounded-sm ${
+                    isBurgerOpen ? "opacity-0" : ""
+                  }`}
+                ></div>
+                <div
+                  className={`w-[28px] h-[4px] bg-black rounded-sm transition-transform ${
+                    isBurgerOpen
+                      ? "-rotate-45 translate-y-[-6px] w-[24px] h-[3px]"
+                      : ""
+                  }`}
+                ></div>
+              </button>
             </div>
           </nav>
         </header>
