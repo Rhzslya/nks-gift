@@ -30,7 +30,6 @@ const UserDropDown = forwardRef<HTMLDivElement, UserDropDownProps>(
           className="flex gap-1 justify-center items-center cursor-pointer"
           onClick={handleToggleDropdown}
         >
-          <span className="text-sm font-semibold">{user.username}</span>
           <div className="flex items-center bg-gray-100 p-1 rounded-full hover:bg-gray-200 duration-300 ">
             {user.profileImage ? (
               <Image

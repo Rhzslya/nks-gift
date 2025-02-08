@@ -39,6 +39,18 @@ const NavbarViews = ({ serverSession }: { serverSession: any }) => {
     };
   }, [isDropdownOpen]);
 
+  useEffect(() => {
+    if (isBurgerOpen) {
+      document.body.classList.add("overflow-hidden");
+    } else {
+      document.body.classList.remove("overflow-hidden");
+    }
+
+    return () => {
+      document.body.classList.remove("overflow-hidden");
+    };
+  }, [isBurgerOpen]);
+
   const user = session?.user || serverSession?.user;
   const getNavSections = () => {
     if (
