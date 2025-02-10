@@ -99,7 +99,7 @@ const NavbarViews = ({ serverSession }: { serverSession: any }) => {
   return (
     <>
       {!disableNavAndFooter.includes(path.split("/")[1]) && (
-        <header className="flex justify-center border-b-[1px] border-gray-300 px-6 bg-white">
+        <header className="fixed top-0  w-full flex justify-center border-b-[1px] border-gray-500 px-6 bg-transparent backdrop-blur-sm opacity-95 z-50">
           <nav className="w-[1400px] flex items-center justify-between text-base text-gray-400 font-semi-bold h-14">
             <NavLink
               sectionsNav={getNavSections()}
