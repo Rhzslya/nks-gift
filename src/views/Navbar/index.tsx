@@ -119,19 +119,19 @@ const NavbarViews = ({ serverSession }: { serverSession: any }) => {
                 onClick={handleBurgerClick}
               >
                 <div
-                  className={`bg-black rounded-sm transition-transform ${
+                  className={`bg-white rounded-sm transition-transform ${
                     isBurgerOpen
                       ? "rotate-45 translate-y-[6px] w-[24px] h-[2px]"
                       : "w-[28px] h-[3px]"
                   }`}
                 ></div>
                 <div
-                  className={`w-[30px] h-[2px] bg-black rounded-sm ${
+                  className={`w-[30px] h-[2px] bg-white rounded-sm ${
                     isBurgerOpen ? "opacity-0" : ""
                   }`}
                 ></div>
                 <div
-                  className={`bg-black rounded-sm transition-transform ${
+                  className={`bg-white rounded-sm transition-transform ${
                     isBurgerOpen
                       ? "-rotate-45 translate-y-[-6px] w-[24px] h-[2px]"
                       : "w-[28px] h-[3px]"

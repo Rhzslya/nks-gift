@@ -57,7 +57,7 @@ export const NavLink: React.FC<NavLinkProps> = ({
 
         {/* Mobile Wrapper */}
         <div
-          className={`lg:hidden fixed top-0 mt-[57px] left-0 bg-gray-600 w-full h-screen z-50 transform transition-transform duration-300 ${
+          className={`lg:hidden fixed top-0 mt-[57px] left-0 bg-white opacity-100 w-full h-screen transform transition-transform duration-300 ${
             isBurgerOpen ? "translate-x-0" : "translate-x-full"
           }`}
         >

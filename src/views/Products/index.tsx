@@ -81,8 +81,8 @@ const ProductsViews = ({
   };
 
   return (
-    <div className="max-w-[1400px] m-auto flex flex-col main-w-header ">
-      <div className="flex justify-center px-6 bg-white">
+    <main className="my-14 max-w-[1400px] m-auto flex flex-col main-w-header ">
+      <div className="flex justify-center px-6 ">
         <NavigationMenuProduct
           items={[
             { value: "new-featured", label: "New & Featured" },
@@ -313,7 +313,7 @@ const ProductsViews = ({
           setCurrentPage={setCurrentPage}
         />
       </div>
-    </div>
+    </main>
   );
 };
 
