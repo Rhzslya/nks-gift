@@ -45,7 +45,11 @@ export default function RootLayout({
           rel="stylesheet"
         ></link>
       </head>
-      <body className={(poppins.className, "bg-black/95")}>
+      <body
+        className={
+          (poppins.className, "antialiased text-gray-400 background-main")
+        }
+      >
         <AuthProviders>
           <Navbar />
           {children}

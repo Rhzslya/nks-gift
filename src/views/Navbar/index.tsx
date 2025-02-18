@@ -9,6 +9,10 @@ import AuthButton from "@/components/Button/AuthButton";
 import { NavLink } from "@/components/NavLink";
 import UserDropDown from "@/components/UserDropDown";
 import { disableNavAndFooter } from "@/utils/Hide";
+import RandomRunningDot from "@/components/RandomRunningDot";
+import HamburgerMenu from "@/components/HamburgerMenu";
+import Link from "next/link";
+import { capitalizeFirst } from "@/utils/Capitalize";
 
 const NavbarViews = ({ serverSession }: { serverSession: any }) => {
   const path = usePathname();
@@ -62,6 +66,7 @@ const NavbarViews = ({ serverSession }: { serverSession: any }) => {
     }
     return sectionsNav;
   };
+  const navSections = getNavSections();
 
   useEffect(() => {
     setIsDropdownOpen(false);
@@ -99,46 +104,60 @@ const NavbarViews = ({ serverSession }: { serverSession: any }) => {
   return (
     <>
       {!disableNavAndFooter.includes(path.split("/")[1]) && (
-        <header className="fixed top-0  w-full flex justify-center border-b-[1px] border-gray-500 px-6 bg-transparent backdrop-blur-sm opacity-95 z-50">
+        <header
+          className={`header fixed top-0 w-full flex justify-center px-6 bg-transparent backdrop-blur-sm z-50`}
+        >
+          <RandomRunningDot />
           <nav className="w-[1400px] flex items-center justify-between text-base text-gray-400 font-semi-bold h-14">
-            <NavLink
-              sectionsNav={getNavSections()}
-              isActiveLink={isActiveLink}
-              path={path}
-              isBurgerOpen={isBurgerOpen}
-            />
+            <div className="sections_link ml-auto">
+              <div className="hidden lg:flex gap-8">
+                {navSections?.map((item, index) => {
+                  const linkPath = `/${item}`;
+                  return (
+                    <Link
+                      href={linkPath}
+                      key={index}
+                      className="relative group hover:text-white duration-300 text-base font-medium"
+                    >
+                      {capitalizeFirst(item)}
+                      <span className="absolute left-0 bottom-0 w-full h-[1px] bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+            <div
+              className={`navbar-mobile lg:hidden fixed top-0 mt-[63px] background-main left-0 w-full h-screen transform transition-transform duration-300 ${
+                isBurgerOpen ? "translate-x-0" : "translate-x-full"
+              }`}
+            >
+              <div className="mt-auto flex flex-col gap-4 p-6">
+                {navSections?.map((item, index) => {
+                  const linkPath = `/${item}`;
+                  return (
+                    <Link
+                      href={linkPath}
+                      key={index}
+                      className="relative group hover:text-white duration-300 text-base font-medium"
+                    >
+                      {capitalizeFirst(item)}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
             <div
               className="relative flex gap-2 justify-center items-center ml-auto"
               ref={dropDownAccountRef}
             >
               {renderAuthButton()}
             </div>
-            <div className="lg:hidden hamburger-button ml-2">
-              <button
-                className="flex flex-col gap-1 justify-center items-center"
-                onClick={handleBurgerClick}
-              >
-                <div
-                  className={`bg-white rounded-sm transition-transform ${
-                    isBurgerOpen
-                      ? "rotate-45 translate-y-[6px] w-[24px] h-[2px]"
-                      : "w-[28px] h-[3px]"
-                  }`}
-                ></div>
-                <div
-                  className={`w-[30px] h-[2px] bg-white rounded-sm ${
-                    isBurgerOpen ? "opacity-0" : ""
-                  }`}
-                ></div>
-                <div
-                  className={`bg-white rounded-sm transition-transform ${
-                    isBurgerOpen
-                      ? "-rotate-45 translate-y-[-6px] w-[24px] h-[2px]"
-                      : "w-[28px] h-[3px]"
-                  }`}
-                ></div>
-              </button>
-            </div>
+            {
+              <HamburgerMenu
+                handleBurgerClick={handleBurgerClick}
+                isBurgerOpen={isBurgerOpen}
+              />
+            }
           </nav>
         </header>
       )}

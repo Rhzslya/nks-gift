@@ -3,9 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --background-main: #070606;
+  --foreground: #776b6b;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -17,6 +16,19 @@
 }
 
 body {
+}
+
+@keyframes running-dot {
+  0% {
+    left: 0;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+.animate-running-dot {
+  animation: running-dot 4s linear infinite;
 }
 
 .shadow-right {
@@ -42,6 +54,10 @@ input[type="number"] {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+.background-main {
+  background-color: var(--background-main);
 }
 
 .container-crop {
